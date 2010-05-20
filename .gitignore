@@ -1,0 +1,4 @@
+# Exclude all config files.
+*.conf
+
+*.pyc
