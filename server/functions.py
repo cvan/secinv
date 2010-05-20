@@ -20,7 +20,8 @@ class ServerFunctions:
         import MySQLdb
 
 
-        db = MySQLdb.connect(host=DB_LOGIN['host'], user=DB_LOGIN['user'],
+        db = MySQLdb.connect(host=DB_LOGIN['host'],
+                             user=DB_LOGIN['user'],
                              passwd=DB_LOGIN['passwd'],
                              db=DB_LOGIN['db'])
         self.cursor = db.cursor()
@@ -49,12 +50,15 @@ class ServerFunctions:
         count = int(count[0])
         if count:
             # TODO: Check if the assets values have changed.
+
+            # INSERT INTO assets_checkin.
+
             '''
             self.cursor.execute("""UPDATE assets sys_name = '%s',
-                                   kernel_ver = '%s', rh_rel = '%s',
+                                   kernel_rel = '%s', rh_rel = '%s',
                                    WHERE sysip = '%s'""" %
                                 (assets_dict['hostname'],
-                                 assets_dict['kernel_ver'],
+                                 assets_dict['kernel_rel'],
                                  assets_dict['rh_rel'],
                                  self.asset_ip))
             '''
@@ -62,14 +66,14 @@ class ServerFunctions:
 
         # TODO: 'ext_ip' ?
         self.cursor.execute("""INSERT INTO assets (date_added, sysname, sysip,
-                          httpd, mysqld, openvpn, kernel_ver, rh_rel)
+                          httpd, mysqld, openvpn, kernel_rel, rh_rel)
                           VALUES (NOW(), '%s', '%s', '%s', '%s', '%s', '%s', '%s')""" %
                        (assets_dict['hostname'],
                         self.asset_ip,
                         assets_dict['httpd'],
                         assets_dict['mysqld'],
                         assets_dict['openvpn'],
-                        assets_dict['kernel_ver'],
+                        assets_dict['kernel_rel'],
                         assets_dict['rh_rel']))
 
 
@@ -150,4 +154,13 @@ class ServerFunctions:
         print "\nInserted into mounts:", mounts_dict
 
         return True
+
+    def rpms(self, rpms_dict):
+        if not self.is_authenticated:
+            return False
+
+        print "\nInserted into rpms:", rpms_dict
+
+        return True
+
 
