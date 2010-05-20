@@ -1,0 +1,5 @@
+# Exclude all config files.
+*.conf
+
+# All python compiled files.
+*.pyc
