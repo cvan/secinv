@@ -1,7 +1,3 @@
-"""
-SecureXMLRPCServer.py - simple XML-RPC server using SSL.
-"""
-
 from ConfigParser import ConfigParser
 
 # Parse server.conf for server settings and database credentials.
