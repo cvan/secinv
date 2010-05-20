@@ -123,7 +123,7 @@ def process(HandlerClass=SecureXMLRPCRequestHandler,
     Process XML-RPC commands over HTTPS server.
     """
 
-    from processor import ServerFunctions
+    from functions import ServerFunctions
 
     # Initialize server.
     server_address = (LISTEN_HOST, int(LISTEN_PORT))
