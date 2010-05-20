@@ -143,3 +143,11 @@ class ServerFunctions:
 
         return True
 
+    def mounts(self, mounts_dict):
+        if not self.is_authenticated:
+            return False
+
+        print "\nInserted into mounts:", mounts_dict
+
+        return True
+

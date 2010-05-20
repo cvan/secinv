@@ -8,7 +8,7 @@ server_config = ConfigParser()
 try:
     server_config.readfp(file(SERVER_CONFIG_FN))
 except IOError:
-    sys.exit("\n\tError: Cannot open server configuration file '%s'\n"
+    sys.exit("Error: Cannot open server configuration file '%s'"
              % SERVER_CONFIG_FN)
 
 AUTH_KEY = server_config.get('server', 'auth_key')
