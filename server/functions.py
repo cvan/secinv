@@ -15,6 +15,11 @@ class ServerFunctions:
     #def connect_database(self, DB_LOGIN):
         import MySQLdb
 
+        # To suppress MySQLdb DeprecationWarning.
+        import warnings
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
         db = MySQLdb.connect(host=DB_LOGIN['host'], user=DB_LOGIN['user'],
                              passwd=DB_LOGIN['passwd'],
                              db=DB_LOGIN['db'])

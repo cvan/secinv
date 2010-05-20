@@ -1,4 +1,5 @@
 from ConfigParser import ConfigParser
+import sys
 
 # Parse server.conf for server settings and database credentials.
 SERVER_CONFIG_FN = 'server.conf'
