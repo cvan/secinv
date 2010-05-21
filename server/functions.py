@@ -18,12 +18,13 @@ class ServerFunctions:
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         import MySQLdb
-
+        import MySQLdb.cursors
 
         db = MySQLdb.connect(host=DB_LOGIN['host'],
                              user=DB_LOGIN['user'],
                              passwd=DB_LOGIN['passwd'],
-                             db=DB_LOGIN['db'])
+                             db=DB_LOGIN['db'],
+                             cursorclass=MySQLdb.cursors.DictCursor)
         self.cursor = db.cursor()
 
     def authenticate(self, auth_key):
@@ -40,41 +41,61 @@ class ServerFunctions:
         if not self.is_authenticated:
             return False
 
-        '''
-        TODO: Do this only if baseline not set.
-        '''
-
-        self.cursor.execute("""SELECT COUNT(*) FROM assets
-                               WHERE sysip = '%s'""" % self.asset_ip)
+        self.cursor.execute("""SELECT COUNT(*) as c FROM history
+                               WHERE asset_ip = '%s'""" % self.asset_ip)
         count = self.cursor.fetchone()
-        count = int(count[0])
+        count = int(count['c'])
         if count:
-            # TODO: Check if the assets values have changed.
+            # Update 'date_scanned' field for this system.
+            self.cursor.execute("""UPDATE history SET date_scanned = NOW()
+                                   WHERE asset_ip = '%s'""" % self.asset_ip)
+        else:
+            # Add a row for this system.
+            self.cursor.execute("""INSERT INTO history (asset_ip, date_scanned)
+                                   VALUES ('%s', NOW())""" % self.asset_ip)
 
-            # INSERT INTO assets_checkin.
 
+        self.cursor.execute("""SELECT COUNT(*) as c, hostname, httpd, mysqld,
+                               openvpn, kernel_rel, rh_rel FROM assets
+                               WHERE sysip = '%s'""" % self.asset_ip)
+        assets_row = self.cursor.fetchone()
+        count = int(assets_row['c'])
+        if count:
             '''
-            self.cursor.execute("""UPDATE assets sys_name = '%s',
-                                   kernel_rel = '%s', rh_rel = '%s',
+            self.cursor.execute("""UPDATE assets SET hostname = '%s',
+                                   httpd = '%s', mysqld = '%s', openvpn = '%s',
+                                   kernel_rel = '%s', rh_rel = '%s'
                                    WHERE sysip = '%s'""" %
                                 (assets_dict['hostname'],
+                                 assets_dict['httpd'],
+                                 assets_dict['mysqld'],
+                                 assets_dict['openvpn'],
                                  assets_dict['kernel_rel'],
                                  assets_dict['rh_rel'],
                                  self.asset_ip))
             '''
-        #else:
 
-        # TODO: 'ext_ip' ?
-        self.cursor.execute("""INSERT INTO assets (date_added, sysname, sysip,
-                          httpd, mysqld, openvpn, kernel_rel, rh_rel)
-                          VALUES (NOW(), '%s', '%s', '%s', '%s', '%s', '%s', '%s')""" %
-                       (assets_dict['hostname'],
-                        self.asset_ip,
-                        assets_dict['httpd'],
-                        assets_dict['mysqld'],
-                        assets_dict['openvpn'],
-                        assets_dict['kernel_rel'],
-                        assets_dict['rh_rel']))
+            is_same = False
+            del assets_row['c']
+            for k, old_v in assets_row.iteritems():
+                if assets_dict[k] == old_v:
+                    is_same = True
+
+            # Insert a row only if the assets values have changed.
+            if not is_same:
+                # TODO: 'ext_ip'?
+                self.cursor.execute("""INSERT INTO assets (date_added, hostname,
+                                       sysip, httpd, mysqld, openvpn,
+                                       kernel_rel, rh_rel)
+                                       VALUES (NOW(), '%s', '%s', '%s', '%s', '%s',
+                                       '%s', '%s')""" %
+                                    (assets_dict['hostname'],
+                                     self.asset_ip,
+                                     assets_dict['httpd'],
+                                     assets_dict['mysqld'],
+                                     assets_dict['openvpn'],
+                                     assets_dict['kernel_rel'],
+                                     assets_dict['rh_rel']))
 
 
         print "\nInserted into assets:", assets_dict
@@ -111,10 +132,10 @@ class ServerFunctions:
                 continue
 
             # If already exists in table, update row(s) accordingly.
-            self.cursor.execute("""SELECT COUNT(*) FROM assets_ip
-                              WHERE asset_ip = '%s'""" % asset_ip)
+            self.cursor.execute("""SELECT COUNT(*) as c FROM assets_ip
+                                   WHERE asset_ip = '%s'""" % asset_ip)
             count = self.cursor.fetchone()
-            count = int(count[0])
+            count = int(count['c'])
             if count:
                 # TODO: Check if the values have changed.
                 '''
@@ -133,7 +154,8 @@ class ServerFunctions:
                                   VALUES ('%s', '%s', '%s', '%s', '%s')""" %
                                (asset_ip,
                                 interface,
-                                assets_ip_dict[interface]['i_ip'] if interface[0:3] != 'eth' else '',
+                                assets_ip_dict[interface]['i_ip'] if \
+                                interface[0:3] != 'eth' else '',
                                 assets_ip_dict[interface]['i_mac'],
                                 assets_ip_dict[interface]['i_mask']))
 
@@ -159,7 +181,7 @@ class ServerFunctions:
         if not self.is_authenticated:
             return False
 
-        print "\nInserted into rpms:", rpms_dict
+        print "\nInserted into rpms:" #, rpms_dict
 
         return True
 
