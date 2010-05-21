@@ -22,19 +22,22 @@ class ServerFunctions:
         import warnings
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+        self.cursor = None
 
-        import MySQLdb
-        import MySQLdb.cursors
+        # TODO: add support for other DB engines
+        if DB_LOGIN['engine'] == 'mysql':
+            import MySQLdb
+            import MySQLdb.cursors
 
 
-        #self.connection = DBConnect()
+            #self.connection = DBConnect()
 
-        db = MySQLdb.connect(host=DB_LOGIN['host'],
-                             user=DB_LOGIN['user'],
-                             passwd=DB_LOGIN['passwd'],
-                             db=DB_LOGIN['db'],
-                             cursorclass=MySQLdb.cursors.DictCursor)
-        self.cursor = db.cursor()
+            db = MySQLdb.connect(host=DB_LOGIN['host'],
+                                 user=DB_LOGIN['user'],
+                                 passwd=DB_LOGIN['passwd'],
+                                 db=DB_LOGIN['db'],
+                                 cursorclass=MySQLdb.cursors.DictCursor)
+            self.cursor = db.cursor()
 
     def authenticate(self, auth_key):
         '''
@@ -65,7 +68,7 @@ class ServerFunctions:
 
 
         self.cursor.execute("""SELECT COUNT(*) as c, hostname, httpd, mysqld,
-                               openvpn, kernel_rel, rh_rel FROM assets
+                               openvpn, nfs, kernel_rel, rh_rel FROM assets
                                WHERE sysip = '%s'""" % self.asset_ip)
         assets_row = self.cursor.fetchone()
         count = int(assets_row['c'])
@@ -75,12 +78,13 @@ class ServerFunctions:
             '''
             self.cursor.execute("""UPDATE assets SET hostname = '%s',
                                    httpd = '%s', mysqld = '%s', openvpn = '%s',
-                                   kernel_rel = '%s', rh_rel = '%s'
+                                   nfs = '%s', kernel_rel = '%s', rh_rel = '%s'
                                    WHERE sysip = '%s'""" %
                                 (assets_dict['hostname'],
                                  assets_dict['httpd'],
                                  assets_dict['mysqld'],
                                  assets_dict['openvpn'],
+                                 assets_dict['nfs'],
                                  assets_dict['kernel_rel'],
                                  assets_dict['rh_rel'],
                                  self.asset_ip))
@@ -95,7 +99,7 @@ class ServerFunctions:
         if not is_same:
             # TODO: 'ext_ip'?
             self.cursor.execute("""INSERT INTO assets (date_added, hostname,
-                                   sysip, httpd, mysqld, openvpn,
+                                   sysip, httpd, mysqld, openvpn, nfs,
                                    kernel_rel, rh_rel)
                                    VALUES (NOW(), '%s', '%s', '%s', '%s', '%s',
                                    '%s', '%s')""" %
@@ -104,6 +108,7 @@ class ServerFunctions:
                                  assets_dict['httpd'],
                                  assets_dict['mysqld'],
                                  assets_dict['openvpn'],
+                                 assets_dict['nfs'],
                                  assets_dict['kernel_rel'],
                                  assets_dict['rh_rel']))
 
@@ -177,14 +182,6 @@ class ServerFunctions:
 
         return True
 
-    def mounts(self, mounts_dict):
-        if not self.is_authenticated:
-            return False
-
-        print "\nInserted into mounts:", mounts_dict
-
-        return True
-
     def rpms(self, rpms_dict):
         if not self.is_authenticated:
             return False
@@ -193,3 +190,21 @@ class ServerFunctions:
 
         return True
 
+    def ports(self, ports_dict):
+        if not self.is_authenticated:
+            return False
+
+        print "\nInserted into ports:", ports_dict
+
+        # Clear all ports from last scan for this asset_ip.
+        # TODO: Do not delete if unchanged.
+        self.cursor.execute("""DELETE FROM assets_ports WHERE asset_ip = '%s'""" %
+                            self.asset_ip)
+
+        for k, v in ports_dict.iteritems():
+            self.cursor.execute("""INSERT INTO assets_ports (asset_ip, process,
+                                   port, date_added)
+                                   VALUES ('%s', '%s', '%s', NOW())""" %
+                                (self.asset_ip, k, v))
+
+        return True

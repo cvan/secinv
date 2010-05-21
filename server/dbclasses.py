@@ -32,7 +32,7 @@ if DB_LOGIN['engine'] == 'mysql':
 
 class Asset(sqlobject.SQLObject):
     _connection = connection
-    _connection.debug = True
+    #_connection.debug = True
     #number = sqlobject.StringCol(length=14, unique=True)
     hostname = sqlobject.StringCol(length=255)
     sysip = sqlobject.StringCol(length=15)
@@ -48,13 +48,15 @@ class Asset(sqlobject.SQLObject):
 
 #Asset.dropTable()
 Asset.createTable(ifNotExists=True)
+
+'''
 assets = Asset.select()
 asset_count = assets.count()
-
+'''
 
 class AssetIp(sqlobject.SQLObject):
     _connection = connection
-    _connection.debug = True
+    #_connection.debug = True
     asset = sqlobject.ForeignKey('Asset')
     i_name = sqlobject.StringCol(length=255)
     i_ip = sqlobject.StringCol(length=15)
@@ -81,7 +83,7 @@ print asset_ip_count
 '''
 class AssetPort(sqlobject.SQLObject):
     _connection = connection
-    _connection.debug = True
+    #_connection.debug = True
     asset = sqlobject.ForeignKey('Asset')
 
     # TODO: processes, ports
@@ -98,7 +100,7 @@ AssetPort.createTable(ifNotExists=True)
 
 class ScanHistory(sqlobject.SQLObject):
     _connection = connection
-    _connection.debug = True
+    #_connection.debug = True
     asset = sqlobject.ForeignKey('Asset')
     date_scanned = sqlobject.DateTimeCol(default=None)
 
