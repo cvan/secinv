@@ -1,5 +1,10 @@
 #!/usr/bin/python26
 
+#import sqlobject
+from dbclasses import *
+
+# TODO: generate auth_keys and remove DB_LOGIN
+
 class ServerFunctions:
     def __init__(self, AUTH_KEY, DB_LOGIN):
         self.data = None
@@ -17,8 +22,12 @@ class ServerFunctions:
         import warnings
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+
         import MySQLdb
         import MySQLdb.cursors
+
+
+        #self.connection = DBConnect()
 
         db = MySQLdb.connect(host=DB_LOGIN['host'],
                              user=DB_LOGIN['user'],
@@ -60,6 +69,8 @@ class ServerFunctions:
                                WHERE sysip = '%s'""" % self.asset_ip)
         assets_row = self.cursor.fetchone()
         count = int(assets_row['c'])
+        is_same = False
+
         if count:
             '''
             self.cursor.execute("""UPDATE assets SET hostname = '%s',
@@ -75,27 +86,26 @@ class ServerFunctions:
                                  self.asset_ip))
             '''
 
-            is_same = False
             del assets_row['c']
             for k, old_v in assets_row.iteritems():
                 if assets_dict[k] == old_v:
                     is_same = True
 
-            # Insert a row only if the assets values have changed.
-            if not is_same:
-                # TODO: 'ext_ip'?
-                self.cursor.execute("""INSERT INTO assets (date_added, hostname,
-                                       sysip, httpd, mysqld, openvpn,
-                                       kernel_rel, rh_rel)
-                                       VALUES (NOW(), '%s', '%s', '%s', '%s', '%s',
-                                       '%s', '%s')""" %
-                                    (assets_dict['hostname'],
-                                     self.asset_ip,
-                                     assets_dict['httpd'],
-                                     assets_dict['mysqld'],
-                                     assets_dict['openvpn'],
-                                     assets_dict['kernel_rel'],
-                                     assets_dict['rh_rel']))
+        # Insert a row only if the assets values have changed.
+        if not is_same:
+            # TODO: 'ext_ip'?
+            self.cursor.execute("""INSERT INTO assets (date_added, hostname,
+                                   sysip, httpd, mysqld, openvpn,
+                                   kernel_rel, rh_rel)
+                                   VALUES (NOW(), '%s', '%s', '%s', '%s', '%s',
+                                   '%s', '%s')""" %
+                                (assets_dict['hostname'],
+                                 self.asset_ip,
+                                 assets_dict['httpd'],
+                                 assets_dict['mysqld'],
+                                 assets_dict['openvpn'],
+                                 assets_dict['kernel_rel'],
+                                 assets_dict['rh_rel']))
 
 
         print "\nInserted into assets:", assets_dict
@@ -122,7 +132,8 @@ class ServerFunctions:
                 self.asset_ip = asset_ip
 
         for interface in assets_ip_dict.keys():
-            if assets_ip_dict[interface]['i_mac'] in ('00:00:00:00', '00:00:00:00:00:00'):
+            if assets_ip_dict[interface]['i_mac'] in ('00:00:00:00',
+                                                      '00:00:00:00:00:00'):
                 assets_ip_dict[interface]['i_mac'] = ''
 
             # If all fields are empty, do not insert a row for inactive device.
@@ -134,30 +145,27 @@ class ServerFunctions:
             # If already exists in table, update row(s) accordingly.
             self.cursor.execute("""SELECT COUNT(*) as c FROM assets_ip
                                    WHERE asset_ip = '%s'""" % asset_ip)
-            count = self.cursor.fetchone()
-            count = int(count['c'])
+            assets_ip_row = self.cursor.fetchone()
+            count = int(assets_ip_row['c'])
+
+            is_same = False
             if count:
-                # TODO: Check if the values have changed.
-                '''
-                self.cursor.execute("""UPDATE assets_ip asset_ip = '%s',
-                                  i_name = '%s', i_ip = '%s', i_mac = '%s',
-                                  i_mask = '%s' WHERE asset_ip = '%s'""" %
-                               (interface,
-                                assets_ip_dict[interface]['i_ip'] if interface[0:3] != 'eth' else '',
-                                assets_ip_dict[interface]['i_mac'],
-                                assets_ip_dict[interface]['i_mask'],
-                                asset_ip))
-                '''
-            #else:
+                del assets_ip_row['c']
+                for k, old_v in assets_ip_row.iteritems():
+                    if assets_ip_dict[k] == old_v:
+                        is_same = True
+
+            if not is_same:
+                # Insert a row only if the assets_ip values have changed.
                 self.cursor.execute("""INSERT INTO assets_ip (asset_ip, i_name,
-                                  i_ip, i_mac, i_mask)
+                                 i_ip, i_mac, i_mask)
                                   VALUES ('%s', '%s', '%s', '%s', '%s')""" %
-                               (asset_ip,
-                                interface,
-                                assets_ip_dict[interface]['i_ip'] if \
-                                interface[0:3] != 'eth' else '',
-                                assets_ip_dict[interface]['i_mac'],
-                                assets_ip_dict[interface]['i_mask']))
+                                   (asset_ip,
+                                    interface,
+                                    assets_ip_dict[interface]['i_ip'] if \
+                                    interface[0:3] != 'eth' else '',
+                                    assets_ip_dict[interface]['i_mac'],
+                                    assets_ip_dict[interface]['i_mask']))
 
         print "\nInserted into assets_ip:", assets_ip_dict
 
@@ -184,5 +192,4 @@ class ServerFunctions:
         print "\nInserted into rpms:" #, rpms_dict
 
         return True
-
 

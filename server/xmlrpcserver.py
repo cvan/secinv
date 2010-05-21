@@ -19,7 +19,8 @@ LISTEN_PORT = server_config.get('server', 'listen_port')
 KEY_FILE = server_config.get('server', 'key_file')
 CERT_FILE = server_config.get('server', 'cert_file')
 
-DB_LOGIN = {'host': server_config.get('db', 'host'),
+DB_LOGIN = {'engine': server_config.get('db', 'engine'),
+            'host': server_config.get('db', 'host'),
             'user': server_config.get('db', 'user'),
             'passwd': server_config.get('db', 'passwd'),
             'db': server_config.get('db', 'db')}
