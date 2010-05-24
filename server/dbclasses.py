@@ -47,7 +47,7 @@ class Asset(sqlobject.SQLObject):
     date_added = sqlobject.DateTimeCol(default=None)
 
 #Asset.dropTable()
-Asset.createTable(ifNotExists=True)
+#Asset.createTable(ifNotExists=True)
 
 '''
 assets = Asset.select()
@@ -64,7 +64,7 @@ class AssetIp(sqlobject.SQLObject):
     i_mac = sqlobject.StringCol(length=255)
 
 #AssetIp.dropTable()
-AssetIp.createTable(ifNotExists=True)
+#AssetIp.createTable(ifNotExists=True)
 
 '''
 
@@ -95,7 +95,7 @@ class AssetPort(sqlobject.SQLObject):
 
     # TODO: Empty database upon every scan. (?)
 
-AssetPort.createTable(ifNotExists=True)
+#AssetPort.createTable(ifNotExists=True)
 
 
 class ScanHistory(sqlobject.SQLObject):
@@ -104,7 +104,7 @@ class ScanHistory(sqlobject.SQLObject):
     asset = sqlobject.ForeignKey('Asset')
     date_scanned = sqlobject.DateTimeCol(default=None)
 
-ScanHistory.createTable(ifNotExists=True)
+#ScanHistory.createTable(ifNotExists=True)
 
 
 

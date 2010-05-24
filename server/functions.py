@@ -7,17 +7,14 @@ from dbclasses import *
 
 class ServerFunctions:
     def __init__(self, AUTH_KEY, DB_LOGIN):
-        self.data = None
-        self.asset_ip = '0.0.0.0'
+        self.machine_ip = '0.0.0.0'
+        self.machine_id = 0
         self.auth_key = AUTH_KEY
         self.is_authenticated = False
 
         # Create logger.
         #self.logger = logging.getLogger("secinv")
 
-        #self.connect_database(DB_LOGIN)
-
-    #def connect_database(self, DB_LOGIN):
         # To suppress MySQLdb DeprecationWarning.
         import warnings
         warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -28,7 +25,6 @@ class ServerFunctions:
         if DB_LOGIN['engine'] == 'mysql':
             import MySQLdb
             import MySQLdb.cursors
-
 
             #self.connection = DBConnect()
 
@@ -54,22 +50,23 @@ class ServerFunctions:
             return False
 
         self.cursor.execute("""SELECT COUNT(*) as c FROM history
-                               WHERE asset_ip = '%s'""" % self.asset_ip)
+                               WHERE machine_id = '%s'""" % self.machine_id)
         count = self.cursor.fetchone()
         count = int(count['c'])
+
         if count:
             # Update 'date_scanned' field for this system.
             self.cursor.execute("""UPDATE history SET date_scanned = NOW()
-                                   WHERE asset_ip = '%s'""" % self.asset_ip)
+                                   WHERE machine_id = '%s'""" % self.machine_id)
         else:
             # Add a row for this system.
-            self.cursor.execute("""INSERT INTO history (asset_ip, date_scanned)
-                                   VALUES ('%s', NOW())""" % self.asset_ip)
+            self.cursor.execute("""INSERT INTO history (machine_id, date_scanned)
+                                   VALUES ('%s', NOW())""" % self.machine_id)
 
 
         self.cursor.execute("""SELECT COUNT(*) as c, hostname, httpd, mysqld,
                                openvpn, nfs, kernel_rel, rh_rel FROM assets
-                               WHERE sysip = '%s'""" % self.asset_ip)
+                               WHERE machine_id = '%s'""" % self.machine_id)
         assets_row = self.cursor.fetchone()
         count = int(assets_row['c'])
         is_same = False
@@ -79,7 +76,7 @@ class ServerFunctions:
             self.cursor.execute("""UPDATE assets SET hostname = '%s',
                                    httpd = '%s', mysqld = '%s', openvpn = '%s',
                                    nfs = '%s', kernel_rel = '%s', rh_rel = '%s'
-                                   WHERE sysip = '%s'""" %
+                                   WHERE sys_ip = '%s'""" %
                                 (assets_dict['hostname'],
                                  assets_dict['httpd'],
                                  assets_dict['mysqld'],
@@ -98,13 +95,13 @@ class ServerFunctions:
         # Insert a row only if the assets values have changed.
         if not is_same:
             # TODO: 'ext_ip'?
-            self.cursor.execute("""INSERT INTO assets (date_added, hostname,
-                                   sysip, httpd, mysqld, openvpn, nfs,
-                                   kernel_rel, rh_rel)
-                                   VALUES (NOW(), '%s', '%s', '%s', '%s', '%s',
-                                   '%s', '%s')""" %
+            self.cursor.execute("""INSERT INTO assets (hostname,
+                                   machine_id, httpd, mysqld, openvpn, nfs,
+                                   kernel_rel, rh_rel, date_added)
+                                   VALUES ('%s', '%s', '%s', '%s', '%s',
+                                   '%s', '%s', '%s', NOW())""" %
                                 (assets_dict['hostname'],
-                                 self.asset_ip,
+                                 self.machine_id,
                                  assets_dict['httpd'],
                                  assets_dict['mysqld'],
                                  assets_dict['openvpn'],
@@ -128,20 +125,37 @@ class ServerFunctions:
         if not self.is_authenticated:
             return False
 
-        # TODO: Check if exists: insert or update.
-
-        asset_ip = '0.0.0.0'
+        # Get the machine IP address as the first ethernet interface.
         for interface in assets_ip_dict.keys():
             if interface[0:3] == 'eth':
-                asset_ip = assets_ip_dict[interface]['i_ip']
-                self.asset_ip = asset_ip
+                self.machine_ip = assets_ip_dict[interface]['i_ip']
+                break
+
+        self.cursor.execute("""SELECT id FROM machines
+                               WHERE sys_ip = '%s'""" % self.machine_ip)
+        machines_row = self.cursor.fetchone()
+        if machines_row:
+            self.machine_id = int(machines_row['id'])
+
+        # Add machine if not already in database table.
+        if not self.machine_id:
+            self.cursor.execute("""INSERT INTO machines (sys_ip, date_added)
+                                   VALUES ('%s', NOW())""" % self.machine_ip)
+
+            self.cursor.execute("""SELECT id FROM machines
+                                   WHERE sys_ip = '%s'""" % self.machine_ip)
+            machines_row = self.cursor.fetchone()
+            if machines_row:
+                self.machine_id = int(machines_row['id'])
+
 
         for interface in assets_ip_dict.keys():
             if assets_ip_dict[interface]['i_mac'] in ('00:00:00:00',
                                                       '00:00:00:00:00:00'):
                 assets_ip_dict[interface]['i_mac'] = ''
 
-            # If all fields are empty, do not insert a row for inactive device.
+            # If all fields are empty, then device is inactive -- so do not
+            # insert a row.
             if assets_ip_dict[interface]['i_ip'] == '' and \
                assets_ip_dict[interface]['i_mac'] == '' and \
                assets_ip_dict[interface]['i_mask'] == '':
@@ -149,7 +163,7 @@ class ServerFunctions:
 
             # If already exists in table, update row(s) accordingly.
             self.cursor.execute("""SELECT COUNT(*) as c FROM assets_ip
-                                   WHERE asset_ip = '%s'""" % asset_ip)
+                                   WHERE machine_id = '%s'""" % self.machine_id)
             assets_ip_row = self.cursor.fetchone()
             count = int(assets_ip_row['c'])
 
@@ -157,18 +171,19 @@ class ServerFunctions:
             if count:
                 del assets_ip_row['c']
                 for k, old_v in assets_ip_row.iteritems():
+                    print k, '===>', old_v
                     if assets_ip_dict[k] == old_v:
                         is_same = True
 
             if not is_same:
                 # Insert a row only if the assets_ip values have changed.
-                self.cursor.execute("""INSERT INTO assets_ip (asset_ip, i_name,
-                                 i_ip, i_mac, i_mask)
+                self.cursor.execute("""INSERT INTO assets_ip (machine_id, i_name,
+                                       i_ip, i_mac, i_mask)
                                   VALUES ('%s', '%s', '%s', '%s', '%s')""" %
-                                   (asset_ip,
+                                   (self.machine_id,
                                     interface,
-                                    assets_ip_dict[interface]['i_ip'] if \
-                                    interface[0:3] != 'eth' else '',
+                                    assets_ip_dict[interface]['i_ip'] \
+                                    if interface[0:3] != 'eth' else '',
                                     assets_ip_dict[interface]['i_mac'],
                                     assets_ip_dict[interface]['i_mask']))
 
@@ -186,7 +201,27 @@ class ServerFunctions:
         if not self.is_authenticated:
             return False
 
-        print "\nInserted into rpms:" #, rpms_dict
+        #print "\nInserted into rpms:", rpms_dict
+
+        self.cursor.execute("""SELECT COUNT(*) as c FROM assets_rpms
+                               WHERE machine_id = '%s'""" % self.machine_id)
+        assets_rpms_row = self.cursor.fetchone()
+        count = int(assets_rpms_row['c'])
+
+        if count:
+            # Update all rpms from last scan for this machine_id.
+            self.cursor.execute("""UPDATE assets_rpms SET rpms = '%s',
+                                   date_updated = NOW()
+                                   WHERE machine_id = '%s'""" %
+                                (MySQLdb.escape_string(rpms_dict['serialized']),
+                                 self.machine_id))
+        else:
+            # If this machine doesn't have a rpms row, create one.
+            self.cursor.execute("""INSERT INTO assets_rpms (machine_id, rpms,
+                                   date_added)
+                                   VALUES ('%s', '%s', NOW())""" %
+                                (self.machine_id,
+                                 MySQLdb.escape_string(rpms_dict['serialized'])))
 
         return True
 
@@ -196,15 +231,26 @@ class ServerFunctions:
 
         print "\nInserted into ports:", ports_dict
 
-        # Clear all ports from last scan for this asset_ip.
-        # TODO: Do not delete if unchanged.
-        self.cursor.execute("""DELETE FROM assets_ports WHERE asset_ip = '%s'""" %
-                            self.asset_ip)
+        csv_procs = ','.join(ports_dict.keys())
+        csv_ports = ','.join(ports_dict.values())
 
-        for k, v in ports_dict.iteritems():
-            self.cursor.execute("""INSERT INTO assets_ports (asset_ip, process,
-                                   port, date_added)
+        self.cursor.execute("""SELECT COUNT(*) as c FROM assets_ports
+                               WHERE machine_id = '%s'""" % self.machine_id)
+        assets_ports_row = self.cursor.fetchone()
+        count = int(assets_ports_row['c'])
+
+        if count:
+            # Update all ports from last scan for this machine_id.
+            self.cursor.execute("""UPDATE assets_ports SET processes = '%s',
+                                   ports = '%s', date_updated = NOW()
+                                   WHERE machine_id = '%s'""" %
+                                (csv_procs, csv_ports, self.machine_id))
+        else:
+            # If this machine doesn't have a ports row, create one.
+            self.cursor.execute("""INSERT INTO assets_ports (machine_id, processes,
+                                   ports, date_added)
                                    VALUES ('%s', '%s', '%s', NOW())""" %
-                                (self.asset_ip, k, v))
+                                (self.machine_id, csv_procs, csv_ports))
 
         return True
+
