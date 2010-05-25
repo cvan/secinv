@@ -1,0 +1,18 @@
+{% extends "machines/base.html" %}
+{% load i18n %}
+
+{% block head_title %}{{ _('Machines') }}{% endblock %}
+
+{% block content %}
+{% if latest_machine_list %}
+      <ul>
+      {% for machine in latest_machine_list %}
+          <li>{{ machine.question }}</li>
+      {% endfor %}
+      </ul>
+{% else %}
+      <p>No machines are available.</p>
+{% endif %}
+{% endblock %}
+
+

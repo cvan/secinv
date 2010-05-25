@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block head_title %}{{ machine.question }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+<h2>{{ machine.question }}</h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url machines.views.vote machine_id=machine.id %}" method="post">
+  <fieldset>
+{% for choice in machine.choice_set.all %}
+    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+    <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br>
+{% endfor %}
+    <input type="submit" value="Vote">
+  </fieldset>
+</form>
+{% endblock %}

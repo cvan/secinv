@@ -1,0 +1,28 @@
+{% load i18n %}
+<!doctype html>
+<html>
+  <head>
+    <title>{% block head_title %}{{ _('SecInv') }}{% endblock %}</title>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" type="image/x-icon"
+          href="{{ MEDIA_URL }}img/favicon.ico">
+    <link rel="stylesheet" type="text/css"
+          href="{{ MEDIA_URL }}css/main.css">
+  </head>
+  <body class="{% block body_class %}{% endblock %}">
+    <header>
+      <figure class="logo">
+        <h1><a href="/">SecInv</a></h1>
+      </figure>
+      <nav>
+        <ul>
+          <li><a href="">{% trans 'Machines' %}</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <section id="content">
+{% block content %}{% endblock %}
+    </section>
+  </body>
+</html>
