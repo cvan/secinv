@@ -176,6 +176,7 @@ class ServerFunctions:
                         is_same = True
 
             if not is_same:
+                print "insert row"
                 # Insert a row only if the assets_ip values have changed.
                 self.cursor.execute("""INSERT INTO assets_ip (machine_id, i_name,
                                        i_ip, i_mac, i_mask)
