@@ -1,4 +1,5 @@
 from ConfigParser import ConfigParser
+import sys
 
 # Parse server.conf for server settings and database credentials.
 SERVER_CONFIG_FN = 'server.conf'
@@ -7,7 +8,7 @@ server_config = ConfigParser()
 try:
     server_config.readfp(file(SERVER_CONFIG_FN))
 except IOError:
-    sys.exit("\n\tError: Cannot open server configuration file '%s'\n"
+    sys.exit("Error: Cannot open server configuration file '%s'"
              % SERVER_CONFIG_FN)
 
 AUTH_KEY = server_config.get('server', 'auth_key')
@@ -18,7 +19,8 @@ LISTEN_PORT = server_config.get('server', 'listen_port')
 KEY_FILE = server_config.get('server', 'key_file')
 CERT_FILE = server_config.get('server', 'cert_file')
 
-DB_LOGIN = {'host': server_config.get('db', 'host'),
+DB_LOGIN = {'engine': server_config.get('db', 'engine'),
+            'host': server_config.get('db', 'host'),
             'user': server_config.get('db', 'user'),
             'passwd': server_config.get('db', 'passwd'),
             'db': server_config.get('db', 'db')}
@@ -123,7 +125,7 @@ def process(HandlerClass=SecureXMLRPCRequestHandler,
     Process XML-RPC commands over HTTPS server.
     """
 
-    from processor import ServerFunctions
+    from functions import ServerFunctions
 
     # Initialize server.
     server_address = (LISTEN_HOST, int(LISTEN_PORT))
