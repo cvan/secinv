@@ -3,3 +3,8 @@
 
 # All python compiled files.
 *.pyc
+
+*._*
+
+*.DS_Store
+

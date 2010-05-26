@@ -1,22 +1,23 @@
 import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-#from fields import IncrementingField, AutoNowField
-
-# Create your models here.
 
 class Machine(models.Model):
-    sys_ip = models.CharField(max_length=15)
-    date_added = models.DateTimeField(_('date added'), editable=False,
-                                      default=datetime.datetime.now())
-    date_edited = models.DateTimeField(_('date edited'))
+    sys_ip = models.IPAddressField(_('IP address'))
+    hostname = models.CharField(max_length=255)
+    ext_ip = models.IPAddressField(_('external IP address'))
 
+    date_added = models.DateTimeField(_('date added'), editable=False,
+                                      default=datetime.datetime.now)
+    date_updated = models.DateTimeField(_('date updated'),
+                                        default=datetime.datetime.now)
+    date_scanned = models.DateTimeField(_('date scanned'))
 
     question = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
 
     def __unicode__(self):
-        return self.question
+        return u'%s - %s' % (self.question, self.sys_ip)
 
     def was_published_today(self):
         return self.pub_date.date() == datetime.date.today()
@@ -32,47 +33,64 @@ class Choice(models.Model):
         return self.choice
 
 
-class Asset(models.Model):
-    machine = models.ForeignKey('Machine')
-    hostname = models.CharField(max_length=255)
-    sys_ip = models.IPAddressField()
-    ext_ip = models.IPAddressField()
-    httpd = models.BooleanField(default=0)
-    mysqld = models.BooleanField(default=0)
-    openvpn = models.BooleanField(default=0)
-    nfs = models.BooleanField(default=0)
-    kernel_rel = models.CharField(max_length=255)
-    rh_rel = models.CharField(max_length=255)
-    #interfaces = models.ForeignKey('Interface')
-    date_added = models.DateTimeField(_('date added'), editable=False,
-                                      default=datetime.datetime.now())
-    def __unicode__(self):
-        return self.sys_ip
-
 class Interface(models.Model):
     machine = models.ForeignKey('Machine')
-    i_name = models.CharField(max_length=50)
-    i_ip = models.IPAddressField()
-    i_mac = models.CharField(max_length=17)
-    i_mask = models.IPAddressField()
-
-class Ports(models.Model):
-    machine = models.ForeignKey('Machine')
-    processes = models.CharField(max_length=255)
-    ports = models.CharField(max_length=255)
+    i_name = models.CharField(_('interface name'), max_length=50)
+    i_ip = models.IPAddressField(_('IP address'))
+    i_mac = models.CharField(_('MAC address'), max_length=17)
+    i_mask = models.IPAddressField(_('netmask'))
     date_added = models.DateTimeField(_('date added'), editable=False,
-                                      default=datetime.datetime.now())
-    date_updated = models.DateTimeField(_('date updated'))
+                                      default=datetime.datetime.now)
+    date_updated = models.DateTimeField(_('date updated'),
+                                        default=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u'%s - %s - %s - %s' % (self.i_name, self.i_ip, self.i_mac,
+                                       self.i_mask)
+
+
+class System(models.Model):
+    machine = models.OneToOneField('Machine')
+    kernel_rel = models.CharField(_('kernel release'), max_length=255)
+    rh_rel = models.CharField(_('RedHat release'), max_length=255)
+    nfs = models.BooleanField(_('NFS?'), default=0)
+    date_updated = models.DateTimeField(_('date updated'),
+                                        default=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u'%s - %s - %s' % (self.kernel_rel, self.rh_rel, self.nfs)
+
+    class Meta:
+        verbose_name_plural = _('System')
+
+
+class Services(models.Model):
+    machine = models.OneToOneField('Machine')
+    processes = models.CharField(max_length=255)
+    ports = models.CommaSeparatedIntegerField(max_length=255)
+    #date_added = models.DateTimeField(_('date added'), editable=False,
+    #                                  default=datetime.datetime.now)
+    date_updated = models.DateTimeField(_('date updated'),
+                                        default=datetime.datetime.now)
+    def __unicode__(self):
+        return u'%s - %s' % (self.processes, self.ports)
+
+    class Meta:
+        verbose_name_plural = _('Services')
+
 
 class RPMs(models.Model):
-    machine = models.ForeignKey('Machine')
-    rpms = models.TextField()
+    machine = models.OneToOneField('Machine')
+    rpms = models.TextField(_('RPMs'))
     date_added = models.DateTimeField(_('date added'), editable=False,
-                                      default=datetime.datetime.now())
+                                      default=datetime.datetime.now)
     date_updated = models.DateTimeField(_('date updated'))
 
-class History(models.Model):
-    machine = models.ForeignKey('Machine')
-    date_scanned = models.DateTimeField(_('date scanned'),
-                                        default=datetime.datetime.now())
+    def __unicode__(self):
+        return u'%s' % (self.rpms)
+
+    class Meta:
+        verbose_name = _('RPMs')
+        verbose_name_plural = _('RPMs')
+
 
