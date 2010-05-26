@@ -28,7 +28,7 @@ class MachineAdmin(admin.ModelAdmin):
     #fields = ['pub_date', 'question']
     fieldsets = [(None,               {'fields': ['question', 'sys_ip',
                                                   'hostname', 'ext_ip']}),
-                 ('Date information', {'fields': ['pub_date', 'date_updated'],
+                 ('Date information', {'fields': ['pub_date', 'date_updated', 'date_scanned'],
                                        'classes': 'collapse'}),]
     inlines = [ChoiceInline, SystemInline, ServicesInline, RPMSInline,
                InterfaceInline]

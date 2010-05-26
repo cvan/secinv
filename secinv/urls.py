@@ -7,6 +7,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     # (r'^secinv/', include('secinv.foo.urls')),
+
     (r'^machines/', include('secinv.machines.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 

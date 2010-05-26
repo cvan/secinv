@@ -19,6 +19,10 @@ class Machine(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.question, self.sys_ip)
 
+    @property
+    def slug(self):
+        return re.sub('[^a-zA-Z-]', '-', self.hostname)
+
     def was_published_today(self):
         return self.pub_date.date() == datetime.date.today()
     was_published_today.short_description = 'Published Today?'

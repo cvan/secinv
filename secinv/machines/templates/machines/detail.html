@@ -1,14 +1,58 @@
-{% extends "base.html" %}
+{% extends "machines/base.html" %}
 {% load i18n %}
 
 {% block head_title %}{{ machine.question }} | {{ block.super }}{% endblock %}
 
 {% block content %}
-<h2>{{ machine.question }}</h2>
+      <h2>{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></h2>
+
+      <table>
+        <caption>{{ _('Machine details') }}</caption>
+        <tbody>
+          <tr>
+            <th>{{ _('IP address') }}</th>
+            <td>{{ machine.sys_ip }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Hostname') }}</th>
+            <td>{{ machine.hostname }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('external IP address') }}</th>
+            <td>{{ machine.ext_ip }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Added') }}</th>
+            <td>
+              <time datetime="{{ machine.date_added }}">
+                {{ machine.date_added }}
+              </time>
+            </td>
+          </tr>
+          <tr>
+            <th>{{ _('Updated') }}</th>
+            <td>
+              <time datetime="{{ machine.date_updated }}">
+                {{ machine.date_updated }}
+              </time>
+            </td>
+          </tr>
+          <tr>
+            <th>{{ _('Scanned') }}</th>
+            <td>
+              <time datetime="{{ machine.date_scanned }}">
+                {{ machine.date_scanned }}
+              </time>
+            </td>
+          </tr>
+      </table>
+
+<!-- <h2>{{ machine.question }}</h2> -->
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url machines.views.vote machine_id=machine.id %}" method="post">
+<!--
+<form action="{% url machines.views.vote machine_slug=machine.hostname %}" method="post">
   <fieldset>
 {% for choice in machine.choice_set.all %}
     <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
@@ -17,4 +61,6 @@
     <input type="submit" value="Vote">
   </fieldset>
 </form>
+-->
+
 {% endblock %}
