@@ -1,10 +1,10 @@
 {% extends "machines/base.html" %}
 {% load i18n %}
 
-{% block head_title %}{{ machine.question }} | {{ block.super }}{% endblock %}
+{% block head_title %}{{ machine.hostname }} | {{ block.super }}{% endblock %}
 
 {% block content %}
-      <h2>{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></h2>
+      <h2><em>{{ machine.sys_ip }}</em> {{ machine.hostname }}</h2>
 
       <table>
         <caption>{{ _('Machine details') }}</caption>
@@ -18,9 +18,10 @@
             <td>{{ machine.hostname }}</td>
           </tr>
           <tr>
-            <th>{{ _('external IP address') }}</th>
+            <th>{{ _('External IP address') }}</th>
             <td>{{ machine.ext_ip }}</td>
           </tr>
+{# TODO: uniform date format #}
           <tr>
             <th>{{ _('Added') }}</th>
             <td>
@@ -45,7 +46,99 @@
               </time>
             </td>
           </tr>
+        </tbody>
       </table>
+
+      <table>
+        <caption>{{ _('System') }}</caption>
+        <tbody>
+          <tr>
+            <th>{{ _('Kernel release') }}</th>
+            <td>{{ system.kernel_rel }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('RedHat release') }}</th>
+            <td>{{ system.rh_rel }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('NFS mounted?') }}</th>
+            <td>{{ system.nfs }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Updated') }}</th>
+            <td>
+              <time datetime="{{ services.date_updated }}">
+                {{ system.date_updated }}
+              </time>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>{{ _('Services') }}</caption>
+        <!--
+          {{ _('Updated') }} <time datetime="{{ services.date_updated }}">
+            {{ system.date_updated }}
+          </time>
+        -->
+        <thead>
+          <tr>
+            <th>{{ _('Process') }}</th>
+            <th>{{ _('Port') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+      {% for service, port in services_list.items %}
+          <tr>
+            <td>{{ service }}</td>
+            <td>{{ port }}</td>
+          </tr>
+      {% endfor %}
+        </tbody>
+      </table>
+
+{# TODO: RPMs #}
+
+{% if interfaces %}
+      <table>
+        <caption>{{ _('Interfaces') }}</caption>
+        <thead>
+          <tr>
+            <th>{{ _('Interface name') }}</th>
+            <th>{{ _('IP address') }}</th>
+            <th>{{ _('MAC address') }}</th>
+            <th>{{ _('Netmask') }}</th>
+            <th>{{ _('Added') }}</th>
+            <th>{{ _('Updated') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+      {% for interface in interfaces %}
+          <tr>
+            <td>{{ interface.i_name }}</td>
+            <td>
+              <a href="http://ws.arin.net/whois/?queryinput={{ interface.i_ip }}">
+                {{ interface.i_ip }}
+              </a>
+            </td>
+            <td>{{ interface.i_mac }}</td>
+            <td>{{ interface.i_mask }}</td>
+            <td>
+              <time datetime="{{ interface.date_added }}">
+                {{ interface.date_added }}
+              </time>
+            </td>
+            <td>
+              <time datetime="{{ interface.date_updated }}">
+                {{ interface.date_updated }}
+              </time>
+            </td>
+          </tr>
+      {% endfor %}
+        </tbody>
+      </table>
+{% endif %}
 
 <!-- <h2>{{ machine.question }}</h2> -->
 

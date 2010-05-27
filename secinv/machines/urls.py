@@ -9,9 +9,5 @@ urlpatterns = patterns('secinv.machines.views',
     (r'^%s/results/$' % machine_slug, 'results'),
     (r'^%s/vote/$' % machine_slug, 'vote'),
 
-#    (r'^(?P<machine_slug>[-\w]+)/$', 'detail'),
-#    (r'^(?P<machine_slug>[-\w]+)/results/$', 'results'),
-#    (r'^(?P<machine_slug>[-\w]+)/vote/$', 'vote'),
-
 )
 

@@ -9,6 +9,9 @@ ROOT = os.path.abspath(os.path.dirname(__file__))
 # Used to translate every path in settings.py to an absolute path.
 path = lambda x: os.path.join(ROOT, x)
 
+# Base URL path.
+BASE_URL = '/secinv/'
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 

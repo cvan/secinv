@@ -1,52 +1,60 @@
 {% extends "machines/base.html" %}
 {% load i18n %}
 
-{% block head_title %}{{ _('Machines') }}{% endblock %}
+{% block head_title %}{{ _('Machines') }} | {{ block.super }}{% endblock %}
+
+{# TODO: sortable columns #}
 
 {% block content %}
       <h2>Machines</h2>
 {% if latest_machine_list %}
       <table>
         <caption>{{ _('Machines') }}</caption>
+        <thead>
+          <tr>
+            <th>{{ _('IP address') }}</th>
+            <th>{{ _('Hostname') }}</th>
+            <th>{{ _('External IP address') }}</th>
+            <th>{{ _('Added') }}</th>
+            <th>{{ _('Updated') }}</th>
+            <th>{{ _('Scanned') }}</th>
+            <th>{{ _('View') }}
+          </tr>
+        </thead>
         <tbody>
       {% for machine in latest_machine_list %}
           <tr>
-            <th>{{ _('IP address') }}</th>
             <td>{{ machine.sys_ip }}</td>
-          </tr>
-          <tr>
-            <th>{{ _('Hostname') }}</th>
-            <td>{{ machine.hostname }}</td>
-          </tr>
-          <tr>
-            <th>{{ _('external IP address') }}</th>
+            <td>
+              <a href="{% url machines.views.detail machine_slug=machine.hostname %}">
+                {{ machine.hostname }}
+              </a>
+            </td>
             <td>{{ machine.ext_ip }}</td>
-          </tr>
-          <tr>
-            <th>{{ _('Added') }}</th>
+{# TODO: uniform date format #}
             <td>
               <time datetime="{{ machine.date_added }}">
                 {{ machine.date_added }}
               </time>
             </td>
-          </tr>
-          <tr>
-            <th>{{ _('Updated') }}</th>
             <td>
               <time datetime="{{ machine.date_updated }}">
                 {{ machine.date_updated }}
               </time>
             </td>
-          </tr>
-          <tr>
-            <th>{{ _('Scanned') }}</th>
             <td>
               <time datetime="{{ machine.date_scanned }}">
                 {{ machine.date_scanned }}
               </time>
             </td>
+            <td>
+              <a href="{% url machines.views.detail machine_slug=machine.hostname %}">
+                View
+              </a>
+            </td>
           </tr>
       {% endfor %}
+        </tbody>
       </table>
 {% else %}
       <p>No machines are available.</p>

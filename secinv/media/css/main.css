@@ -42,7 +42,7 @@ table {
 
 body {
     margin: 0 auto;
-    padding: 100px 200px;
+    padding: 20px 200px;
     color: #444;
 /*    font-size: 13px; */
     font-size: 15px;
@@ -128,6 +128,13 @@ h4 {
 }
 h5, h6 {
     font-size:1em /* 13px */;
+}
+
+h2 em {
+  color: #666;
+  display: block;
+  font-size: 0.7em;
+  font-style: normal;
 }
 
 /* @end */

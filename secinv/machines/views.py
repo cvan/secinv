@@ -1,7 +1,9 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from secinv.machines.models import Machine
+from secinv.machines.models import Machine, Services, System, RPMs, Interface
 #from django.http import HttpResponse
+
+import re
 
 def index(request):
     latest_machine_list = Machine.objects.all()
@@ -10,7 +12,24 @@ def index(request):
 
 def detail(request, machine_slug):
     p = get_object_or_404(Machine, hostname=machine_slug)
-    return render_to_response('machines/detail.html', {'machine': p},
+
+    system = System.objects.filter(machine__id=1).all()
+
+    services = Services.objects.filter(machine__id=p.id).all()
+    services_processes = re.split(',', services[0].processes)
+    services_ports = re.split(',', services[0].ports)
+
+    services_list = dict(zip(services_processes, services_ports))
+
+    rpms = RPMs.objects.filter(machine__id=p.id).all()
+    interfaces = Interface.objects.filter(machine__id=p.id).all()
+
+    template_context = {'machine': p,
+                        'system': system[0],
+                        'services_list': services_list,
+                        'rpms': rpms,
+                        'interfaces': interfaces}
+    return render_to_response('machines/detail.html', template_context,
         context_instance=RequestContext(request))
 
 def results(request, machine_slug):

@@ -12,11 +12,11 @@
   <body class="{% block body_class %}{% endblock %}">
     <header>
       <figure class="logo">
-        <h1><a href="/">SecInv</a></h1>
+        <h1><a href="/secinv/">SecInv</a></h1>
       </figure>
       <nav>
         <ul>
-          <li><a href="">{% trans 'Machines' %}</a></li>
+          <li><a href="{% url machines.views.index %}">{% trans 'Machines' %}</a></li>
         </ul>
       </nav>
     </header>
