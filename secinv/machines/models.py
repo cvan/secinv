@@ -88,7 +88,7 @@ class RPMs(models.Model):
     rpms = models.TextField(_('RPMs'))
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
-    date_updated = models.DateTimeField(_('date updated'))
+    #date_updated = models.DateTimeField(_('date updated'))
 
     def __unicode__(self):
         return u'%s' % (self.rpms)

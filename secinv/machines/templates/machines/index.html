@@ -7,7 +7,8 @@
 
 {% block content %}
       <h2>Machines</h2>
-{% if latest_machine_list %}
+{% if machine_list %}
+{# TODO: Pagination #}
       <table>
         <caption>{{ _('Machines') }}</caption>
         <thead>
@@ -22,7 +23,7 @@
           </tr>
         </thead>
         <tbody>
-      {% for machine in latest_machine_list %}
+      {% for machine in machine_list %}
           <tr>
             <td>{{ machine.sys_ip }}</td>
             <td>
@@ -33,20 +34,28 @@
             <td>{{ machine.ext_ip }}</td>
 {# TODO: uniform date format #}
             <td>
-              <time datetime="{{ machine.date_added }}">
+              {% if machine.date_added %}
+              <time datetime="{{ machine.date_added|date:'c' }}">
                 {{ machine.date_added }}
               </time>
+              {% endif %}
             </td>
             <td>
-              <time datetime="{{ machine.date_updated }}">
+              {% if machine.date_updated %}
+              <time datetime="{{ machine.date_updated|date:'c' }}">
                 {{ machine.date_updated }}
               </time>
+              {% endif %}
             </td>
             <td>
-              <time datetime="{{ machine.date_scanned }}">
+              {% if services.date_scanned %}
+              <time datetime="{{ machine.date_scanned|date:'c' }}">
                 {{ machine.date_scanned }}
               </time>
+              {% endif %}
             </td>
+{# TODO: Edit #}
+{# TODO: Delete #}
             <td>
               <a href="{% url machines.views.detail machine_slug=machine.hostname %}">
                 View
@@ -56,6 +65,7 @@
       {% endfor %}
         </tbody>
       </table>
+{# TODO: Pagination #}
 {% else %}
       <p>No machines are available.</p>
 {% endif %}

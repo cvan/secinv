@@ -40,7 +40,6 @@ class MachineAdmin(admin.ModelAdmin):
     search_fields = ['question', 'sys_ip', 'hostname', 'ext_ip']
     date_hierarchy = 'pub_date'
 
-
 admin.site.register(Machine, MachineAdmin)
 
 

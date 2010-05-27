@@ -6,8 +6,8 @@ from secinv.machines.models import Machine, Services, System, RPMs, Interface
 import re
 
 def index(request):
-    latest_machine_list = Machine.objects.all()
-    return render_to_response('machines/index.html', {'latest_machine_list': latest_machine_list},
+    machine_list = Machine.objects.all()
+    return render_to_response('machines/index.html', {'machine_list': machine_list},
         context_instance=RequestContext(request))
 
 def detail(request, machine_slug):
@@ -22,12 +22,14 @@ def detail(request, machine_slug):
     services_list = dict(zip(services_processes, services_ports))
 
     rpms = RPMs.objects.filter(machine__id=p.id).all()
+    rpms_list = re.split('\n', rpms[0].rpms)
+
     interfaces = Interface.objects.filter(machine__id=p.id).all()
 
     template_context = {'machine': p,
                         'system': system[0],
                         'services_list': services_list,
-                        'rpms': rpms,
+                        'rpms': rpms_list,
                         'interfaces': interfaces}
     return render_to_response('machines/detail.html', template_context,
         context_instance=RequestContext(request))

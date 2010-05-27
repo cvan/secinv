@@ -11,7 +11,11 @@
         <tbody>
           <tr>
             <th>{{ _('IP address') }}</th>
-            <td>{{ machine.sys_ip }}</td>
+            <td>
+              <a href="http://ws.arin.net/whois/?queryinput={{ machine.sys_ip }}">
+                {{ machine.sys_ip }}
+              </a>
+            </td>
           </tr>
           <tr>
             <th>{{ _('Hostname') }}</th>
@@ -19,31 +23,41 @@
           </tr>
           <tr>
             <th>{{ _('External IP address') }}</th>
-            <td>{{ machine.ext_ip }}</td>
+            <td>
+              <a href="http://ws.arin.net/whois/?queryinput={{ machine.ext_ip }}">
+                {{ machine.ext_ip }}
+              </a>
+            </td>
           </tr>
 {# TODO: uniform date format #}
           <tr>
             <th>{{ _('Added') }}</th>
             <td>
-              <time datetime="{{ machine.date_added }}">
+              {% if machine.date_added %}
+              <time datetime="{{ machine.date_added|date:'c' }}">
                 {{ machine.date_added }}
               </time>
+              {% endif %}
             </td>
           </tr>
           <tr>
             <th>{{ _('Updated') }}</th>
             <td>
-              <time datetime="{{ machine.date_updated }}">
+            {% if machine.date_updated %}
+              <time datetime="{{ machine.date_updated|date:'c'|default:'0000-00-00T00:00:00.000000' }}">
                 {{ machine.date_updated }}
               </time>
+            {% endif %}
             </td>
           </tr>
           <tr>
             <th>{{ _('Scanned') }}</th>
             <td>
-              <time datetime="{{ machine.date_scanned }}">
+              {% if machine.date_scanned %}
+              <time datetime="{{ machine.date_scanned|date:'c' }}">
                 {{ machine.date_scanned }}
               </time>
+              {% endif %}
             </td>
           </tr>
         </tbody>
@@ -67,18 +81,20 @@
           <tr>
             <th>{{ _('Updated') }}</th>
             <td>
-              <time datetime="{{ services.date_updated }}">
+              {% if services.date_updated %}
+              <time datetime="{{ services.date_updated|date:'c' }}">
                 {{ system.date_updated }}
               </time>
+              {% endif %}
             </td>
           </tr>
         </tbody>
       </table>
 
       <table>
-        <caption>{{ _('Services') }}</caption>
+        <caption>{{ _('Services listening') }}</caption>
         <!--
-          {{ _('Updated') }} <time datetime="{{ services.date_updated }}">
+          {{ _('Updated') }} <time datetime="{{ services.date_updated|date:'c' }}">
             {{ system.date_updated }}
           </time>
         -->
@@ -99,6 +115,19 @@
       </table>
 
 {# TODO: RPMs #}
+      <!--
+        {{ _('Updated') }} <time datetime="{{ rpms.date_updated|date:'c' }}">
+          {{ rpms.date_updated }}
+        </time>
+      -->
+      <h3>RPMs</h3>
+      {% if rpms %}
+      <ul>
+        {% for rpm in rpms %}
+        <li>{{ rpm }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
 
 {% if interfaces %}
       <table>
@@ -125,14 +154,18 @@
             <td>{{ interface.i_mac }}</td>
             <td>{{ interface.i_mask }}</td>
             <td>
-              <time datetime="{{ interface.date_added }}">
+              {% if interface.date_added %}
+              <time datetime="{{ interface.date_added|date:'c' }}">
                 {{ interface.date_added }}
               </time>
+              {% endif %}
             </td>
             <td>
-              <time datetime="{{ interface.date_updated }}">
+              {% if interface.date_updated %}
+              <time datetime="{{ interface.date_updated|date:'c' }}">
                 {{ interface.date_updated }}
               </time>
+              {% endif %}
             </td>
           </tr>
       {% endfor %}
