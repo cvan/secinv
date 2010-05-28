@@ -248,10 +248,12 @@ address {
 }
 
 ins {
+    color: #080;
     text-decoration: underline;
 }
 
 del {
+    color: #800;
     text-decoration: line-through;
 }
 

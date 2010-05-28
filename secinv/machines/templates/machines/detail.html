@@ -106,10 +106,14 @@
         <tbody>
 {% for system_h in system_history %}
           <tr>
-            <td>{{ system_h.kernel_rel }}</td>
-            <td>{{ system_h.rh_rel }}</td>
-            <td>{{ system_h.nfs }}</td>
-            <td>{{ system_h.date_modified }}</td>
+            <td{% if 'kernel_rel' in system_h.diff_split %} class="diff_changed"{% endif %}>{{ system_h.kernel_rel }}</td>
+            <td{% if 'rh_rel' in system_h.diff_split %} class="diff_changed"{% endif %}>{{ system_h.rh_rel }}</td>
+            <td{% if 'nfs' in system_h.diff_split %} class="diff_changed"{% endif %}>{{ system_h.nfs }}</td>
+            <td>
+              <time datetime="{{ system_h.date_added|date:'c' }}">
+                {{ system_h.date_added }}
+              </time>
+            </td>
           </tr>
 {% empty %}
           <tr>
@@ -119,9 +123,10 @@
         </tbody>
       </table>
 
-{# TODO: Change history for services listening #}
+
+      <h3>{{ _('Services listening') }}</h3>
       <table>
-        <caption>{{ _('Services listening') }}</caption>
+        <caption>{{ _('Latest') }}</caption>
         <thead>
           <tr>
             <th>{{ _('Process') }}</th>
@@ -129,7 +134,7 @@
           </tr>
         </thead>
         <tbody>
-      {% for service, port in services_list.items %}
+      {% for service, port in services.items %}
           <tr>
             <td>{{ service }}</td>
             <td>{{ port }}</td>
@@ -137,13 +142,69 @@
       {% endfor %}
         </tbody>
       </table>
-      <small>
-<!--
-        {{ _('Date added:') }} <time datetime="{{ services.date_added|date:'c' }}">
-          {{ services.date_added }}
-        </time>
--->
-      </small>
+
+{# TODO: consider having a column for each process/port #}
+      <table>
+        <caption>{{ _('Change history') }}</caption>
+        <thead>
+          <tr>
+            <th>{{ _('Process') }}</th>
+            <th>{{ _('Port') }}</th>
+            <th>{{ _('Date changed') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+{% for services_h in services_history %}
+          <tr>
+{# TODO: highlight changed 'process's and changed 'port's #}
+            <td>
+              {% if services_h.processes_split %}
+              <ul>
+                {% for proc in services_h.processes_split %}
+                <li{% if proc in services_h.diff_ins_processes_split %} class="diff_changed"{% endif %}>
+                  {{ proc }}
+                </li>
+                {% endfor %}
+
+                {# loop through removed processes #}
+                {% for old_proc in services_h.diff_del_processes_split %}
+                <li><del>{{ old_proc }}</del></li>
+                {% endfor %}
+
+              </ul>
+              {% endif %}
+            </td>
+            <td>
+              {% if services_h.ports_split %}
+              <ul>
+                {% for port in services_h.ports_split %}
+                <li{% if port in services_h.diff_ins_ports_split %} class="diff_changed"{% endif %}>
+                  {{ port }}
+                </li>
+                {% endfor %}
+
+                {# loop through removed ports #}
+                {% for old_port in services_h.diff_del_ports_split %}
+                <li><del>{{ old_port }}</del></li>
+                {% endfor %}
+
+              </ul>
+              {% endif %}
+            </td>
+            <td>
+              <time datetime="{{ services_h.date_added|date:'c' }}">
+                {{ services_h.date_added }}
+              </time>
+            </td>
+          </tr>
+{% empty %}
+          <tr>
+            <td></td>
+          </tr>
+{% endfor %}
+        </tbody>
+      </table>
+
 
 {# TODO: Change history for RPMs #}
       <h3>RPMs</h3>

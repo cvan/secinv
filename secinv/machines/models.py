@@ -48,6 +48,9 @@ class Interface(models.Model):
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
+    def diff_split(self):
+        return re.split(',', self.diff)
+
     def __unicode__(self):
         return u'%s - %s - %s - %s' % (self.i_name, self.i_ip, self.i_mac,
                                        self.i_mask)
@@ -82,8 +85,36 @@ class Services(models.Model):
     processes = models.CharField(max_length=255)
     ports = models.CommaSeparatedIntegerField(max_length=255)
     diff = models.CharField(_('differences'), max_length=255)
+    diff_ins_processes = models.CharField(_('new processes'),
+                                         max_length=255)
+    diff_del_processes = models.CharField(_('removed processes'),
+                                          max_length=255)
+    diff_ins_ports = models.CharField(_('new ports'), max_length=255)
+    diff_del_ports = models.CharField(_('removed ports'), max_length=255)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
+
+    def diff_split(self):
+        return re.split(',', self.diff)
+
+    def diff_ins_processes_split(self):
+        return re.split(',', self.diff_ins_processes)
+
+    def diff_del_processes_split(self):
+        return re.split(',', self.diff_del_processes)
+
+    def diff_ins_ports_split(self):
+        return re.split(',', self.diff_ins_ports)
+
+    def diff_del_ports_split(self):
+        return re.split(',', self.diff_del_ports)
+
+    def processes_split(self):
+        return re.split(',', self.processes)
+
+    def ports_split(self):
+        return re.split(',', self.ports)
+
     def __unicode__(self):
         return u'%s - %s' % (self.processes, self.ports)
 
@@ -96,8 +127,13 @@ class RPMs(models.Model):
     machine = models.ForeignKey('Machine')
     rpms = models.TextField(_('RPMs'))
     diff = models.CharField(_('differences'), max_length=255)
+    diff_ins_rpms = models.CharField(_('RPM differences'), max_length=255)
+    diff_del_rpms = models.CharField(_('RPM differences'), max_length=255)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
+
+    def diff_split(self):
+        return re.split(',', self.diff)
 
     def __unicode__(self):
         return u'%s' % (self.rpms)
