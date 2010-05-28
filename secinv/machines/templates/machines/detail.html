@@ -1,5 +1,6 @@
 {% extends "machines/base.html" %}
 {% load i18n %}
+{% load machine_extras %}
 
 {% block head_title %}{{ machine.hostname }} | {{ block.super }}{% endblock %}
 
@@ -41,11 +42,11 @@
             </td>
           </tr>
           <tr>
-            <th>{{ _('Updated') }}</th>
+            <th>{{ _('Modified') }}</th>
             <td>
-            {% if machine.date_updated %}
-              <time datetime="{{ machine.date_updated|date:'c'|default:'0000-00-00T00:00:00.000000' }}">
-                {{ machine.date_updated }}
+            {% if machine.date_modified %}
+              <time datetime="{{ machine.date_modified|date:'c'|default:'0000-00-00T00:00:00.000000' }}">
+                {{ machine.date_modified }}
               </time>
             {% endif %}
             </td>
@@ -63,27 +64,28 @@
         </tbody>
       </table>
 
+      <h3>{{ _('System') }}</h3>
       <table>
-        <caption>{{ _('System') }}</caption>
+        <caption>{{ _('Latest') }}</caption>
         <tbody>
           <tr>
             <th>{{ _('Kernel release') }}</th>
-            <td>{{ system.kernel_rel }}</td>
+            <td{% if 'kernel_rel' in system.diff_split %} class="diff_changed"{% endif %}>{{ system.kernel_rel }}</td>
           </tr>
           <tr>
             <th>{{ _('RedHat release') }}</th>
-            <td>{{ system.rh_rel }}</td>
+            <td{% if 'rh_rel' in system.diff_split %} class="diff_changed"{% endif %}>{{ system.rh_rel }}</td>
           </tr>
           <tr>
             <th>{{ _('NFS mounted?') }}</th>
-            <td>{{ system.nfs }}</td>
+            <td{% if 'nfs' in system.diff_split %} class="diff_changed"{% endif %}>{{ system.nfs }}</td>
           </tr>
           <tr>
-            <th>{{ _('Updated') }}</th>
+            <th>{{ _('Added') }}</th>
             <td>
-              {% if services.date_updated %}
-              <time datetime="{{ services.date_updated|date:'c' }}">
-                {{ system.date_updated }}
+              {% if system.date_added %}
+              <time datetime="{{ system.date_added|date:'c' }}">
+                {{ system.date_added }}
               </time>
               {% endif %}
             </td>
@@ -92,12 +94,34 @@
       </table>
 
       <table>
+        <caption>{{ _('Change history') }}</caption>
+        <thead>
+          <tr>
+            <th>{{ _('Kernel release') }}</th>
+            <th>{{ _('RedHat release') }}</th>
+            <th>{{ _('NFS') }}</th>
+            <th>{{ _('Date changed') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+{% for system_h in system_history %}
+          <tr>
+            <td>{{ system_h.kernel_rel }}</td>
+            <td>{{ system_h.rh_rel }}</td>
+            <td>{{ system_h.nfs }}</td>
+            <td>{{ system_h.date_modified }}</td>
+          </tr>
+{% empty %}
+          <tr>
+            <td></td>
+          </tr>
+{% endfor %}
+        </tbody>
+      </table>
+
+{# TODO: Change history for services listening #}
+      <table>
         <caption>{{ _('Services listening') }}</caption>
-        <!--
-          {{ _('Updated') }} <time datetime="{{ services.date_updated|date:'c' }}">
-            {{ system.date_updated }}
-          </time>
-        -->
         <thead>
           <tr>
             <th>{{ _('Process') }}</th>
@@ -113,13 +137,15 @@
       {% endfor %}
         </tbody>
       </table>
-
-{# TODO: RPMs #}
-      <!--
-        {{ _('Updated') }} <time datetime="{{ rpms.date_updated|date:'c' }}">
-          {{ rpms.date_updated }}
+      <small>
+<!--
+        {{ _('Date added:') }} <time datetime="{{ services.date_added|date:'c' }}">
+          {{ services.date_added }}
         </time>
-      -->
+-->
+      </small>
+
+{# TODO: Change history for RPMs #}
       <h3>RPMs</h3>
       {% if rpms %}
       <ul>
@@ -139,7 +165,7 @@
             <th>{{ _('MAC address') }}</th>
             <th>{{ _('Netmask') }}</th>
             <th>{{ _('Added') }}</th>
-            <th>{{ _('Updated') }}</th>
+            <th>{{ _('Change history') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -161,11 +187,7 @@
               {% endif %}
             </td>
             <td>
-              {% if interface.date_updated %}
-              <time datetime="{{ interface.date_updated|date:'c' }}">
-                {{ interface.date_updated }}
-              </time>
-              {% endif %}
+{# TODO: Change history for this interface name #}
             </td>
           </tr>
       {% endfor %}
@@ -173,20 +195,7 @@
       </table>
 {% endif %}
 
-<!-- <h2>{{ machine.question }}</h2> -->
-
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<!--
-<form action="{% url machines.views.vote machine_slug=machine.hostname %}" method="post">
-  <fieldset>
-{% for choice in machine.choice_set.all %}
-    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-    <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br>
-{% endfor %}
-    <input type="submit" value="Vote">
-  </fieldset>
-</form>
--->
 
 {% endblock %}

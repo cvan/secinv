@@ -255,6 +255,10 @@ del {
     text-decoration: line-through;
 }
 
+.diff_changed {
+    color: #080;
+}
+
 /* @end */
 
 

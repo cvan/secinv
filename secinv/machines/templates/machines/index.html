@@ -17,7 +17,7 @@
             <th>{{ _('Hostname') }}</th>
             <th>{{ _('External IP address') }}</th>
             <th>{{ _('Added') }}</th>
-            <th>{{ _('Updated') }}</th>
+            <th>{{ _('Modified') }}</th>
             <th>{{ _('Scanned') }}</th>
             <th>{{ _('View') }}
           </tr>
@@ -41,9 +41,9 @@
               {% endif %}
             </td>
             <td>
-              {% if machine.date_updated %}
-              <time datetime="{{ machine.date_updated|date:'c' }}">
-                {{ machine.date_updated }}
+              {% if machine.date_modified %}
+              <time datetime="{{ machine.date_modified|date:'c' }}">
+                {{ machine.date_modified }}
               </time>
               {% endif %}
             </td>
@@ -54,6 +54,7 @@
               </time>
               {% endif %}
             </td>
+{# TODO: Add #}
 {# TODO: Edit #}
 {# TODO: Delete #}
             <td>

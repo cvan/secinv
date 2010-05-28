@@ -1,13 +1,15 @@
 from secinv.machines.models import Machine
-from secinv.machines.models import Choice, Interface, System, Services, RPMs
+from secinv.machines.models import *
 from django.contrib import admin
 
 #admin.site.register(Machine)
 
 #class ChoiceInline(admin.StackedInline):
+'''
 class ChoiceInline(admin.TabularInline):
     model = Choice
     extra = 3
+'''
 
 class InterfaceInline(admin.TabularInline):
     model = Interface
@@ -25,20 +27,19 @@ class RPMSInline(admin.TabularInline):
     model = RPMs
 
 class MachineAdmin(admin.ModelAdmin):
-    #fields = ['pub_date', 'question']
-    fieldsets = [(None,               {'fields': ['question', 'sys_ip',
+    #fields = ['sys_ip', 'hostname', 'ext_ip']
+    fieldsets = [(None,               {'fields': ['sys_ip',
                                                   'hostname', 'ext_ip']}),
-                 ('Date information', {'fields': ['pub_date', 'date_updated', 'date_scanned'],
+                 ('Date information', {'fields': ['date_modified',
+                                                  'date_scanned'],
                                        'classes': 'collapse'}),]
-    inlines = [ChoiceInline, SystemInline, ServicesInline, RPMSInline,
-               InterfaceInline]
+    inlines = [SystemInline, ServicesInline, RPMSInline, InterfaceInline]
 
-    list_display = ('sys_ip', 'hostname', 'ext_ip', 'question', 'pub_date',
-                    'date_added', 'date_updated', 'date_scanned',
-                    'was_published_today')
-    list_filter = ['pub_date']
-    search_fields = ['question', 'sys_ip', 'hostname', 'ext_ip']
-    date_hierarchy = 'pub_date'
+    list_display = ('sys_ip', 'hostname', 'ext_ip',
+                    'date_added', 'date_modified', 'date_scanned')
+    list_filter = ['hostname']
+    search_fields = ['sys_ip', 'hostname', 'ext_ip']
+    date_hierarchy = 'date_added'
 
 admin.site.register(Machine, MachineAdmin)
 

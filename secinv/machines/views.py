@@ -13,24 +13,42 @@ def index(request):
 def detail(request, machine_slug):
     p = get_object_or_404(Machine, hostname=machine_slug)
 
-    system = System.objects.filter(machine__id=1).all()
+    system_obj = None
+    system_obj = System.objects.filter(machine__id=1).latest()
 
-    services = Services.objects.filter(machine__id=p.id).all()
-    services_processes = re.split(',', services[0].processes)
-    services_ports = re.split(',', services[0].ports)
 
-    services_list = dict(zip(services_processes, services_ports))
+    services_list = {}
+    services_obj = Services.objects.filter(machine__id=p.id).latest()
 
-    rpms = RPMs.objects.filter(machine__id=p.id).all()
-    rpms_list = re.split('\n', rpms[0].rpms)
+    if services_obj:
+        services_processes = re.split(',', services_obj.processes)
+        services_ports = re.split(',', services_obj.ports)
 
-    interfaces = Interface.objects.filter(machine__id=p.id).all()
+        services_list = dict(zip(services_processes, services_ports))
+
+
+    rpms_list = []
+    rpms_obj = RPMs.objects.filter(machine__id=p.id).latest()
+
+    if rpms_obj:
+        rpms_list = re.split('\n', rpms_obj.rpms)
+
+
+    # Get latest interfaces (select by distinct interface name)
+    distinct_interfaces = Interface.objects.filter(machine__id=1).values_list('i_name', flat=True).distinct()
+
+    latest_interfaces = []
+    for i in distinct_interfaces:
+        latest_distinct = Interface.objects.filter(machine__id=1, i_name=i).latest()
+        if latest_distinct:
+            latest_interfaces.append(latest_distinct)
+
 
     template_context = {'machine': p,
-                        'system': system[0],
+                        'system': system_obj,
                         'services_list': services_list,
                         'rpms': rpms_list,
-                        'interfaces': interfaces}
+                        'interfaces': latest_interfaces}
     return render_to_response('machines/detail.html', template_context,
         context_instance=RequestContext(request))
 
@@ -40,6 +58,7 @@ def results(request, machine_slug):
         context_instance=RequestContext(request))
 
 def vote(request, machine_slug):
+    '''
     p = get_object_or_404(Machine, hostname=machine_slug)
     try:
         selected_choice = p.choice_set.get(pk=request.POST['choice'])
@@ -57,4 +76,6 @@ def vote(request, machine_slug):
         # user hits the Back button.
         return HttpResponseRedirect(reverse('secinv.machines.views.results',
             args=(p.id,)))
+    '''
+    pass
 
