@@ -9,7 +9,7 @@ class Machine(models.Model):
 
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
-    date_updated = models.DateTimeField(_('date updated'),
+    date_modified = models.DateTimeField(_('date modified'),
                                         default=datetime.datetime.now)
     date_scanned = models.DateTimeField(_('date scanned'))
 
@@ -45,7 +45,7 @@ class Interface(models.Model):
     i_mask = models.IPAddressField(_('netmask'))
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
-    date_updated = models.DateTimeField(_('date updated'),
+    date_modified = models.DateTimeField(_('date modified'),
                                         default=datetime.datetime.now)
 
     def __unicode__(self):
@@ -54,11 +54,11 @@ class Interface(models.Model):
 
 
 class System(models.Model):
-    machine = models.OneToOneField('Machine')
+    machine = models.ForeignKey('Machine')
     kernel_rel = models.CharField(_('kernel release'), max_length=255)
     rh_rel = models.CharField(_('RedHat release'), max_length=255)
     nfs = models.BooleanField(_('NFS?'), default=0)
-    date_updated = models.DateTimeField(_('date updated'),
+    date_modified = models.DateTimeField(_('date modified'),
                                         default=datetime.datetime.now)
 
     def __unicode__(self):
@@ -69,13 +69,11 @@ class System(models.Model):
 
 
 class Services(models.Model):
-    machine = models.OneToOneField('Machine')
+    machine = models.ForeignKey('Machine')
     processes = models.CharField(max_length=255)
     ports = models.CommaSeparatedIntegerField(max_length=255)
-    #date_added = models.DateTimeField(_('date added'), editable=False,
-    #                                  default=datetime.datetime.now)
-    date_updated = models.DateTimeField(_('date updated'),
-                                        default=datetime.datetime.now)
+    date_added = models.DateTimeField(_('date added'),
+                                      default=datetime.datetime.now)
     def __unicode__(self):
         return u'%s - %s' % (self.processes, self.ports)
 
@@ -84,11 +82,11 @@ class Services(models.Model):
 
 
 class RPMs(models.Model):
-    machine = models.OneToOneField('Machine')
+    machine = models.ForeignKey('Machine')
     rpms = models.TextField(_('RPMs'))
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
-    #date_updated = models.DateTimeField(_('date updated'))
+    #date_modified = models.DateTimeField(_('date modified'))
 
     def __unicode__(self):
         return u'%s' % (self.rpms)

@@ -8,21 +8,70 @@
           href="{{ MEDIA_URL }}img/favicon.ico">
     <link rel="stylesheet" type="text/css"
           href="{{ MEDIA_URL }}css/main.css">
+
+    <!--<script src="{{ MEDIA_URL }}js/html5.js"></script>-->
+    <!-- allowing html5 to run in older browsers -->
+
+    <!--
+    <link rel="stylesheet" type="text/css"
+          href="{{ MEDIA_URL }}css/reset.css" media="screen">
+    <link rel="stylesheet" type="text/css"
+          href="{{ MEDIA_URL }}css/general.css" media="screen">
+    <link rel="stylesheet" type="text/css"
+          href="{{ MEDIA_URL }}css/grid.css" media="screen">
+    -->
   </head>
   <body class="{% block body_class %}{% endblock %}">
-    <header>
-      <figure class="logo">
-        <h1><a href="/secinv/">SecInv</a></h1>
-      </figure>
-      <nav>
-        <ul>
-          <li><a href="{% url machines.views.index %}">{% trans 'Machines' %}</a></li>
-        </ul>
-      </nav>
-    </header>
+    <div id="wrap" class="row">
+      <header>
+        <figure class="logo">
+          <h1><a href="/secinv/">SecInv</a></h1>
+        </figure>
+        <nav>
+          <ul>
+            <li class="machines"><a href="{% url machines.views.index %}">{% trans 'Machines' %}</a></li>
+            <li class="profiles"><a href="{% url machines.views.index %}">{% trans 'Profiles' %}</a></li>
+            <li class="config"><a href="{% url machines.views.index %}">{% trans 'Configuration Files' %}</a></li>
+          </ul>
+        </nav>
+      </header>
 
-    <section id="content">
+      <div class="clear"></div>
+
+      <section id="content" class="content col_12 col">
 {% block content %}{% endblock %}
-    </section>
+      </section><!-- #content -->
+
+      <!--
+      <aside class="col_4 col">
+      	<h2>Form Elements</h2>
+          <form>
+          	<fieldset><legend>Fieldset</legend>
+                  <label for="normalText">Normal Text</label>
+                  <input type="text" value="normal text field" name="normalText" id="normalText" class="width_3" />
+                  <label for="email">Email</label>
+                  <input type="email" value="email@field.com" name="email" id="email" class="width_3" />
+                  <label for="url">URL</label>
+                  <input type="url" value="url.com" name="url" id="url" class="width_3" />
+                  <label for="required">Required</label>
+                  <input type="text" required="" value="required" name="required" id="required" class="width_3" />
+                  <div class="clear"></div>
+
+                  <button class="submit">submit &raquo;</button>
+              </fieldset>
+          </form>
+      </aside>
+
+      <div class="clear" style="height:10px; border-bottom:1px solid #ccc;"></div>
+      -->
+    </div><!-- #wrap -->
+
+    <footer class="row">
+      <section class="col_8 col align_left">
+      </section>
+      <section class="col_8 col align_right">
+      </section>
+    </footer>
+
   </body>
 </html>

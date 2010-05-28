@@ -1,0 +1,5 @@
+{{ object.sys_ip }}
+
+{% for interface in object.interfaces.all %}
+    {{ interface.i_name }} | {{ interface.i_ip }} | {{ interface.i_mac }} | {{ interface.i_mask }}
+{% endfor %}

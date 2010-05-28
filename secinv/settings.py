@@ -2,12 +2,10 @@
 
 import os
 
-# The absolute path to this settings.py file, used to determine the location of
-# package data (no, really, if you want to change something, it's probably
-# DATA_PATH, below).
-ROOT = os.path.abspath(os.path.dirname(__file__))
+# The filepaths relative to settings.
+ROOT = os.path.dirname(os.path.abspath(__file__))
 # Used to translate every path in settings.py to an absolute path.
-path = lambda x: os.path.join(ROOT, x)
+path = lambda *a: os.path.join(ROOT, *a)
 
 # Base URL path.
 BASE_URL = '/secinv/'
@@ -24,11 +22,13 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'secinv2',                      # Or path to database file if using sqlite3.
-        'USER': 'root',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'NAME': 'secinv2',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+        'TEST_CHARSET': 'utf8',
+        'TEST_COLLATION': 'utf8_general_ci',
     }
 }
 
@@ -106,4 +106,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'secinv.machines',
+    #'haystack',
 )
+
+#HAYSTACK_SITECONF = 'secinv.search_sites'
+
+#HAYSTACK_SEARCH_ENGINE = 'simple'
+
