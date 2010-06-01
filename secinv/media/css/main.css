@@ -248,18 +248,36 @@ address {
 }
 
 ins {
-    color: #080;
-    text-decoration: underline;
+    background-color: #ff9;
+    color: #000;
+    text-decoration: none;
+}
+li ins,
+td ins {
+    background-color: #fff;
+    color: #080; /* Green */
+}
+
+mark {
+    background-color: #ff9;
+    color: #000; 
+    font-weight: bold;
+}
+li mark,
+td mark {
+    background-color: #fff;
+    color: #c50; /* Burnt orange */
+    font-weight: normal;
 }
 
 del {
-    color: #800;
+    color: #800; /* Red */
     text-decoration: line-through;
 }
 
-.diff_changed {
-    color: #080;
-}
+
+
+
 
 /* @end */
 

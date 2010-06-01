@@ -4,6 +4,33 @@ from django.utils.translation import ugettext_lazy as _
 import datetime
 import re
 
+def diff_dict(d_old, d_new):
+    """
+    Creates a new dict representing a diff between two dicts.
+    
+    >>> old = {'a': 1, 'b': 2}
+    >>> new = {'a': 1, 'b': 2, 'c': 3}
+    >>> diff_dict(old, new)
+    {'c': {'new': 3, 'old': None}}
+    """
+
+    # Added and changed items.
+    diff = {}
+    for k, v in d_new.items():
+        old_v = d_old.get(k, None)
+        if v == old_v:
+            continue
+        diff.update({k: {'old': old_v,
+                         'new': v}})
+
+    # Deleted items.
+    for k, v in d_old.items():
+        if k not in d_new.keys():
+            diff.update({k: {'deleted': v}})
+
+    return diff
+
+
 class Machine(models.Model):
     sys_ip = models.IPAddressField(_('IP address'))
     hostname = models.CharField(max_length=255)
@@ -85,35 +112,54 @@ class Services(models.Model):
     processes = models.CharField(max_length=255)
     ports = models.CommaSeparatedIntegerField(max_length=255)
     diff = models.CharField(_('differences'), max_length=255)
-    diff_ins_processes = models.CharField(_('new processes'),
-                                         max_length=255)
-    diff_del_processes = models.CharField(_('removed processes'),
-                                          max_length=255)
-    diff_ins_ports = models.CharField(_('new ports'), max_length=255)
-    diff_del_ports = models.CharField(_('removed ports'), max_length=255)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
     def diff_split(self):
         return re.split(',', self.diff)
 
-    def diff_ins_processes_split(self):
-        return re.split(',', self.diff_ins_processes)
+    def differences(self):
+        s_older = Services.objects.filter(
+            machine__id=self.machine_id).exclude(id=self.id).filter(
+            date_added__lt=self.date_added).order_by('-date_added').all()
 
-    def diff_del_processes_split(self):
-        return re.split(',', self.diff_del_processes)
+        s_previous = {}
+        if s_older:
+            s_procs = re.split(',', s_older[0].processes)
+            s_ports = re.split(',', s_older[0].ports)
+            s_previous = dict(zip(s_procs, s_ports))
 
-    def diff_ins_ports_split(self):
-        return re.split(',', self.diff_ins_ports)
+        s_procs = re.split(',', self.processes)
+        s_ports = re.split(',', self.ports)
+        s_latest = dict(zip(s_procs, s_ports))
 
-    def diff_del_ports_split(self):
-        return re.split(',', self.diff_del_ports)
+        return diff_dict(s_previous, s_latest)
 
     def processes_split(self):
         return re.split(',', self.processes)
 
     def ports_split(self):
         return re.split(',', self.ports)
+
+    def processes_dict(self):
+        """
+        Merge and return latest and previous dictionaries of process/ports.
+        """
+        s_older = Services.objects.filter(
+            machine__id=self.machine_id).exclude(id=self.id).filter(
+            date_added__lt=self.date_added).order_by('-date_added').all()
+
+        s_previous = {}
+        if s_older.exists():
+            s_procs = re.split(',', s_older[0].processes)
+            s_ports = re.split(',', s_older[0].ports)
+            s_previous = dict(zip(s_procs, s_ports))
+
+        s_procs = re.split(',', self.processes)
+        s_ports = re.split(',', self.ports)
+        s_latest = dict(zip(s_procs, s_ports))
+
+        return dict(s_latest, **s_previous)
 
     def __unicode__(self):
         return u'%s - %s' % (self.processes, self.ports)

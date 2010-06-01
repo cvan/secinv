@@ -70,15 +70,29 @@
         <tbody>
           <tr>
             <th>{{ _('Kernel release') }}</th>
-            <td{% if 'kernel_rel' in system.diff_split %} class="diff_changed"{% endif %}>{{ system.kernel_rel }}</td>
+            {# TODO: dict differences #}
+            {# ins, mark #}
+            <td>
+              {% if 'kernel_rel' in system.diff_split %}<mark>{% endif %}
+              {{ system.kernel_rel }}
+              {% if 'kernel_rel' in system.diff_split %}</mark>{% endif %}
+            </td>
           </tr>
           <tr>
             <th>{{ _('RedHat release') }}</th>
-            <td{% if 'rh_rel' in system.diff_split %} class="diff_changed"{% endif %}>{{ system.rh_rel }}</td>
+            <td>
+              {% if 'rh_rel' in system.diff_split %}<mark>{% endif %}
+              {{ system.rh_rel }}
+              {% if 'rh_rel' in system.diff_split %}</mark>{% endif %}
+            </td>
           </tr>
           <tr>
             <th>{{ _('NFS mounted?') }}</th>
-            <td{% if 'nfs' in system.diff_split %} class="diff_changed"{% endif %}>{{ system.nfs }}</td>
+            <td>
+              {% if 'nfs' in system.diff_split %}<mark>{% endif %}
+              {{ system.nfs }}
+              {% if 'nfs' in system.diff_split %}</mark>{% endif %}
+            </td>
           </tr>
           <tr>
             <th>{{ _('Added') }}</th>
@@ -100,15 +114,33 @@
             <th>{{ _('Kernel release') }}</th>
             <th>{{ _('RedHat release') }}</th>
             <th>{{ _('NFS') }}</th>
-            <th>{{ _('Date changed') }}</th>
+            <th>{{ _('Date modified') }}</th>
           </tr>
         </thead>
         <tbody>
 {% for system_h in system_history %}
           <tr>
-            <td{% if 'kernel_rel' in system_h.diff_split %} class="diff_changed"{% endif %}>{{ system_h.kernel_rel }}</td>
-            <td{% if 'rh_rel' in system_h.diff_split %} class="diff_changed"{% endif %}>{{ system_h.rh_rel }}</td>
-            <td{% if 'nfs' in system_h.diff_split %} class="diff_changed"{% endif %}>{{ system_h.nfs }}</td>
+            <td>
+              {% if forloop.first %}<ins>{% endif %}
+              {% if 'kernel_rel' in system_h.diff_split %}<mark>{% endif %}
+              {{ system_h.kernel_rel }}
+              {% if 'kernel_rel' in system_h.diff_split %}</mark>{% endif %}
+              {% if forloop.first %}</ins>{% endif %}
+            </td>
+            <td>
+              {% if forloop.first %}<ins>{% endif %}
+              {% if 'rh_rel' in system_h.diff_split %}<mark>{% endif %}
+              {{ system_h.rh_rel }}
+              {% if 'rh_rel' in system_h.diff_split %}</mark>{% endif %}
+              {% if forloop.first %}</ins>{% endif %}
+            </td>
+            <td>
+              {% if forloop.first %}<ins>{% endif %}
+              {% if 'nfs' in system_h.diff_split %}<mark>{% endif %}
+              {{ system_h.nfs }}
+              {% if 'nfs' in system_h.diff_split %}</mark>{% endif %}
+              {% if forloop.first %}</ins>{% endif %}
+            </td>
             <td>
               <time datetime="{{ system_h.date_added|date:'c' }}">
                 {{ system_h.date_added }}
@@ -131,6 +163,7 @@
           <tr>
             <th>{{ _('Process') }}</th>
             <th>{{ _('Port') }}</th>
+            <th>{{ _('Date modified') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -138,6 +171,14 @@
           <tr>
             <td>{{ service }}</td>
             <td>{{ port }}</td>
+        {# Get timestamp of first services entry. #}
+        {% if forloop.first %}
+          {% for services_h in services_history %}
+            {% if forloop.first %}
+            <td>{{ services_h.date_added }}</td>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
           </tr>
       {% endfor %}
         </tbody>
@@ -150,7 +191,7 @@
           <tr>
             <th>{{ _('Process') }}</th>
             <th>{{ _('Port') }}</th>
-            <th>{{ _('Date changed') }}</th>
+            <th>{{ _('Date modified') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -160,15 +201,31 @@
             <td>
               {% if services_h.processes_split %}
               <ul>
-                {% for proc in services_h.processes_split %}
-                <li{% if proc in services_h.diff_ins_processes_split %} class="diff_changed"{% endif %}>
-                  {{ proc }}
-                </li>
-                {% endfor %}
+                {% for process, port in services_h.processes_dict.items %}
+                <li>
 
-                {# loop through removed processes #}
-                {% for old_proc in services_h.diff_del_processes_split %}
-                <li><del>{{ old_proc }}</del></li>
+                {# Check if key has been changed. #}
+                {% if process in services_h.differences %}
+
+                  {% with services_h.differences|dict_get:process as process_dict %}
+                    {% if process_dict.new and not process_dict.old %}
+                        <ins>{{ process }}</ins>
+                    {% else %}
+                      {% if process_dict.new and process_dict.old %}
+                        <mark>{{ process }}</mark> <!-- {{ process_dict.new }} -->
+                      {% endif %}
+
+                      {% if process_dict.deleted %}
+                        <del>{{ process }}</del> <!--{{ process_dict.deleted }} -->
+                      {% endif %}
+                    {% endif %}
+                  {% endwith %}
+
+                {% else %}
+                        {{ process }}
+                {% endif %}
+
+                </li>
                 {% endfor %}
 
               </ul>
@@ -177,15 +234,29 @@
             <td>
               {% if services_h.ports_split %}
               <ul>
-                {% for port in services_h.ports_split %}
-                <li{% if port in services_h.diff_ins_ports_split %} class="diff_changed"{% endif %}>
-                  {{ port }}
-                </li>
-                {% endfor %}
+                {% for process, port in services_h.processes_dict.items %}
+                <li>
+                  {# Check if key has been changed. #}
+                  {% if process in services_h.differences %}
 
-                {# loop through removed ports #}
-                {% for old_port in services_h.diff_del_ports_split %}
-                <li><del>{{ old_port }}</del></li>
+                    {% with services_h.differences|dict_get:process as process_dict %}
+                      {% if process_dict.new and not process_dict.old %}
+                          <ins>{{ port }}</ins>
+                      {% else %}
+                        {% if process_dict.new and process_dict.old %}
+                          <mark>{{ process_dict.new }}</mark>
+                        {% endif %}
+
+                        {% if process_dict.deleted %}
+                          <del>{{ port }}</del> <!--{{ process_dict.deleted }} -->
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ port }}
+                  {% endif %}
+                </li>
                 {% endfor %}
 
               </ul>

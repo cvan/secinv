@@ -13,14 +13,18 @@ def index(request):
 def detail(request, machine_slug):
     p = get_object_or_404(Machine, hostname=machine_slug)
 
-    system_latest = System.objects.filter(machine__id=p.id).latest()
+    system_latest = {}
     system_history = System.objects.filter(machine__id=p.id).all()
 
+    if system_history.exists():
+        system_latest = System.objects.filter(machine__id=p.id).latest()
+
     services_latest = {}
-    services_obj = Services.objects.filter(machine__id=p.id).latest()
     services_history = Services.objects.filter(machine__id=p.id).all()
 
-    if services_obj:
+    if services_history.exists():
+        services_obj = Services.objects.filter(machine__id=p.id).latest()
+
         services_processes = re.split(',', services_obj.processes)
         services_ports = re.split(',', services_obj.ports)
 
@@ -28,9 +32,11 @@ def detail(request, machine_slug):
 
 
     rpms_list = []
-    rpms_obj = RPMs.objects.filter(machine__id=p.id).latest()
+    rpms_history = RPMs.objects.filter(machine__id=p.id).all()
 
-    if rpms_obj:
+    if rpms_history.exists():
+        rpms_obj = RPMs.objects.filter(machine__id=p.id).latest()
+
         rpms_list = re.split('\n', rpms_obj.rpms)
 
     # TODO: RPMS diff, history.
