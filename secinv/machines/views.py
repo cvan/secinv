@@ -19,16 +19,12 @@ def detail(request, machine_slug):
     if system_history.exists():
         system_latest = System.objects.filter(machine__id=p.id).latest()
 
-    services_latest = {}
+
+    services_latest = []
     services_history = Services.objects.filter(machine__id=p.id).all()
 
     if services_history.exists():
-        services_obj = Services.objects.filter(machine__id=p.id).latest()
-
-        services_processes = re.split(',', services_obj.processes)
-        services_ports = re.split(',', services_obj.ports)
-
-        services_latest = dict(zip(services_processes, services_ports))
+        services_latest = Services.objects.filter(machine__id=p.id).latest()
 
 
     rpms_list = []

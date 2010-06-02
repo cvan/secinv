@@ -86,12 +86,12 @@
             <th>{{ _('NFS mounted?') }}</th>
             <td>
               {% if 'nfs' in system.diff_split %}<mark>{% endif %}
-              {{ system.nfs }}
+              {% if system.nfs %}Yes{% else %}No{% endif %}
               {% if 'nfs' in system.diff_split %}</mark>{% endif %}
             </td>
           </tr>
           <tr>
-            <th>{{ _('Added') }}</th>
+            <th>{{ _('Modified') }}</th>
             <td>
               {% if system.date_added %}
               <time datetime="{{ system.date_added|date:'c' }}">
@@ -164,26 +164,85 @@
           </tr>
         </thead>
         <tbody>
-      {% spaceless %}
-      {% for service, port in services.items %}
+
           <tr>
-            <td>{{ service }}</td>
-            <td>{{ port }}</td>
-        {# Get timestamp of first services entry. #}
-        {% if forloop.first %}
-          {% for services_h in services_history %}
-            {% if forloop.first %}
-            <td>{{ services_h.date_added }}</td>
-            {% endif %}
-          {% endfor %}
-        {% endif %}
+            <td>
+              {% if services.processes_split %}
+              <ul>
+                {% for process, port in services.processes_dict.items %}
+                {% spaceless %}
+                <li>
+                {# Check if key has been changed. #}
+                {% if process in services.differences %}
+
+                  {% with services.differences|dict_get:process as process_dict %}
+                    {% if process_dict.new and not process_dict.old %}
+                        <ins>{{ process }}</ins>
+                    {% else %}
+                      {% if process_dict.new and process_dict.old %}
+                        <mark>{{ process }}</mark>
+                      {% endif %}
+
+                      {% if process_dict.deleted %}
+                        <del>{{ process }}</del>
+                      {% endif %}
+                    {% endif %}
+                  {% endwith %}
+
+                {% else %}
+                        {{ process }}
+                {% endif %}
+
+                </li>
+                {% endspaceless %}
+                {% endfor %}
+
+              </ul>
+              {% endif %}
+            </td>
+            <td>
+              {% if services.ports_split %}
+              <ul>
+                {% for process, port in services.processes_dict.items %}
+                {% spaceless %}
+                <li>
+                  {# Check if key has been changed. #}
+                  {% if process in services.differences %}
+
+                    {% with services.differences|dict_get:process as process_dict %}
+                      {% if process_dict.new and not process_dict.old %}
+                          <ins>{{ port }}</ins>
+                      {% else %}
+                        {% if process_dict.new and process_dict.old %}
+                          <mark>{{ process_dict.new }}</mark>
+                        {% endif %}
+
+                        {% if process_dict.deleted %}
+                          <del>{{ port }}</del>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ port }}
+                  {% endif %}
+                </li>
+                {% endspaceless %}
+                {% endfor %}
+
+              </ul>
+              {% endif %}
+            </td>
+            <td>
+              <time datetime="{{ services.date_added|date:'c' }}">
+                {{ services.date_added }}
+              </time>
+            </td>
           </tr>
-      {% endfor %}
-      {% endspaceless %}
+
         </tbody>
       </table>
 
-{# TODO: consider having a column for each process/port #}
       <table>
         <caption>{{ _('Change history') }}</caption>
         <thead>
@@ -196,7 +255,6 @@
         <tbody>
 {% for services_h in services_history %}
           <tr>
-{# TODO: highlight changed 'process's and changed 'port's #}
             <td>
               {% if services_h.processes_split %}
               <ul>
