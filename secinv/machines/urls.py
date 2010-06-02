@@ -1,4 +1,5 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns, url, include
+from . import views
 
 # Regex fragments for easy reading.
 machine_slug = r'(?P<machine_slug>[-\w]+)'

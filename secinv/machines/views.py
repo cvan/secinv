@@ -1,6 +1,6 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from secinv.machines.models import Machine, Services, System, RPMs, Interface
+from .models import Machine, Services, System, RPMs, Interface
 #from django.http import HttpResponse
 
 import re
@@ -13,7 +13,7 @@ def index(request):
 def detail(request, machine_slug):
     p = get_object_or_404(Machine, hostname=machine_slug)
 
-    system_latest = {}
+    system_latest = []
     system_history = System.objects.filter(machine__id=p.id).all()
 
     if system_history.exists():

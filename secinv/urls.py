@@ -9,7 +9,7 @@ urlpatterns = patterns('',
     # (r'^secinv/', include('secinv.foo.urls')),
 
     (r'^machines/', include('secinv.machines.urls')),
-    #(r'^search/', include('haystack.urls')),
+    (r'^search/', include('secinv.haystack_search.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

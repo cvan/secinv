@@ -106,10 +106,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'secinv.machines',
-    #'haystack',
+    'secinv.haystack_search',
 )
 
-#HAYSTACK_SITECONF = 'secinv.search_sites'
+HAYSTACK_SITECONF = 'secinv.search_sites'
 
-#HAYSTACK_SEARCH_ENGINE = 'simple'
+HAYSTACK_SEARCH_ENGINE = 'simple'
 

@@ -1,8 +1,8 @@
 import datetime
-from haystack.indexes import *
+from secinv.haystack_search.indexes import *
 from haystack import site
-from secinv.machines.models import Machine
-
+#from .models import Machine
+from .models import Machine, Services, System, RPMs, Interface
 
 class MachineIndex(RealTimeSearchIndex):
     text = CharField(document=True, use_template=True)
