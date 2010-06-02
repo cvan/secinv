@@ -30,6 +30,23 @@ def diff_dict(d_old, d_new):
 
     return diff
 
+def diff_list(l_old, l_new):
+    """
+    Creates a new dict representing a diff between two lists.
+    """
+
+    set_new, set_past = set(l_new), set(l_old)
+    intersect = set_new.intersection(set_past)
+
+    added = list(set_new - intersect)
+    deleted = list(set_past - intersect)
+
+    # Added and removed items.
+    diff = {'added': added,
+            'deleted': deleted}
+
+    return diff
+
 
 class Machine(models.Model):
     sys_ip = models.IPAddressField(_('IP address'))
@@ -124,7 +141,7 @@ class Services(models.Model):
             date_added__lt=self.date_added).order_by('-date_added').all()
 
         s_previous = {}
-        if s_older:
+        if s_older.exists():
             s_procs = re.split(',', s_older[0].processes)
             s_ports = re.split(',', s_older[0].ports)
             s_previous = dict(zip(s_procs, s_ports))
@@ -172,17 +189,25 @@ class Services(models.Model):
 class RPMs(models.Model):
     machine = models.ForeignKey('Machine')
     rpms = models.TextField(_('RPMs'))
-    diff = models.CharField(_('differences'), max_length=255)
-    diff_ins_rpms = models.CharField(_('RPM differences'), max_length=255)
-    diff_del_rpms = models.CharField(_('RPM differences'), max_length=255)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
-    def diff_split(self):
-        return re.split(',', self.diff)
+    def differences(self):
+        r_older = RPMs.objects.filter(
+            machine__id=self.machine_id).exclude(id=self.id).filter(
+            date_added__lt=self.date_added).order_by('-date_added').all()
+
+        r_previous = []
+        if r_older:
+            r_previous = re.split('\n', r_older[0].rpms)
+
+        r_latest = re.split('\n', self.rpms)
+
+        return diff_list(r_previous, r_latest)
+
 
     def __unicode__(self):
-        return u'%s' % (self.rpms)
+        return u'%s' % (self.rpms[0:100])
 
     class Meta:
         verbose_name = _('RPMs')

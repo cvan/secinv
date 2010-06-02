@@ -274,7 +274,9 @@ del {
     color: #800; /* Red */
     text-decoration: line-through;
 }
-
+del.visible {
+    text-decoration: none;
+}
 
 
 

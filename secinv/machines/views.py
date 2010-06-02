@@ -71,6 +71,7 @@ def detail(request, machine_slug):
                         'services': services_latest,
                         'services_history': services_history,
                         'rpms': rpms_list,
+                        'rpms_history': rpms_history,
                         'interfaces': interfaces_latest,
                         'interfaces_history': interfaces_history}
     return render_to_response('machines/detail.html', template_context,

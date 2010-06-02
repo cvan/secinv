@@ -167,6 +167,7 @@
           </tr>
         </thead>
         <tbody>
+      {% spaceless %}
       {% for service, port in services.items %}
           <tr>
             <td>{{ service }}</td>
@@ -181,6 +182,7 @@
         {% endif %}
           </tr>
       {% endfor %}
+      {% endspaceless %}
         </tbody>
       </table>
 
@@ -202,8 +204,8 @@
               {% if services_h.processes_split %}
               <ul>
                 {% for process, port in services_h.processes_dict.items %}
+                {% spaceless %}
                 <li>
-
                 {# Check if key has been changed. #}
                 {% if process in services_h.differences %}
 
@@ -226,6 +228,7 @@
                 {% endif %}
 
                 </li>
+                {% endspaceless %}
                 {% endfor %}
 
               </ul>
@@ -235,6 +238,7 @@
               {% if services_h.ports_split %}
               <ul>
                 {% for process, port in services_h.processes_dict.items %}
+                {% spaceless %}
                 <li>
                   {# Check if key has been changed. #}
                   {% if process in services_h.differences %}
@@ -257,6 +261,7 @@
                           {{ port }}
                   {% endif %}
                 </li>
+                {% endspaceless %}
                 {% endfor %}
 
               </ul>
@@ -286,6 +291,47 @@
         {% endfor %}
       </ul>
       {% endif %}
+
+      <table>
+        <caption>{{ _('Change history') }}</caption>
+        <thead>
+          <tr>
+            <th>{{ _('Installed') }}</th>
+            <th>{{ _('Removed') }}</th>
+            <th>{{ _('Date modified') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+{% for rpms_h in rpms_history %}
+          <tr>
+            <td>
+              {% if rpms_h.differences.added %}
+              <ul>
+                {% for rpm in rpms_h.differences.added %}
+                <li><ins>{{ rpm }}</ins></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </td>
+            <td>
+              {% if rpms_h.differences.deleted %}
+              <ul>
+                {% for rpm in rpms_h.differences.deleted %}
+                <li><del class="visible">{{ rpm }}</del></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </td>
+            <td>{{ rpms_h.date_added }}</td>
+          </tr>
+{% empty %}
+          <tr>
+            <td></td>
+          </tr>
+{% endfor %}
+        </tbody>
+      </table>
+
 
 {% if interfaces %}
       <table>
@@ -326,6 +372,20 @@
         </tbody>
       </table>
 {% endif %}
+
+<table>
+  <caption>{{ _('Change history') }}</caption>
+  <thead>
+    <tr>
+      <th>{{ _('Installed') }}</th>
+      <th>{{ _('Removed') }}</th>
+      <th>{{ _('Date modified') }}</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
