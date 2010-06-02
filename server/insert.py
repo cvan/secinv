@@ -28,7 +28,7 @@ setup_environ(settings)
 
 from machines.models import *
 
-ip_dict = {'sit0': {'i_mac': '00:00:00:00', 'i_mask': '', 'i_ip': ''}, 'lo': {'i_mac': '00:00:00:00:00:00', 'i_mask': '255.0.0.0', 'i_ip': '127.0.0.1'}, 'eth0': {'i_mac': '00:50:56:a5:11:39', 'i_mask': '255.255.255.0', 'i_ip': '10.2.72.89'}}
+ip_dict = {'sit0': {'i_mac': '00:00:00:00', 'i_mask': '', 'i_ip': ''}, 'lo': {'i_mac': '00:00:00:00:00:06', 'i_mask': '255.0.0.0', 'i_ip': '127.0.0.1'}, 'eth0': {'i_mac': '01:50:56:a5:11:39', 'i_mask': '255.255.255.0', 'i_ip': '10.2.72.89'}}
 
 system_dict = {'kernel_rel': '2.8.18-194.3.1.el5', 'hostname': 'cm-sectest02', 'nfs': 0, 'rh_rel': '5.5 (Tikanga)'}
 
