@@ -88,12 +88,53 @@ class Interface(models.Model):
     i_ip = models.IPAddressField(_('IP address'))
     i_mac = models.CharField(_('MAC address'), max_length=17)
     i_mask = models.IPAddressField(_('netmask'))
-    diff = models.CharField(_('differences'), max_length=255)
+    active = models.BooleanField(_('active'), default=1)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
     def diff_split(self):
         return re.split(',', self.diff)
+
+    def differences(self):
+        """
+        Create a dictionary of the differences between the latest
+        interface of the same interface name.
+        """
+        i_older = Interface.objects.filter(machine__id=self.machine_id,
+            i_name=self.i_name).exclude(id=self.id).filter(
+            date_added__lt=self.date_added).order_by('-date_added').all()
+
+        i_fields = ['i_ip', 'i_mac', 'i_mask']
+
+        i_previous = {}
+        if i_older.exists():
+            i_values = [i_older[0].i_ip, i_older[0].i_mac, i_older[0].i_mask]
+            i_previous = dict(zip(i_fields, i_values))
+
+        i_values = [self.i_ip, self.i_mac, self.i_mask]
+        i_latest = dict(zip(i_fields, i_values))
+
+        return diff_dict(i_previous, i_latest)
+
+    def interfaces_dict(self):
+        """
+        Merge and return latest and previous dictionaries of interfaces.
+        """
+        i_older = Interface.objects.filter(machine__id=self.machine_id,
+            i_name=self.i_name).exclude(id=self.id).filter(
+            date_added__lt=self.date_added).order_by('-date_added').all()
+
+        i_fields = ['i_ip', 'i_mac', 'i_mask']
+
+        i_previous = {}
+        if i_older.exists():
+            i_values = [i_older[0].i_ip, i_older[0].i_mac, i_older[0].i_mask]
+            i_previous = dict(zip(i_fields, i_values))
+
+        i_values = [self.i_ip, self.i_mac, self.i_mask]
+        i_latest = dict(zip(i_fields, i_values))
+
+        return dict(i_latest, **i_previous)
 
     def __unicode__(self):
         return u'%s - %s - %s - %s' % (self.i_name, self.i_ip, self.i_mac,

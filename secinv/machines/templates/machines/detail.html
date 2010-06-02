@@ -13,9 +13,7 @@
           <tr>
             <th>{{ _('IP address') }}</th>
             <td>
-              <a href="http://ws.arin.net/whois/?queryinput={{ machine.sys_ip }}">
-                {{ machine.sys_ip }}
-              </a>
+              {{ machine.sys_ip }}
             </td>
           </tr>
           <tr>
@@ -25,9 +23,7 @@
           <tr>
             <th>{{ _('External IP address') }}</th>
             <td>
-              <a href="http://ws.arin.net/whois/?queryinput={{ machine.ext_ip }}">
-                {{ machine.ext_ip }}
-              </a>
+              {{ machine.ext_ip }}
             </td>
           </tr>
 {# TODO: uniform date format #}
@@ -120,6 +116,7 @@
         <tbody>
 {% for system_h in system_history %}
           <tr>
+            {# TODO: do diff_differences #}
             <td>
               {% if forloop.first %}<ins>{% endif %}
               {% if 'kernel_rel' in system_h.diff_split %}<mark>{% endif %}
@@ -322,7 +319,10 @@
               </ul>
               {% endif %}
             </td>
-            <td>{{ rpms_h.date_added }}</td>
+            <td>
+              <time datetime="{{ rpms_h.date_added|date:'c' }}">
+                {{ rpms_h.date_added }}
+              </time>
           </tr>
 {% empty %}
           <tr>
@@ -342,30 +342,88 @@
             <th>{{ _('IP address') }}</th>
             <th>{{ _('MAC address') }}</th>
             <th>{{ _('Netmask') }}</th>
-            <th>{{ _('Added') }}</th>
-            <th>{{ _('Change history') }}</th>
+            <th>{{ _('Modified') }}</th>
           </tr>
         </thead>
         <tbody>
       {% for interface in interfaces %}
           <tr>
-            <td>{{ interface.i_name }}</td>
             <td>
-              <a href="http://ws.arin.net/whois/?queryinput={{ interface.i_ip }}">
-                {{ interface.i_ip }}
-              </a>
+              {% if interface.id in interfaces_oldest %}<ins>{% endif %}
+              {% if not interface.active %}<del>{% endif %}
+              {{ interface.i_name }}
+              {% if not interface.active %}</del>{% endif %}
+              {% if interface.id in interfaces_oldest %}</ins>{% endif %}
             </td>
-            <td>{{ interface.i_mac }}</td>
-            <td>{{ interface.i_mask }}</td>
+            <td>
+              {% if not interface.active %}<del>{% endif %}
+
+              {% spaceless %}
+              {% if 'i_ip' in interface.differences %}
+                {% with interface.differences.i_ip as interface_dict %}
+                  {% if interface_dict.new and not interface_dict.old %}
+                      <ins>{{ interface.i_ip }}</ins>
+                  {% else %}
+                    {% if interface_dict.new and interface_dict.old %}
+                      <mark>{{ interface.i_ip }}</mark>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                      {{ interface.i_ip }}
+              {% endif %}
+              {% endspaceless %}
+
+              {% if not interface.active %}</del>{% endif %}
+            </td>
+            <td>
+              {% if not interface.active %}<del>{% endif %}
+
+              {% spaceless %}
+              {% if 'i_mac' in interface.differences %}
+                {% with interface.differences.i_mac as interface_dict %}
+                  {% if interface_dict.new and not interface_dict.old %}
+                      <ins>{{ interface.i_mac }}</ins>
+                  {% else %}
+                    {% if interface_dict.new and interface_dict.old %}
+                      <mark>{{ interface.i_mac }}</mark>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                      {{ interface.i_mac }}
+              {% endif %}
+              {% endspaceless %}
+
+              {% if not interface.active %}</del>{% endif %}
+            </td>
+            <td>
+              {% if not interface.active %}<del>{% endif %}
+
+              {% spaceless %}
+              {% if 'i_mask' in interface.differences %}
+                {% with interface.differences.i_mask as interface_dict %}
+                  {% if interface_dict.new and not interface_dict.old %}
+                      <ins>{{ interface.i_mask }}</ins>
+                  {% else %}
+                    {% if interface_dict.new and interface_dict.old %}
+                      <mark>{{ interface.i_mask }}</mark>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                      {{ interface.i_mask }}
+              {% endif %}
+              {% endspaceless %}
+
+              {% if not interface.active %}</del>{% endif %}
+            </td>
             <td>
               {% if interface.date_added %}
               <time datetime="{{ interface.date_added|date:'c' }}">
                 {{ interface.date_added }}
               </time>
               {% endif %}
-            </td>
-            <td>
-{# TODO: Change history for this interface name #}
             </td>
           </tr>
       {% endfor %}
@@ -377,12 +435,93 @@
   <caption>{{ _('Change history') }}</caption>
   <thead>
     <tr>
-      <th>{{ _('Installed') }}</th>
-      <th>{{ _('Removed') }}</th>
-      <th>{{ _('Date modified') }}</th>
+      <th>{{ _('Interface name') }}</th>
+      <th>{{ _('IP address') }}</th>
+      <th>{{ _('MAC address') }}</th>
+      <th>{{ _('Netmask') }}</th>
+      <th>{{ _('Modified') }}</th>
     </tr>
   </thead>
   <tbody>
+    {% for interface_h in interfaces_history %}
+    <tr>
+      <td>
+        {% if interface_h.id in interfaces_oldest %}<ins>{% endif %}
+        {% if not interface_h.active %}<del>{% endif %}
+        {{ interface_h.i_name }}
+        {% if not interface_h.active %}</del>{% endif %}
+        {% if interface_h.id in interfaces_oldest %}</ins>{% endif %}
+      </td>
+      <td>
+        {% if not interface_h.active %}<del>{% endif %}
+
+        {% spaceless %}
+        {% if 'i_ip' in interface_h.differences %}
+          {% with interface_h.differences.i_ip as interface_dict %}
+            {% if interface_dict.new and not interface_dict.old %}
+                <ins>{{ interface_h.i_ip }}</ins>
+            {% else %}
+              {% if interface_dict.new and interface_dict.old %}
+                <mark>{{ interface_h.i_ip }}</mark>
+              {% endif %}
+            {% endif %}
+          {% endwith %}
+        {% else %}
+                {{ interface_h.i_ip }}
+        {% endif %}
+        {% endspaceless %}
+
+        {% if not interface_h.active %}</del>{% endif %}
+      </td>
+      <td>
+        {% if not interface_h.active %}<del>{% endif %}
+
+        {% spaceless %}
+        {% if 'i_mac' in interface_h.differences %}
+          {% with interface_h.differences.i_mac as interface_dict %}
+            {% if interface_dict.new and not interface_dict.old %}
+                <ins>{{ interface_h.i_mac }}</ins>
+            {% else %}
+              {% if interface_dict.new and interface_dict.old %}
+                <mark>{{ interface_h.i_mac }}</mark>
+              {% endif %}
+            {% endif %}
+          {% endwith %}
+        {% else %}
+                {{ interface_h.i_mac }}
+        {% endif %}
+        {% endspaceless %}
+
+        {% if not interface_h.active %}</del>{% endif %}
+      </td>
+      <td>
+        {% if not interface_h.active %}<del>{% endif %}
+
+        {% spaceless %}
+        {% if 'i_mask' in interface_h.differences %}
+          {% with interface_h.differences.i_mask as interface_dict %}
+            {% if interface_dict.new and not interface_dict.old %}
+                <ins>{{ interface_h.i_mask }}</ins>
+            {% else %}
+              {% if interface_dict.new and interface_dict.old %}
+                <mark>{{ interface_h.i_mask }}</mark>
+              {% endif %}
+            {% endif %}
+          {% endwith %}
+        {% else %}
+                {{ interface_h.i_mask }}
+        {% endif %}
+        {% endspaceless %}
+
+        {% if not interface_h.active %}</del>{% endif %}
+      </td>
+      <td>
+        <time datetime="{{ interface_h.date_added|date:'c' }}">
+          {{ interface_h.date_added }}
+        </time>
+      </td>
+    </tr>
+    {% endfor %}
   </tbody>
 </table>
 

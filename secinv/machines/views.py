@@ -39,31 +39,25 @@ def detail(request, machine_slug):
 
         rpms_list = re.split('\n', rpms_obj.rpms)
 
-    # TODO: RPMS diff, history.
-
 
     # Get latest interfaces (select by distinct interface name).
     distinct_interfaces = Interface.objects.filter(
         machine__id=p.id).values_list('i_name', flat=True).distinct()
 
     interfaces_latest = []
+    interfaces_oldest_ids = []
     for i in distinct_interfaces:
         i_latest_distinct = Interface.objects.filter(machine__id=p.id,
                                                      i_name=i).latest()
         if i_latest_distinct:
             interfaces_latest.append(i_latest_distinct)
 
-    # Get all interfaces (select by distinct interface name).
-    '''
-    interfaces_history = []
-    for i in distinct_interfaces:
-        i_latest_distinct = Interface.objects.filter(machine__id=p.id,
-                                                    i_name=i).all()
-        if latest_distinct:
-            interfaces_history.append(i_latest_distinct)
-    '''
-    interfaces_history = Interface.objects.filter(machine__id=p.id).all()
+        i_oldest = Interface.objects.filter(machine__id=p.id,
+            i_name=i).order_by('date_added').all()
+        if i_oldest.exists():
+            interfaces_oldest_ids.append(i_oldest[0].id)
 
+    interfaces_history = Interface.objects.filter(machine__id=p.id).all()
 
     template_context = {'machine': p,
                         'system': system_latest,
@@ -73,7 +67,8 @@ def detail(request, machine_slug):
                         'rpms': rpms_list,
                         'rpms_history': rpms_history,
                         'interfaces': interfaces_latest,
-                        'interfaces_history': interfaces_history}
+                        'interfaces_history': interfaces_history,
+                        'interfaces_oldest': interfaces_oldest_ids}
     return render_to_response('machines/detail.html', template_context,
         context_instance=RequestContext(request))
 
