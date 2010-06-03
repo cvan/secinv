@@ -1,0 +1,490 @@
+/* @group General styles */
+
+/* @group Reset */
+
+/* Based on http://meyerweb.com/eric/tools/css/reset/ */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* @end */
+
+body {
+    margin: 0 auto;
+    padding: 20px 200px;
+    color: #444;
+/*    font-size: 13px; */
+    font-size: 15px;
+    line-height: 1.538em; /* Baseline grid of 20px */
+    min-width: 780px;
+}
+
+a:link,
+button.link span {
+    color: #05e;
+    text-decoration: none;
+}
+a:visited {
+    color: #003595;
+    text-decoration: none;
+}
+a:hover,
+a:focus,
+a:active,
+button.link:hover span,
+button.link:focus span,
+button.link:active span {
+    color: #003595;
+    text-decoration: underline;
+}
+
+
+/* @group Font families */
+
+body,
+#title,
+.categories h3,
+.item h3,
+.section-teaser .addon-view h3 {
+    font-family: "helvetica neue", arial, helvetica, sans-serif;
+}
+
+h2,
+h3,
+#title em,
+.highlight h2,
+.highlight h3,
+.stats strong,
+h4.step {
+    font-family: georgia, serif;
+}
+
+pre, code, kbd, tt, samp, tt {
+    font-family: "andale mono", monospace;
+}
+
+/* @end */
+
+/* @group Headings */
+
+/* size headings using classic scale of 16, 18, 24, 36 */
+
+h1 {
+    font-size: 2.571em /* 36px */;
+    line-height:1em /* 36px */;
+    margin-top:0.1667em /* 6px */;
+    margin-bottom:0.5833em /* 21px */;
+}
+h2 {
+    font-size:2.154em /* 28px */;
+    font-weight:normal;
+    line-height:1em /* 28px */;
+    margin-top:0.5em /* 42px */;
+    margin-bottom:0.5em /* 14px */;
+    color:#C63717;
+}
+h3 {
+    color:#011234;
+    font-size:1.385em /* 18px */;
+    font-weight:normal;
+    line-height:1.111em /* 20px */;
+    margin-top:1.556em /* 28px */;
+    margin-bottom:0.778em /* 14px */;
+}
+h4 {
+    color:#223355;
+    font-size:1em /* 13px */;
+}
+h5, h6 {
+    font-size:1em /* 13px */;
+}
+
+h2 em {
+  color: #666;
+  display: block;
+  font-size: 0.7em;
+  font-style: normal;
+}
+
+/* @end */
+
+/* @group Lists */
+
+.prose ul,
+ul.xoxo,
+ul.xoxo ul {
+/* unordered lists more often DON'T require bullets except in extended bits of writing. Where bullets are required apply the .prose class to a container, or apply directly with .xoxo */
+    list-style-type: square;
+    margin-left: 1.5em; /* 21px */
+}
+
+.html-rtl .prose ul,
+.html-rtl ul.xoxo,
+.html-rtl ul.xoxo ul {
+/* unordered lists more often DON'T require bullets except in extended bits of writing. Where bullets are required apply the .prose class to a container, or apply directly with .xoxo */
+    list-style-type: square;
+    margin-left: 0em;
+    margin-right: 1.5em; /* 21px */
+}
+
+.prose ul li,
+ul.xoxo li,
+ul.xoxo ul li {
+    margin-bottom: 0.5em;
+}
+
+ol { /* ordered lists usually DO require (numbered) bullets */
+    list-style-type: decimal;
+    margin-left: 2em; /* 26px */
+}
+
+.html-rtl ol {
+    margin-left: 0;
+    margin-right: 2em;
+}
+
+dt {
+    font-weight: bold;
+    margin-top: 1.5em; /* 19.5px */
+}
+
+ul ul, ol ol, ol ul, ul ol {
+    margin-bottom: 0;
+}
+
+/* @end */
+
+/* @group Tables */
+
+table {
+    border-bottom: 1px solid #666;
+}
+
+caption {
+    font-weight: bold;
+    padding-bottom: 0.539em; /* 7px */
+    font-size:1.231em; /* 16px */
+}
+
+thead th {
+    border-top: 1px solid #666;
+    border-bottom: 3px solid #666;
+    padding-top: 0;
+    padding-bottom: 0.539em; /* 7px */
+}
+
+tbody {
+    border-top: 3px solid #666; /* not rendered in IE6/7 */
+}
+
+tbody tr th, tbody tr td {
+    border-top: 1px solid #ddd;
+}
+
+th, td {
+    text-align: left;
+    padding: 0.308em 0.537em 0.214em 0.231em; /* 4px 7px 3px 7px */
+}
+
+/* @end */
+
+/* @group Blockquotes */
+
+blockquote {
+    font-style: italic;
+    margin:0 1.5em 1.5em 1.5em; /* 19.5px */
+}
+
+p+p+blockquote {
+    margin-top: 1.5em /* 19.5px */;
+}
+
+blockquote cite, blockquote em {
+    font-style: normal;
+}
+
+/* @end */
+
+/* @group Other styling */
+
+p, ul, ol, dl, address, table, pre, form, fieldset {
+    font-size: 1em /* 14px */;
+    margin-bottom: 1.5em; /* 21px */
+}
+
+address {
+    font-style: normal;
+}
+
+ins {
+    background-color: #ff9;
+    color: #000;
+    text-decoration: none;
+}
+li ins,
+td ins {
+    background-color: #fff;
+    color: #080; /* Green */
+}
+
+mark {
+    background-color: #ff9;
+    color: #000; 
+    font-weight: bold;
+}
+li mark,
+td mark {
+    background-color: #fff;
+    color: #c50; /* Burnt orange */
+    font-weight: normal;
+}
+
+del {
+    color: #800; /* Red */
+    text-decoration: line-through;
+}
+del.visible {
+    text-decoration: none;
+}
+
+
+
+
+/* @end */
+
+
+/* @end */
+
+/* @group Helper styles */
+
+/* @group Header */
+header {height:112px; position:relative; margin-bottom:5px;}
+	header .logo {font-size:1.5em; height:52px; padding-top:28px; font-weight:700; text-shadow:1px 1px 2px #000; color:#fff; filter: Shadow(Color=#666666, Direction=135, Strength=3);}
+  header .logo a { text-decoration: none; }
+	header .statement {width:20%; text-align:right; padding-top:30px;}
+header nav { background-color: #525252; color: #fff; height: 35px; float: left; width: 100%; }
+	nav ul {list-style:none;}
+	nav ul li {float:left; margin-left:5px; }
+	nav ul li a, nav ul li a:visited {display:block; color: #999; text-decoration:none; padding:2px 8px; margin-top:8px;  
+					-moz-border-radius-topleft: 5px; -webkit-border-top-left-radius: 5px; -moz-border-radius-topright: 5px; -webkit-border-top-right-radius: 5px;}
+	nav ul li a:hover,
+	body.machines nav ul li.machines a {
+	  background-color:#fff; color:#000; text-decoration: none;
+	}
+aside {min-height:525px;}	
+
+	.submit, .submit:visited {
+		background: #525252; 
+		display: inline-block; 
+		padding: 5px 10px 6px; 
+		color: #fff; 
+		-moz-border-radius: 5px; 
+		-webkit-border-radius: 5px;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+		-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+		-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+		border:none;
+		text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+		position: relative;
+		cursor: pointer;
+		margin-bottom:5px;
+	}
+
+footer { font-size:.8em; } 
+.clear { clear: both; }
+/* @end */
+
+/* @group Forms */
+
+/* @group Containers */
+
+form .container {
+    margin-bottom: 1.5em; /* 19.5px */
+}
+
+
+/* @group Fieldsets */
+
+fieldset {
+    border: 1px solid #ccc;
+    padding: 0 1.5em 1em 1.5em; /* 0 19.5px 13px 19.5px */
+}
+
+legend {
+    font-weight: bold;
+}
+
+form fieldset .container {
+    margin-top: 1em; /* 13px */
+    margin-bottom:0;
+    position: relative;
+}
+
+/* @end */
+
+/* @end */
+
+/* @group Labels */
+
+label {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.meta-label {
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.multi-container label,
+.radio-container label,
+.checkbox-container label {
+    font-weight: normal;
+}
+
+.radio-container label,
+.checkbox-container label {
+    display: block;
+}
+
+.compact label {
+    display: inline;
+}
+
+/* @end */
+
+/* @group Meta */
+
+form .help {
+    display: block;
+    color: #777;
+    font-style: normal;
+    font-size: 0.923em; /* 12px */
+}
+
+/* @end */
+
+/* @group Form controls */
+
+input, textarea, select, button {
+    font-family: inherit;
+    font-size: 1em;
+    line-height: inherit;
+}
+
+select {
+    background-color: #fff; /* fixes bug in Opera which inherits bgcolor from container */
+}
+
+
+button {
+    overflow: visible;
+    cursor: pointer;
+}
+
+textarea,
+input[type='text'],
+input[type='password'],
+select {
+    border-width: 1px;
+    border-style: solid;
+    border-top-color: #999;
+    border-left-color: #999;
+    border-bottom-color: #ccc;
+    border-right-color: #ccc;
+    padding: 0 1px 1px 1px;
+}
+
+textarea:focus,
+input[type='text']:focus,
+input[type='password']:focus,
+select:focus {
+    border-color: #888;
+    outline: 1px solid #ffffaa;
+}
+
+input.short {
+    width: 4em;
+}
+
+input.medium, textarea.medium {
+    width: 12em;
+}
+
+input.long, textarea.long {
+    width: 30em;
+}
+
+input.placeholder {
+    color: #444;
+}
+
+textarea {
+    width: 99%;
+    display: block;
+}
+
+.button-container input {
+    font-weight: bold;
+}
+
+.button-container input.cancel {
+    font-weight: normal;
+}
+
+button.link {
+    background-image: none;
+    border: 0;
+    padding: 0;
+    background-color: #fff;
+    font-weight: normal;
+    cursor: pointer;
+    width: auto;
+    overflow: visible;
+    text-shadow: none;
+    -moz-user-select: text;
+}
+
+/* accessibility feature, resize check and radio inputs */
+.radio-container input,
+.checkbox-container input {
+    width: 1em;
+    height: 1em;
+}
+
+/* @end */
+
+/* @end */
+
+/* @end */
