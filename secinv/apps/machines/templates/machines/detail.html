@@ -69,25 +69,61 @@
             {# TODO: dict differences #}
             {# ins, mark #}
             <td>
-              {% if 'kernel_rel' in system.diff_split %}<mark>{% endif %}
-              {{ system.kernel_rel }}
-              {% if 'kernel_rel' in system.diff_split %}</mark>{% endif %}
+              {% spaceless %}
+              {% if 'kernel_rel' in system.differences %}
+                {% with system.differences.kernel_rel as system_dict %}
+                  {% if system_dict.new and not system_dict.old %}
+                      <ins>{{ system.kernel_rel }}</ins>
+                  {% else %}
+                    {% if system_dict.new and system_dict.old %}
+                      <mark>{{ system.kernel_rel }}</mark>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                      {{ system.kernel_rel }}
+              {% endif %}
+              {% endspaceless %}
             </td>
           </tr>
           <tr>
             <th>{{ _('RedHat release') }}</th>
             <td>
-              {% if 'rh_rel' in system.diff_split %}<mark>{% endif %}
-              {{ system.rh_rel }}
-              {% if 'rh_rel' in system.diff_split %}</mark>{% endif %}
+              {% spaceless %}
+              {% if 'rh_rel' in system.differences %}
+                {% with system.differences.rh_rel as system_dict %}
+                  {% if system_dict.new and not system_dict.old %}
+                      <ins>{{ system.rh_rel }}</ins>
+                  {% else %}
+                    {% if system_dict.new and system_dict.old %}
+                      <mark>{{ system.rh_rel }}</mark>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                      {{ system.rh_rel }}
+              {% endif %}
+              {% endspaceless %}
             </td>
           </tr>
           <tr>
             <th>{{ _('NFS mounted?') }}</th>
             <td>
-              {% if 'nfs' in system.diff_split %}<mark>{% endif %}
-              {% if system.nfs %}Yes{% else %}No{% endif %}
-              {% if 'nfs' in system.diff_split %}</mark>{% endif %}
+              {% spaceless %}
+              {% if 'nfs' in system.differences %}
+                {% with system.differences.nfs as system_dict %}
+                  {% if system_dict.new and not system_dict.old %}
+                      <ins>{{ system.nfs_mounted }}</ins>
+                  {% else %}
+                    {% if system_dict.old %}
+                      <mark>{{ system.nfs_mounted }}</mark>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                      {{ system.nfs_mounted }}
+              {% endif %}
+              {% endspaceless %}
             </td>
           </tr>
           <tr>
@@ -116,27 +152,56 @@
         <tbody>
 {% for system_h in system_history %}
           <tr>
-            {# TODO: do diff_differences #}
             <td>
-              {% if forloop.first %}<ins>{% endif %}
-              {% if 'kernel_rel' in system_h.diff_split %}<mark>{% endif %}
-              {{ system_h.kernel_rel }}
-              {% if 'kernel_rel' in system_h.diff_split %}</mark>{% endif %}
-              {% if forloop.first %}</ins>{% endif %}
+              {% spaceless %}
+              {% if 'kernel_rel' in system_h.differences %}
+                {% with system_h.differences.kernel_rel as system_dict %}
+                  {% if system_dict.new and not system_dict.old %}
+                      <ins>{{ system_h.kernel_rel }}</ins>
+                  {% else %}
+                    {% if system_dict.new and system_dict.old %}
+                      <mark>{{ system_h.kernel_rel }}</mark>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                      {{ system_h.kernel_rel }}
+              {% endif %}
+              {% endspaceless %}
             </td>
             <td>
-              {% if forloop.first %}<ins>{% endif %}
-              {% if 'rh_rel' in system_h.diff_split %}<mark>{% endif %}
-              {{ system_h.rh_rel }}
-              {% if 'rh_rel' in system_h.diff_split %}</mark>{% endif %}
-              {% if forloop.first %}</ins>{% endif %}
+              {% spaceless %}
+              {% if 'rh_rel' in system_h.differences %}
+                {% with system_h.differences.rh_rel as system_dict %}
+                  {% if system_dict.new and not system_dict.old %}
+                      <ins>{{ system_h.rh_rel }}</ins>
+                  {% else %}
+                    {% if system_dict.new and system_dict.old %}
+                      <mark>{{ system_h.rh_rel }}</mark>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                      {{ system_h.rh_rel }}
+              {% endif %}
+              {% endspaceless %}
             </td>
             <td>
-              {% if forloop.first %}<ins>{% endif %}
-              {% if 'nfs' in system_h.diff_split %}<mark>{% endif %}
-              {{ system_h.nfs }}
-              {% if 'nfs' in system_h.diff_split %}</mark>{% endif %}
-              {% if forloop.first %}</ins>{% endif %}
+              {% spaceless %}
+              {% if 'nfs' in system_h.differences %}
+                {% with system_h.differences.nfs as system_dict %}
+                  {% if system_dict.new and not system_dict.old %}
+                      <ins>{{ system_h.nfs_mounted }}</ins>
+                  {% else %}
+                    {% if system_dict.old %}
+                      <mark>{{ system_h.nfs_mounted }}</mark>
+                    {% endif %}
+                  {% endif %}
+                {% endwith %}
+              {% else %}
+                      {{ system_h.nfs_mounted }}
+              {% endif %}
+              {% endspaceless %}
             </td>
             <td>
               <time datetime="{{ system_h.date_added|date:'c' }}">
@@ -192,11 +257,9 @@
                 {% else %}
                         {{ process }}
                 {% endif %}
-
                 </li>
                 {% endspaceless %}
                 {% endfor %}
-
               </ul>
               {% endif %}
             </td>
@@ -229,7 +292,6 @@
                 </li>
                 {% endspaceless %}
                 {% endfor %}
-
               </ul>
               {% endif %}
             </td>
@@ -285,7 +347,6 @@
                 </li>
                 {% endspaceless %}
                 {% endfor %}
-
               </ul>
               {% endif %}
             </td>
@@ -318,7 +379,6 @@
                 </li>
                 {% endspaceless %}
                 {% endfor %}
-
               </ul>
               {% endif %}
             </td>
@@ -337,11 +397,17 @@
       </table>
 
 
-{# TODO: Change history for RPMs #}
-      <h3>RPMs</h3>
+      <h3>{{ _('RPMs') }}</h3>
+      <h4>{{ _('Installed RPMs') }}</h4>
       {% if rpms %}
+      <p>
+        <strong>{{ _('Last Modified') }}</strong>
+        <time datetime="{{ rpms.date_added|date:'c' }}">
+          {{ rpms.date_added }}
+        </time>
+      </p>
       <ul>
-        {% for rpm in rpms %}
+        {% for rpm in rpms.installed %}
         <li>{{ rpm }}</li>
         {% endfor %}
       </ul>
@@ -582,9 +648,6 @@
     {% endfor %}
   </tbody>
 </table>
-
-
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 
 {% endblock %}

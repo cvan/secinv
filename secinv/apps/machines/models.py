@@ -156,6 +156,29 @@ class System(models.Model):
         return re.split(',', self.diff)
     diff_split.short_description = 'differences split'
 
+    def nfs_mounted(self):
+        return _('Yes') if self.nfs else _('No')
+
+    def differences(self):
+        """
+        Create a dictionary of the differences between the latest
+        and the previous system info.
+        """
+        s_older = System.objects.filter(machine__id=self.machine_id).exclude(
+            id=self.id).filter(date_added__lt=self.date_added).order_by(
+            '-date_added').all()
+
+        s_fields = ['kernel_rel', 'rh_rel', 'nfs']
+
+        s_previous = {}
+        if s_older.exists():
+            s_values = [s_older[0].kernel_rel, s_older[0].rh_rel, s_older[0].nfs]
+            s_previous = dict(zip(s_fields, s_values))
+
+        s_values = [self.kernel_rel, self.rh_rel, self.nfs]
+        s_latest = dict(zip(s_fields, s_values))
+
+        return diff_dict(s_previous, s_latest)
 
     def __unicode__(self):
         return u'%s - %s - %s' % (self.kernel_rel, self.rh_rel, self.nfs)
@@ -173,6 +196,7 @@ class Services(models.Model):
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
+    # TODO: remove diff_splits
     def diff_split(self):
         return re.split(',', self.diff)
 

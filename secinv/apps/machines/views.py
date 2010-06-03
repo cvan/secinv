@@ -28,6 +28,7 @@ def detail(request, machine_slug):
 
 
     rpms_list = []
+    rpms_date_added = None
     rpms_history = RPMs.objects.filter(machine__id=p.id).all()
 
     if rpms_history.exists():
@@ -35,6 +36,9 @@ def detail(request, machine_slug):
 
         rpms_list = re.split('\n', rpms_obj.rpms)
 
+        rpms_date_added = rpms_obj.date_added
+
+    rpms_latest = {'installed': rpms_list, 'date_added': rpms_date_added}
 
     # Get latest interfaces (select by distinct interface name).
     distinct_interfaces = Interface.objects.filter(
@@ -60,7 +64,7 @@ def detail(request, machine_slug):
                         'system_history': system_history,
                         'services': services_latest,
                         'services_history': services_history,
-                        'rpms': rpms_list,
+                        'rpms': rpms_latest,
                         'rpms_history': rpms_history,
                         'interfaces': interfaces_latest,
                         'interfaces_history': interfaces_history,
