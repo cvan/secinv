@@ -14,14 +14,16 @@ def detail(request, machine_slug):
     p = get_object_or_404(Machine, hostname=machine_slug)
 
     system_latest = []
-    system_history = System.objects.filter(machine__id=p.id).all()
+    system_history = System.objects.filter(machine__id=p.id).order_by(
+        '-date_added').all()
 
     if system_history.exists():
         system_latest = System.objects.filter(machine__id=p.id).latest()
 
 
     services_latest = []
-    services_history = Services.objects.filter(machine__id=p.id).all()
+    services_history = Services.objects.filter(machine__id=p.id).order_by(
+        '-date_added').all()
 
     if services_history.exists():
         services_latest = Services.objects.filter(machine__id=p.id).latest()
@@ -29,7 +31,8 @@ def detail(request, machine_slug):
 
     rpms_list = []
     rpms_date_added = None
-    rpms_history = RPMs.objects.filter(machine__id=p.id).all()
+    rpms_history = RPMs.objects.filter(machine__id=p.id).order_by(
+        '-date_added').all()
 
     if rpms_history.exists():
         rpms_obj = RPMs.objects.filter(machine__id=p.id).latest()
@@ -57,7 +60,8 @@ def detail(request, machine_slug):
         if i_oldest.exists():
             interfaces_oldest_ids.append(i_oldest[0].id)
 
-    interfaces_history = Interface.objects.filter(machine__id=p.id).all()
+    interfaces_history = Interface.objects.filter(machine__id=p.id).order_by(
+        '-date_added').all()
 
     template_context = {'machine': p,
                         'system': system_latest,
