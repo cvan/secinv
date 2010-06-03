@@ -1,5 +1,5 @@
 import datetime
-from secinv.haystack_search.indexes import *
+from ..haystack.indexes import *
 from haystack import site
 #from .models import Machine
 from .models import Machine, Services, System, RPMs, Interface

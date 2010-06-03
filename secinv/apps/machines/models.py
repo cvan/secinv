@@ -7,11 +7,6 @@ import re
 def diff_dict(d_old, d_new):
     """
     Creates a new dict representing a diff between two dicts.
-    
-    >>> old = {'a': 1, 'b': 2}
-    >>> new = {'a': 1, 'b': 2, 'c': 3}
-    >>> diff_dict(old, new)
-    {'c': {'new': 3, 'old': None}}
     """
 
     # Added and changed items.
@@ -20,8 +15,7 @@ def diff_dict(d_old, d_new):
         old_v = d_old.get(k, None)
         if v == old_v:
             continue
-        diff.update({k: {'old': old_v,
-                         'new': v}})
+        diff.update({k: {'old': old_v, 'new': v}})
 
     # Deleted items.
     for k, v in d_old.items():
@@ -41,9 +35,8 @@ def diff_list(l_old, l_new):
     added = list(set_new - intersect)
     deleted = list(set_past - intersect)
 
-    # Added and removed items.
-    diff = {'added': added,
-            'deleted': deleted}
+    # Added and deleted items.
+    diff = {'added': added, 'deleted': deleted}
 
     return diff
 
@@ -66,21 +59,6 @@ class Machine(models.Model):
     def slug(self):
         return re.sub('[^a-zA-Z-]', '-', self.hostname)
 
-    '''
-    def was_published_today(self):
-        return self.pub_date.date() == datetime.date.today()
-    was_published_today.short_description = 'Published Today?'
-    '''
-
-'''
-class Choice(models.Model):
-    machine = models.ForeignKey(Machine)
-    choice = models.CharField(max_length=200)
-    votes = models.IntegerField()
-
-    def __unicode__(self):
-        return self.choice
-'''
 
 class Interface(models.Model):
     machine = models.ForeignKey('Machine')
@@ -148,13 +126,8 @@ class System(models.Model):
     kernel_rel = models.CharField(_('kernel release'), max_length=255)
     rh_rel = models.CharField(_('RedHat release'), max_length=255)
     nfs = models.BooleanField(_('NFS?'), default=0)
-    diff = models.CharField(_('differences'), max_length=255)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                         default=datetime.datetime.now)
-
-    def diff_split(self):
-        return re.split(',', self.diff)
-    diff_split.short_description = 'differences split'
 
     def nfs_mounted(self):
         return _('Yes') if self.nfs else _('No')
@@ -192,13 +165,8 @@ class Services(models.Model):
     machine = models.ForeignKey('Machine')
     processes = models.CharField(max_length=255)
     ports = models.CommaSeparatedIntegerField(max_length=255)
-    diff = models.CharField(_('differences'), max_length=255)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
-
-    # TODO: remove diff_splits
-    def diff_split(self):
-        return re.split(',', self.diff)
 
     def differences(self):
         s_older = Services.objects.filter(
