@@ -4,6 +4,24 @@ import datetime
 import os
 import sys
 
+def diff_list(l_old, l_new):
+    """
+    Creates a new dict representing a diff between two lists.
+    """
+
+    set_new, set_past = set(l_new), set(l_old)
+    intersect = set_new.intersection(set_past)
+
+    added = list(set_new - intersect)
+    deleted = list(set_past - intersect)
+
+    # Added and removed items.
+    diff = {'added': added,
+            'deleted': deleted}
+
+    return diff
+
+
 # BASE_PATH is the absolute path of '..' relative to this script location.
 BASE_PATH = reduce(lambda l, r: l + os.path.sep + r,
     os.path.dirname(os.path.realpath(__file__)).split(os.path.sep)[:-1])
@@ -29,6 +47,7 @@ setup_environ(settings)
 from machines.models import *
 
 ip_dict = {'sit0': {'i_mac': '00:00:00:00', 'i_mask': '', 'i_ip': ''}, 'lo': {'i_mac': '00:00:00:00:00:06', 'i_mask': '255.0.0.0', 'i_ip': '127.0.0.1'}, 'eth0': {'i_mac': '01:50:56:a5:11:39', 'i_mask': '255.255.255.0', 'i_ip': '10.2.72.89'}}
+ip_dict = {'sit0': {'i_mac': '00:00:00:00', 'i_mask': '', 'i_ip': ''}, 'eth0': {'i_mac': '01:50:56:a5:11:39', 'i_mask': '255.255.255.0', 'i_ip': '10.2.72.89'}}
 
 system_dict = {'kernel_rel': '2.8.18-194.3.1.el5', 'hostname': 'cm-sectest02', 'nfs': 0, 'rh_rel': '5.5 (Tikanga)'}
 
@@ -134,6 +153,7 @@ class ServerFunctions:
             try:
                 i_object = Interface.objects.filter(machine__id=self.machine_id,
                                                     i_name=interface).latest()
+
                 i_diff = []
                 if i_object.i_ip != ip_dict[interface]['i_ip']:
                     i_diff.append('i_ip')
@@ -149,8 +169,7 @@ class ServerFunctions:
                               'i_name': interface,
                               'i_ip': ip_dict[interface]['i_ip'],
                               'i_mac': ip_dict[interface]['i_mac'],
-                              'i_mask': ip_dict[interface]['i_mask'],
-                              'diff': ','.join(i_diff)}
+                              'i_mask': ip_dict[interface]['i_mask']}
                     i_object = Interface.objects.create(**i_dict)
 
             except Interface.DoesNotExist:
@@ -162,6 +181,37 @@ class ServerFunctions:
                           'i_mac': ip_dict[interface]['i_mac'],
                           'i_mask': ip_dict[interface]['i_mask']}
                 i_object = Interface.objects.create(**i_dict)
+
+        # See if any interfaces have since been deactivated.
+
+        # Get latest interfaces (select by distinct interface name).
+        distinct_interfaces = Interface.objects.filter(
+            machine__id=self.machine_id).values_list(
+            'i_name', flat=True).distinct()
+        print 'distinct_interfaces:', distinct_interfaces
+
+        i_diff = diff_list(distinct_interfaces, ip_dict.keys())
+        print 'i_diff:', i_diff
+
+        # Update each interface as inactive.
+        for i in i_diff['deleted']:
+            i_latest = Interface.objects.filter(machine__id=self.machine_id,
+                                                i_name=i, active=True).latest()
+
+            i_inactive = Interface.objects.filter(machine__id=self.machine_id,
+                                                  i_name=i, active=False).all()
+
+            # Check if interface is already listed as inactive.
+            if i_inactive.exists():
+                continue
+
+            i_dict = {'machine': self.machine_obj,
+                      'i_name': i_latest.i_name,
+                      'i_ip': i_latest.i_ip,
+                      'i_mac': i_latest.i_mac,
+                      'i_mask': i_latest.i_mask,
+                      'active': False}
+            i_object = Interface.objects.create(**i_dict)
 
 
         ## System.
