@@ -3,15 +3,15 @@ from django.core.paginator import Paginator, InvalidPage
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from .forms import ModelSearchForm
-from .query import EmptySearchQuerySet
+from haystack.forms import ModelSearchForm
+from haystack.query import EmptySearchQuerySet
 
 
 RESULTS_PER_PAGE = getattr(settings, 'HAYSTACK_SEARCH_RESULTS_PER_PAGE', 20)
 
 
 class SearchView(object):
-    template = 'haystack_search/search/search.html'
+    template = 'haystack/search/search.html'
     extra_context = {}
     query = ''
     results = EmptySearchQuerySet()
@@ -146,10 +146,7 @@ class FacetedSearchView(SearchView):
         return extra
 
 
-def basic_search(request, template='haystack_search/search/search.html',
-                 load_all=True, form_class=ModelSearchForm,
-                 searchqueryset=None, context_class=RequestContext,
-                 extra_context=None, results_per_page=None):
+def basic_search(request, template='haystack/search/search.html', load_all=True, form_class=ModelSearchForm, searchqueryset=None, context_class=RequestContext, extra_context=None, results_per_page=None):
     """
     A more traditional view that also demonstrate an alternative
     way to use Haystack.
@@ -159,7 +156,7 @@ def basic_search(request, template='haystack_search/search/search.html',
     Also has the benefit of thread-safety, which the ``SearchView`` class may
     not be.
     
-    Template:: ``search/search.html``
+    Template:: ``haystack/search/search.html``
     Context::
         * form
           An instance of the ``form_class``. (default: ``ModelSearchForm``)

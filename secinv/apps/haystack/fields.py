@@ -1,7 +1,7 @@
 import re
 from django.utils import datetime_safe
 from django.template import loader, Context
-from .exceptions import SearchFieldError
+from haystack.exceptions import SearchFieldError
 
 
 class NOT_PROVIDED:

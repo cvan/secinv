@@ -1,0 +1,76 @@
+{% extends "machines/base.html" %}
+{% load i18n %}
+
+{% block head_title %}{{ _('Machines') }} | {{ block.super }}{% endblock %}
+
+{# TODO: sortable columns #}
+
+{% block content %}
+      <h2>Machines</h2>
+{% if machine_list %}
+{# TODO: Pagination #}
+      <table>
+        <caption>{{ _('Machines') }}</caption>
+        <thead>
+          <tr>
+            <th>{{ _('IP address') }}</th>
+            <th>{{ _('Hostname') }}</th>
+            <th>{{ _('External IP address') }}</th>
+            <th>{{ _('Added') }}</th>
+            <th>{{ _('Modified') }}</th>
+            <th>{{ _('Scanned') }}</th>
+            <th>{{ _('View') }}</th>
+{# TODO: add httpd, mysqld, openvpn columns! #}
+          </tr>
+        </thead>
+        <tbody>
+      {% for machine in machine_list %}
+          <tr>
+            <td>{{ machine.sys_ip }}</td>
+            <td>
+              <a href="{% url apps.machines.views.detail machine_slug=machine.hostname %}">
+                {{ machine.hostname }}
+              </a>
+            </td>
+            <td>{{ machine.ext_ip }}</td>
+{# TODO: uniform date format #}
+            <td>
+              {% if machine.date_added %}
+              <time datetime="{{ machine.date_added|date:'c' }}">
+                {{ machine.date_added }}
+              </time>
+              {% endif %}
+            </td>
+            <td>
+              {% if machine.date_modified %}
+              <time datetime="{{ machine.date_modified|date:'c' }}">
+                {{ machine.date_modified }}
+              </time>
+              {% endif %}
+            </td>
+            <td>
+              {% if services.date_scanned %}
+              <time datetime="{{ machine.date_scanned|date:'c' }}">
+                {{ machine.date_scanned }}
+              </time>
+              {% endif %}
+            </td>
+{# TODO: Add #}
+{# TODO: Edit #}
+{# TODO: Delete #}
+            <td>
+              <a href="{% url apps.machines.views.detail machine_slug=machine.hostname %}">
+                View
+              </a>
+            </td>
+          </tr>
+      {% endfor %}
+        </tbody>
+      </table>
+{# TODO: Pagination #}
+{% else %}
+      <p>No machines are available.</p>
+{% endif %}
+{% endblock %}
+
+

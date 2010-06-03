@@ -91,9 +91,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'secinv.urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
     path('secinv/templates'),
 )
 
@@ -105,8 +102,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'secinv.machines',
-    'secinv.haystack_search',
+    'machines',
+    'secinv.apps.haystack',
 )
 
 HAYSTACK_SITECONF = 'secinv.search_sites'

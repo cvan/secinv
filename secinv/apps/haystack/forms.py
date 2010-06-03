@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 import haystack
-from .query import SearchQuerySet
+from haystack.query import SearchQuerySet
 
 
 def model_choices(site=None):

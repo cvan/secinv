@@ -3,11 +3,11 @@ import logging
 import os
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from .sites import site
+from haystack.sites import site
 try:
     from django.utils import importlib
 except ImportError:
-    from .utils import importlib
+    from haystack.utils import importlib
 
 
 __author__ = 'Daniel Lindsley'
@@ -54,7 +54,7 @@ def load_backend(backend_name=None):
     try:
         # Most of the time, the search backend will be one of the
         # backends that ships with haystack, so look there first.
-        return importlib.import_module('secinv.haystack_search.backends.%s_backend' % backend_name)
+        return importlib.import_module('haystack.backends.%s_backend' % backend_name)
     except ImportError, e:
         # If the import failed, we might be looking for a search backend
         # distributed external to haystack. So we'll try that next.

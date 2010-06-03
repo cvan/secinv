@@ -1,9 +1,9 @@
 import re
 import warnings
 from django.conf import settings
-from .backends import SQ
-from .constants import REPR_OUTPUT_SIZE, ITERATOR_LOAD_PER_QUERY, DEFAULT_OPERATOR
-from .exceptions import NotRegistered
+from haystack.backends import SQ
+from haystack.constants import REPR_OUTPUT_SIZE, ITERATOR_LOAD_PER_QUERY, DEFAULT_OPERATOR
+from haystack.exceptions import NotRegistered
 
 
 class SearchQuerySet(object):
