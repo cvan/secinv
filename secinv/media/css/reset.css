@@ -115,7 +115,7 @@ input, select {
 }
 
 /* HTML 5 block elements */
-section, nav, article, aside, hgroup, header, footer, 
+section, nav, article, aside, hgroup, header, footer, details
 {
     display: block;
 }

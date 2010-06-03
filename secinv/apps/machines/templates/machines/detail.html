@@ -11,6 +11,18 @@
       </hgroup>
       <div class="clear"></div>
 
+      <details class="differences">
+        <summary>Legend</summary>
+        <dl>
+          <dt><figure class="added"></figure></dt>
+          <dd>Added</dd>
+          <dt><figure class="changed"></figure></dt>
+          <dd>Changed</dd>
+          <dt><figure class="deleted"></figure></dt>
+          <dd>Deleted</dd>
+        </dl>
+      </details>
+
       <table>
         <caption>{{ _('Machine details') }}</caption>
         <tbody>
@@ -434,20 +446,24 @@
           <li><a href="#rpms-history" class="history">{{ _('History') }}</a></li>
         </ul>
         <div id="rpms-latest" class="latest">
-          <h4>{{ _('Installed RPMs') }}</h4>
+          <h4 class="group">{{ _('Installed RPMs') }}</h4>
 
           {% if rpms %}
-          <p>
+          <p class="date">
             <strong>{{ _('Last Modified') }}</strong>
             <time datetime="{{ rpms.date_added|date:'c' }}">
               {{ rpms.date_added }}
             </time>
           </p>
+          <div class="clear"></div>
+
           <ul>
             {% for rpm in rpms.installed %}
             <li>{{ rpm }}</li>
             {% endfor %}
           </ul>
+          {% else %}
+          <div class="clear"></div>
           {% endif %}
         </div><!-- #rpms-latest -->
         <div id="rpms-history" class="history">

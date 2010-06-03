@@ -574,4 +574,68 @@ caption {
     display: none;
 }
 
+/* Last Modified */
+h4.group {
+    float: left;
+}
+p.date {
+    float: right;
+}
+
+/* Details legend */
+details {
+    border: #ccc 1px solid;
+}
+
+details.differences {
+    margin-bottom: 1.5em;
+    position: relative;
+}
+details.differences summary {
+    background-color: #eee;
+    border: #ccc 1px solid;
+    padding: 0.25em 1em;
+    margin: -1px;
+}
+
+details.differences summary,
+details.differences dl,
+details.differences dt,
+details.differences dd {
+    display: inline-block;
+}
+
+details.differences dl {
+    position: absolute;
+    top: 0.25em;
+    right: 0;
+}
+
+figure.added,
+figure.changed,
+figure.deleted {
+    background: black;
+    -moz-border-radius: 135px;
+    -webkit-border-radius: 135px;
+    border-radius: 135px;
+    display: block;
+    height: 1px;
+    width: 1px;
+    padding: 5px;
+}
+
+figure.added {
+    background-color: #080;
+}
+figure.changed {
+    background-color: #c50;
+}
+figure.deleted {
+    background-color: #800;
+}
+
+details.differences dd {
+    margin-right: 1em;
+}
+
 /* @end */
