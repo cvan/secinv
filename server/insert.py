@@ -15,9 +15,8 @@ def diff_list(l_old, l_new):
     added = list(set_new - intersect)
     deleted = list(set_past - intersect)
 
-    # Added and removed items.
-    diff = {'added': added,
-            'deleted': deleted}
+    # Added and deleted items.
+    diff = {'added': added, 'deleted': deleted}
 
     return diff
 
@@ -36,7 +35,7 @@ except:
     print "Could not import settings"
     sys.exit(1)
 
-# To suppress MySQLdb DeprecationWarning.
+# To suppress MySQLdb and haystack warnings.
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -44,7 +43,7 @@ from django.core.management import setup_environ
 setup_environ(settings)
 
 
-from machines.models import *
+from apps.machines.models import *
 
 ip_dict = {'sit0': {'i_mac': '00:00:00:00', 'i_mask': '', 'i_ip': ''}, 'lo': {'i_mac': '00:00:00:00:00:06', 'i_mask': '255.0.0.0', 'i_ip': '127.0.0.1'}, 'eth0': {'i_mac': '01:50:56:a5:11:39', 'i_mask': '255.255.255.0', 'i_ip': '10.2.72.89'}}
 ip_dict = {'sit0': {'i_mac': '00:00:00:00', 'i_mask': '', 'i_ip': ''}, 'eth0': {'i_mac': '01:50:56:a5:11:39', 'i_mask': '255.255.255.0', 'i_ip': '10.2.72.89'}}

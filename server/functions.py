@@ -1,12 +1,54 @@
-#!/usr/bin/python26
+#!/usr/bin/env python26
 
-#import sqlobject
-from dbclasses import *
+import datetime
+import os
+import sys
 
-# TODO: generate auth_keys and remove DB_LOGIN
+def diff_list(l_old, l_new):
+    """
+    Creates a new dict representing a diff between two lists.
+    """
+
+    set_new, set_past = set(l_new), set(l_old)
+    intersect = set_new.intersection(set_past)
+
+    added = list(set_new - intersect)
+    deleted = list(set_past - intersect)
+
+    # Added and deleted items.
+    diff = {'added': added, 'deleted': deleted}
+
+    return diff
+
+
+# BASE_PATH is the absolute path of '..' relative to this script location.
+BASE_PATH = reduce(lambda l, r: l + os.path.sep + r,
+    os.path.dirname(os.path.realpath(__file__)).split(os.path.sep)[:-1])
+
+# Append settings directory.
+sys.path.append(os.path.join(BASE_PATH, 'secinv'))
+
+from django.core.management import execute_manager
+try:
+    import settings
+except:
+    print "Could not import settings"
+    sys.exit(1)
+
+# To suppress MySQLdb and haystack warnings.
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+from django.core.management import setup_environ
+setup_environ(settings)
+
+from apps.machines.models import *
+
+
+# TODO: generate auth_keys
 
 class ServerFunctions:
-    def __init__(self, AUTH_KEY, DB_LOGIN):
+    def __init__(self, AUTH_KEY):
         self.machine_ip = '0.0.0.0'
         self.machine_id = 0
         self.auth_key = AUTH_KEY
@@ -15,243 +57,270 @@ class ServerFunctions:
         # Create logger.
         #self.logger = logging.getLogger("secinv")
 
-        # To suppress MySQLdb DeprecationWarning.
-        import warnings
-        warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-        self.cursor = None
-
-        # TODO: add support for other DB engines
-        if DB_LOGIN['engine'] == 'mysql':
-            import MySQLdb
-            import MySQLdb.cursors
-
-            #self.connection = DBConnect()
-
-            db = MySQLdb.connect(host=DB_LOGIN['host'],
-                                 user=DB_LOGIN['user'],
-                                 passwd=DB_LOGIN['passwd'],
-                                 db=DB_LOGIN['db'],
-                                 cursorclass=MySQLdb.cursors.DictCursor)
-            self.cursor = db.cursor()
-
     def authenticate(self, auth_key):
         '''
         Compare server's auth_key against client's auth_key.
         '''
         if self.auth_key != auth_key:
+            print 'failed authentication'
             return False
 
+        print 'ok authentication'
         self.is_authenticated = True
         return True
 
-    def assets(self, assets_dict):
-        if not self.is_authenticated:
-            return False
-
-        self.cursor.execute("""SELECT COUNT(*) as c FROM history
-                               WHERE machine_id = '%s'""" % self.machine_id)
-        count = self.cursor.fetchone()
-        count = int(count['c'])
-
-        if count:
-            # Update 'date_scanned' field for this system.
-            self.cursor.execute("""UPDATE history SET date_scanned = NOW()
-                                   WHERE machine_id = '%s'""" % self.machine_id)
-        else:
-            # Add a row for this system.
-            self.cursor.execute("""INSERT INTO history (machine_id, date_scanned)
-                                   VALUES ('%s', NOW())""" % self.machine_id)
-
-
-        self.cursor.execute("""SELECT COUNT(*) as c, hostname, httpd, mysqld,
-                               openvpn, nfs, kernel_rel, rh_rel FROM assets
-                               WHERE machine_id = '%s'""" % self.machine_id)
-        assets_row = self.cursor.fetchone()
-        count = int(assets_row['c'])
-        is_same = False
-
-        if count:
-            '''
-            self.cursor.execute("""UPDATE assets SET hostname = '%s',
-                                   httpd = '%s', mysqld = '%s', openvpn = '%s',
-                                   nfs = '%s', kernel_rel = '%s', rh_rel = '%s'
-                                   WHERE sys_ip = '%s'""" %
-                                (assets_dict['hostname'],
-                                 assets_dict['httpd'],
-                                 assets_dict['mysqld'],
-                                 assets_dict['openvpn'],
-                                 assets_dict['nfs'],
-                                 assets_dict['kernel_rel'],
-                                 assets_dict['rh_rel'],
-                                 self.asset_ip))
-            '''
-
-            del assets_row['c']
-            for k, old_v in assets_row.iteritems():
-                if assets_dict[k] == old_v:
-                    is_same = True
-
-        # Insert a row only if the assets values have changed.
-        if not is_same:
-            # TODO: 'ext_ip'?
-            self.cursor.execute("""INSERT INTO assets (hostname,
-                                   machine_id, httpd, mysqld, openvpn, nfs,
-                                   kernel_rel, rh_rel, date_added)
-                                   VALUES ('%s', '%s', '%s', '%s', '%s',
-                                   '%s', '%s', '%s', NOW())""" %
-                                (assets_dict['hostname'],
-                                 self.machine_id,
-                                 assets_dict['httpd'],
-                                 assets_dict['mysqld'],
-                                 assets_dict['openvpn'],
-                                 assets_dict['nfs'],
-                                 assets_dict['kernel_rel'],
-                                 assets_dict['rh_rel']))
-
-
-        print "\nInserted into assets:", assets_dict
-
-        self.cursor.execute("""SELECT * FROM assets""")
-        self.cursor.fetchall()
-
-        for rows in self.cursor:
-            print ''.join(str(rows))
-
-
-        return True
-
-    def assets_ip(self, assets_ip_dict):
+    def machine(self, ip_dict, system_dict, services_dict, rpms_dict):
         if not self.is_authenticated:
             return False
 
         # Get the machine IP address as the first ethernet interface.
-        for interface in assets_ip_dict.keys():
+        for interface in ip_dict.keys():
             if interface[0:3] == 'eth':
-                self.machine_ip = assets_ip_dict[interface]['i_ip']
+                self.machine_ip = ip_dict[interface]['i_ip']
                 break
 
-        self.cursor.execute("""SELECT id FROM machines
-                               WHERE sys_ip = '%s'""" % self.machine_ip)
-        machines_row = self.cursor.fetchone()
-        if machines_row:
-            self.machine_id = int(machines_row['id'])
+        ## Machine.
+        try:
+            m_obj = None
 
-        # Add machine if not already in database table.
-        if not self.machine_id:
-            self.cursor.execute("""INSERT INTO machines (sys_ip, date_added)
-                                   VALUES ('%s', NOW())""" % self.machine_ip)
+            m_objs = Machine.objects.filter(sys_ip=self.machine_ip).all()
+            if m_objs:
+                m_obj = m_objs[0]
+            else:
+                # Find machine by hostname if we cannot find by ip address.
+                m_objs_by_h = Machine.objects.filter(
+                    hostname=system_dict['hostname']).all()
 
-            self.cursor.execute("""SELECT id FROM machines
-                                   WHERE sys_ip = '%s'""" % self.machine_ip)
-            machines_row = self.cursor.fetchone()
-            if machines_row:
-                self.machine_id = int(machines_row['id'])
+                m_obj = m_objs_by_h[0]
+
+            m_obj.date_scanned = datetime.datetime.now()
+            m_diff = []
+
+            if m_obj.sys_ip != self.machine_ip:
+                m_obj.sys_ip = self.machine_ip
+                m_diff.append('sys_ip')
+
+            if m_obj.hostname != system_dict['hostname']:
+                m_obj.hostname = system_dict['hostname']
+                m_diff.append('hostname')
+
+            if m_diff:
+                m_obj.diff = ','.join(m_diff)
+                m_obj.date_modified = datetime.datetime.now()
+
+            m_obj.save()
+
+            self.machine_obj = m_obj
+            self.machine_id = self.machine_obj.id
+        except IndexError:
+            # Add machine if not in table.
+            mach_dict = {'sys_ip': self.machine_ip,
+                         'hostname': system_dict['hostname'],
+                         'ext_ip': '',
+                         'date_scanned': datetime.datetime.now()}
+            m_new = Machine.objects.create(**mach_dict)
+            self.machine_obj = m_new
+            self.machine_id = m_new.id
 
 
-        for interface in assets_ip_dict.keys():
-            if assets_ip_dict[interface]['i_mac'] in ('00:00:00:00',
-                                                      '00:00:00:00:00:00'):
-                assets_ip_dict[interface]['i_mac'] = ''
+        ## Interfaces.
+        for interface in ip_dict.keys():
+            if ip_dict[interface]['i_mac'] in ('00:00:00:00',
+                                               '00:00:00:00:00:00'):
+                ip_dict[interface]['i_mac'] = ''
 
             # If all fields are empty, then device is inactive -- so do not
             # insert a row.
-            if assets_ip_dict[interface]['i_ip'] == '' and \
-               assets_ip_dict[interface]['i_mac'] == '' and \
-               assets_ip_dict[interface]['i_mask'] == '':
+            if ip_dict[interface]['i_ip'] == '' and \
+               ip_dict[interface]['i_mac'] == '' and \
+               ip_dict[interface]['i_mask'] == '':
                 continue
 
-            # If already exists in table, update row(s) accordingly.
-            self.cursor.execute("""SELECT COUNT(*) as c FROM assets_ip
-                                   WHERE machine_id = '%s'""" % self.machine_id)
-            assets_ip_row = self.cursor.fetchone()
-            count = int(assets_ip_row['c'])
+            # If interface already exists in table, update accordingly.
+            try:
+                i_object = Interface.objects.filter(machine__id=self.machine_id,
+                                                    i_name=interface).latest()
 
-            is_same = False
-            if count:
-                del assets_ip_row['c']
-                for k, old_v in assets_ip_row.iteritems():
-                    print k, '===>', old_v
-                    if assets_ip_dict[k] == old_v:
-                        is_same = True
+                i_diff = []
+                if i_object.i_ip != ip_dict[interface]['i_ip']:
+                    i_diff.append('i_ip')
 
-            if not is_same:
-                print "insert row"
-                # Insert a row only if the assets_ip values have changed.
-                self.cursor.execute("""INSERT INTO assets_ip (machine_id, i_name,
-                                       i_ip, i_mac, i_mask)
-                                  VALUES ('%s', '%s', '%s', '%s', '%s')""" %
-                                   (self.machine_id,
-                                    interface,
-                                    assets_ip_dict[interface]['i_ip'] \
-                                    if interface[0:3] != 'eth' else '',
-                                    assets_ip_dict[interface]['i_mac'],
-                                    assets_ip_dict[interface]['i_mask']))
+                if i_object.i_mac != ip_dict[interface]['i_mac']:
+                    i_diff.append('i_mac')
 
-        print "\nInserted into assets_ip:", assets_ip_dict
+                if i_object.i_mask != ip_dict[interface]['i_mask']:
+                    i_diff.append('i_mask')
 
-        self.cursor.execute("""SELECT * FROM assets_ip""")
-        self.cursor.fetchall()
+                if i_diff:
+                    i_dict = {'machine': self.machine_obj,
+                              'i_name': interface,
+                              'i_ip': ip_dict[interface]['i_ip'],
+                              'i_mac': ip_dict[interface]['i_mac'],
+                              'i_mask': ip_dict[interface]['i_mask']}
+                    i_object = Interface.objects.create(**i_dict)
 
-        for rows in self.cursor:
-            print ''.join(str(rows))
+            except Interface.DoesNotExist:
+                print 'interface does not exist'
+
+                i_dict = {'machine': self.machine_obj,
+                          'i_name': interface,
+                          'i_ip': ip_dict[interface]['i_ip'],
+                          'i_mac': ip_dict[interface]['i_mac'],
+                          'i_mask': ip_dict[interface]['i_mask']}
+                i_object = Interface.objects.create(**i_dict)
+
+        # See if any interfaces have since been deactivated.
+
+        # Get latest interfaces (select by distinct interface name).
+        distinct_interfaces = Interface.objects.filter(
+            machine__id=self.machine_id).values_list(
+            'i_name', flat=True).distinct()
+        print 'distinct_interfaces:', distinct_interfaces
+
+        i_diff = diff_list(distinct_interfaces, ip_dict.keys())
+        print 'i_diff:', i_diff
+
+        # Update each interface as inactive.
+        for i in i_diff['deleted']:
+            i_latest = Interface.objects.filter(machine__id=self.machine_id,
+                                                i_name=i, active=True).latest()
+
+            i_inactive = Interface.objects.filter(machine__id=self.machine_id,
+                                                  i_name=i, active=False).all()
+
+            # Check if interface is already listed as inactive.
+            if i_inactive.exists():
+                continue
+
+            i_dict = {'machine': self.machine_obj,
+                      'i_name': i_latest.i_name,
+                      'i_ip': i_latest.i_ip,
+                      'i_mac': i_latest.i_mac,
+                      'i_mask': i_latest.i_mask,
+                      'active': False}
+            i_object = Interface.objects.create(**i_dict)
+
+
+        ## System.
+        try:
+            sys_object = System.objects.filter(
+                machine__id=self.machine_id).latest()
+
+            sys_diff = []
+
+            if sys_object.kernel_rel != system_dict['kernel_rel']:
+                sys_diff.append('kernel_rel')
+
+            if sys_object.rh_rel != system_dict['rh_rel']:
+                sys_diff.append('rh_rel')
+
+            if sys_object.nfs != system_dict['nfs']:
+                sys_diff.append('nfs')
+
+            if sys_diff:
+                sys_dict = {'machine': self.machine_obj,
+                            'kernel_rel': system_dict['kernel_rel'],
+                            'rh_rel': system_dict['rh_rel'],
+                            'nfs': system_dict['nfs'],
+                            'diff': ','.join(sys_diff)}
+                sys_object = System.objects.create(**sys_dict)
+
+        except System.DoesNotExist:
+            print 'system does not exist'
+
+            sys_dict = {'machine': self.machine_obj,
+                        'kernel_rel': system_dict['kernel_rel'],
+                        'rh_rel': system_dict['rh_rel'],
+                        'nfs': system_dict['nfs']}
+            sys_object = System.objects.create(**sys_dict)
+
+
+        ## Services.
+        procs = services_dict.keys()
+        csv_procs = ','.join(procs)
+        ports = services_dict.values()
+        csv_ports = ','.join(ports)
+
+        try:
+            s_object = Services.objects.filter(
+                machine__id=self.machine_id).latest()
+
+            s_diff = []
+            s_diff_ins_processes = []
+            s_diff_del_processes = []
+            s_diff_ins_ports = []
+            s_diff_del_ports = []
+
+            if s_object.processes != csv_procs:
+                old = re.split(',', s_object.processes)
+                new = procs
+
+                s1 = set(old)
+                s2 = set(new)
+                print s1
+                print s2
+
+                new_procs = s2.difference(s1)
+                del_procs = s1.difference(s2)
+                print new_procs
+                print del_procs
+
+                s_diff_ins_processes = list(s2.difference(s1))
+                s_diff_del_processes = list(s1.difference(s2))
+                print s_diff_ins_processes
+                print s_diff_del_processes
+
+                s_diff.append('processes')
+
+            if s_object.ports != csv_ports:
+                old = re.split(',', s_object.ports)
+                new = ports
+
+                s1 = set(old)
+                s2 = set(new)
+
+                new_procs = s2.difference(s1)
+                del_procs = s1.difference(s2)
+
+                s_diff_ins_ports = list(s2.difference(s1))
+                s_diff_del_ports = list(s1.difference(s2))
+
+                s_diff.append('ports')
+
+            if s_diff:
+                s_dict = {'machine': self.machine_obj,
+                          'processes': csv_procs,
+                          'ports': csv_ports,
+                          'diff': ','.join(s_diff)}
+                s_object = Services.objects.create(**s_dict)
+
+        except Services.DoesNotExist:
+            print 'services does not exist'
+
+            s_dict = {'machine': self.machine_obj,
+                      'processes': csv_procs,
+                      'ports': csv_ports}
+            s_object = Services.objects.create(**s_dict)
+
+
+        ## RPMs.
+        try:
+            r_object = RPMs.objects.filter(machine__id=self.machine_id).latest()
+
+            r_diff = []
+            if r_object.rpms != rpms_dict['unserialized']:
+                r_diff.append('rpms')
+
+            if r_diff:
+                r_dict = {'machine': self.machine_obj,
+                          'rpms': rpms_dict['unserialized']}
+                r_object = RPMs.objects.create(**r_dict)
+
+        except RPMs.DoesNotExist:
+            print 'RPMs does not exist'
+
+            r_dict = {'machine': self.machine_obj,
+                      'rpms': rpms_dict['unserialized']}
+            r_object = RPMs.objects.create(**r_dict)
 
         return True
-
-    def rpms(self, rpms_dict):
-        if not self.is_authenticated:
-            return False
-
-        #print "\nInserted into rpms:", rpms_dict
-
-        self.cursor.execute("""SELECT COUNT(*) as c FROM assets_rpms
-                               WHERE machine_id = '%s'""" % self.machine_id)
-        assets_rpms_row = self.cursor.fetchone()
-        count = int(assets_rpms_row['c'])
-
-        if count:
-            # Update all rpms from last scan for this machine_id.
-            self.cursor.execute("""UPDATE assets_rpms SET rpms = '%s',
-                                   date_updated = NOW()
-                                   WHERE machine_id = '%s'""" %
-                                (MySQLdb.escape_string(rpms_dict['serialized']),
-                                 self.machine_id))
-        else:
-            # If this machine doesn't have a rpms row, create one.
-            self.cursor.execute("""INSERT INTO assets_rpms (machine_id, rpms,
-                                   date_added)
-                                   VALUES ('%s', '%s', NOW())""" %
-                                (self.machine_id,
-                                 MySQLdb.escape_string(rpms_dict['serialized'])))
-
-        return True
-
-    def ports(self, ports_dict):
-        if not self.is_authenticated:
-            return False
-
-        print "\nInserted into ports:", ports_dict
-
-        csv_procs = ','.join(ports_dict.keys())
-        csv_ports = ','.join(ports_dict.values())
-
-        self.cursor.execute("""SELECT COUNT(*) as c FROM assets_ports
-                               WHERE machine_id = '%s'""" % self.machine_id)
-        assets_ports_row = self.cursor.fetchone()
-        count = int(assets_ports_row['c'])
-
-        if count:
-            # Update all ports from last scan for this machine_id.
-            self.cursor.execute("""UPDATE assets_ports SET processes = '%s',
-                                   ports = '%s', date_updated = NOW()
-                                   WHERE machine_id = '%s'""" %
-                                (csv_procs, csv_ports, self.machine_id))
-        else:
-            # If this machine doesn't have a ports row, create one.
-            self.cursor.execute("""INSERT INTO assets_ports (machine_id, processes,
-                                   ports, date_added)
-                                   VALUES ('%s', '%s', '%s', NOW())""" %
-                                (self.machine_id, csv_procs, csv_ports))
-
-        return True
-
