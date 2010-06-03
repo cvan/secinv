@@ -8,7 +8,6 @@ def diff_dict(d_old, d_new):
     """
     Creates a new dict representing a diff between two dicts.
     """
-
     # Added and changed items.
     diff = {}
     for k, v in d_new.items():
@@ -28,7 +27,6 @@ def diff_list(l_old, l_new):
     """
     Creates a new dict representing a diff between two lists.
     """
-
     set_new, set_past = set(l_new), set(l_old)
     intersect = set_new.intersection(set_past)
 
@@ -169,6 +167,10 @@ class Services(models.Model):
                                       default=datetime.datetime.now)
 
     def differences(self):
+        """
+        Create a dictionary of the differences between the latest
+        and the previous system info.
+        """
         s_older = Services.objects.filter(
             machine__id=self.machine_id).exclude(id=self.id).filter(
             date_added__lt=self.date_added).order_by('-date_added').all()
