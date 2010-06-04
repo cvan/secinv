@@ -48,9 +48,9 @@
               <a href="{% url apps.machines.views.index %}" class="button black pill">{{ _('Configuration Files') }}</a>
             </li>
           </ul>
-          <form action="{% url haystack_search %}" method="get">
-<!--          <label for="search">Search</label> -->
-            <input type="search" name="search" id="search" value="">
+          <form action="{% url apps.machines.views.search %}" method="get">
+            <label for="q">{{ _('Search') }}</label>
+            <input type="search" name="q" id="q" value="{{ query|escape }}">
             <input type="submit" class="button pill pink" value="Search">
           </form>
           <div class="clear"></div>
@@ -63,11 +63,11 @@
         </section><!-- #content -->
 
         <aside class="col_5 col">
-        	<h2>Machines</h2>
+        	<h2>{{ _('Machines') }}</h2>
           <form action="" method="post">
-          	<fieldset><legend>Filter Machines</legend>
+          	<fieldset><legend>{{ _('Filter Machines') }}</legend>
 
-          	  <label for="machine_hostname">Select by machine</label>
+          	  <label for="machine_hostname">{{ _('Select by machine') }}</label>
               <select name="machine_hostname" id="machine_hostname"
                       onchange="this.form.submit();">
                 <option>*</option>
@@ -155,7 +155,7 @@
                 <option>pm-weaveadmin01</option>
               </select>
 
-              <label for="domain">Select by domain</label>
+              <label for="domain">{{ _('Select by domain') }}</label>
               <select name="domain" id="domain" onchange="this.form.submit();">
                 <option>addons.mozilla.org</option>
                 <option>air.mozilla.com</option>

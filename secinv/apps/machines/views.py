@@ -1,17 +1,25 @@
+from django.db.models import Q
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from .models import Machine, Services, System, RPMs, Interface
+
+from .forms import MachineSearchForm
+
 #from django.http import HttpResponse
 
 import re
 
 def index(request):
     machine_list = Machine.objects.all()
-    return render_to_response('machines/index.html', {'machine_list': machine_list},
+    query = request.GET.get('q', '')
+    return render_to_response('machines/index.html',
+        {'machine_list': machine_list, 'query': query},
         context_instance=RequestContext(request))
+
 
 def detail(request, machine_slug):
     p = get_object_or_404(Machine, hostname=machine_slug)
+    query = request.GET.get('q', '')
 
     system_latest = []
     system_history = System.objects.filter(machine__id=p.id).order_by(
@@ -70,7 +78,8 @@ def detail(request, machine_slug):
     interfaces_history = Interface.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
 
-    template_context = {'machine': p,
+    template_context = {'query': query,
+                        'machine': p,
                         'system': system_latest,
                         'system_history': system_history,
                         'services': services_latest,
@@ -83,10 +92,12 @@ def detail(request, machine_slug):
     return render_to_response('machines/detail.html', template_context,
         context_instance=RequestContext(request))
 
+
 def results(request, machine_slug):
     p = get_object_or_404(Machine, hostname=machine_slug)
     return render_to_response('machines/results.html', {'machine': p},
         context_instance=RequestContext(request))
+
 
 def vote(request, machine_slug):
     '''
@@ -110,3 +121,39 @@ def vote(request, machine_slug):
     '''
     pass
 
+
+def search(request):
+    query = request.GET.get('q', '')
+    if query:
+        form = MachineSearchForm(request.GET)
+        if form.is_valid():
+            results = form.get_result_queryset()
+        else:
+            results = []
+    else:
+        form = MachineSearchForm()
+        results = []
+
+    template_context = {'form': form,
+                        'results': results,
+                        'query': query}
+
+    return render_to_response('machines/search.html', template_context,
+        context_instance=RequestContext(request))
+
+'''
+def search(request):
+    query = request.GET.get('q', '')
+    if query:
+        qset = (
+            Q(sys_ip__icontains=query) |
+            Q(hostname__icontains=query)
+        )
+        results = Machine.objects.filter(qset).distinct()
+    else:
+        results = []
+    template_context = {'results': results,
+                        'query': query}
+    return render_to_response('machines/search.html', template_context,
+        context_instance=RequestContext(request))
+'''

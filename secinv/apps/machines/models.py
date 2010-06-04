@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+#from ..fulltext.search import SearchManager
 
 import datetime
 import re
@@ -49,6 +50,10 @@ class Machine(models.Model):
     date_modified = models.DateTimeField(_('date modified'),
                                         default=datetime.datetime.now)
     date_scanned = models.DateTimeField(_('date scanned'))
+
+    # Use a SearchManager for retrieving objects,
+    # and tell it which fields to search.
+    #objects = SearchManager(('sys_ip', 'hostname'))
 
     def __unicode__(self):
         return u'%s - %s' % (self.sys_ip, self.hostname)
