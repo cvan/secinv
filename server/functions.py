@@ -31,13 +31,12 @@ sys.path.append(os.path.join(BASE_PATH, 'secinv'))
 from django.core.management import execute_manager
 try:
     import settings
-except:
-    print "Could not import settings"
-    sys.exit(1)
+except ImportError:
+    sys.exit('Error: Could not import Django settings')
 
 # To suppress MySQLdb and haystack warnings.
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 from django.core.management import setup_environ
 setup_environ(settings)
@@ -55,7 +54,7 @@ class ServerFunctions:
         self.is_authenticated = False
 
         # Create logger.
-        #self.logger = logging.getLogger("secinv")
+        #self.logger = logging.getLogger('secinv')
 
     def authenticate(self, auth_key):
         '''
@@ -221,8 +220,7 @@ class ServerFunctions:
                 sys_dict = {'machine': self.machine_obj,
                             'kernel_rel': system_dict['kernel_rel'],
                             'rh_rel': system_dict['rh_rel'],
-                            'nfs': system_dict['nfs'],
-                            'diff': ','.join(sys_diff)}
+                            'nfs': system_dict['nfs']}
                 sys_object = System.objects.create(**sys_dict)
 
         except System.DoesNotExist:
@@ -290,8 +288,7 @@ class ServerFunctions:
             if s_diff:
                 s_dict = {'machine': self.machine_obj,
                           'processes': csv_procs,
-                          'ports': csv_ports,
-                          'diff': ','.join(s_diff)}
+                          'ports': csv_ports}
                 s_object = Services.objects.create(**s_dict)
 
         except Services.DoesNotExist:
@@ -308,19 +305,19 @@ class ServerFunctions:
             r_object = RPMs.objects.filter(machine__id=self.machine_id).latest()
 
             r_diff = []
-            if r_object.rpms != rpms_dict['unserialized']:
+            if r_object.rpms != rpms_dict['list']:
                 r_diff.append('rpms')
 
             if r_diff:
                 r_dict = {'machine': self.machine_obj,
-                          'rpms': rpms_dict['unserialized']}
+                          'rpms': rpms_dict['list']}
                 r_object = RPMs.objects.create(**r_dict)
 
         except RPMs.DoesNotExist:
             print 'RPMs does not exist'
 
             r_dict = {'machine': self.machine_obj,
-                      'rpms': rpms_dict['unserialized']}
+                      'rpms': rpms_dict['list']}
             r_object = RPMs.objects.create(**r_dict)
 
         return True

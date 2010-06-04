@@ -1,8 +1,10 @@
 from ConfigParser import ConfigParser
 import sys
 
-# Parse server.conf for server settings and database credentials.
+# Path to server configuration file.
 SERVER_CONFIG_FN = 'server.conf'
+
+# Parse server.conf for server settings and database credentials.
 server_config = ConfigParser()
 
 try:
@@ -18,12 +20,6 @@ LISTEN_PORT = server_config.get('server', 'listen_port')
 
 KEY_FILE = server_config.get('server', 'key_file')
 CERT_FILE = server_config.get('server', 'cert_file')
-
-DB_LOGIN = {'engine': server_config.get('db', 'engine'),
-            'host': server_config.get('db', 'host'),
-            'user': server_config.get('db', 'user'),
-            'passwd': server_config.get('db', 'passwd'),
-            'db': server_config.get('db', 'db')}
 
 
 import BaseHTTPServer
@@ -111,14 +107,6 @@ class SecureXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
             self.connection.shutdown()
 
 
-'''
-class XMLRPCRegisters(ServerFunctions):
-    def __init__(self):
-        # Inherit superclass' __init__ method.
-        if hasattr(ServerFunctions, '__init__'):
-            ServerFunctions.__init__(self, AUTH_KEY, DB_LOGIN)
-'''
-
 def process(HandlerClass=SecureXMLRPCRequestHandler,
             ServerClass=SecureXMLRPCServer):
     """
@@ -132,7 +120,7 @@ def process(HandlerClass=SecureXMLRPCRequestHandler,
     server = ServerClass(server_address, HandlerClass)
 
     # Register XML-RPC functions.
-    server.register_instance(ServerFunctions(AUTH_KEY, DB_LOGIN))
+    server.register_instance(ServerFunctions(AUTH_KEY))
     server.register_multicall_functions()
 
     on_host, on_port = server.socket.getsockname()

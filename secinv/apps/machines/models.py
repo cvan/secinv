@@ -85,6 +85,10 @@ class Interface(models.Model):
         i_previous = {}
         if i_older.exists():
             i_values = [i_older[0].i_ip, i_older[0].i_mac, i_older[0].i_mask]
+
+            if not i_older[0].active:
+                i_values = ['', '', '']
+
             i_previous = dict(zip(i_fields, i_values))
 
         i_values = [self.i_ip, self.i_mac, self.i_mask]

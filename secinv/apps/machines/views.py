@@ -60,6 +60,8 @@ def detail(request, machine_slug):
         if i_oldest.exists():
             interfaces_oldest_ids.append(i_oldest[0].id)
 
+    # TODO: if previous interface was inactive, append id to interfaces_now_active_ids
+
     interfaces_history = Interface.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
 
