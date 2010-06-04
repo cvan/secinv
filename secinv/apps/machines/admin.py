@@ -14,6 +14,7 @@ class ChoiceInline(admin.TabularInline):
 class InterfaceInline(admin.TabularInline):
     model = Interface
     extra = 2
+    search_fields = ['i_iname', 'i_ip', 'i_mac', 'i_mask']
     #fields = ('i_name', 'i_ip', 'i_mac', 'i_mask')
     #list_display
 

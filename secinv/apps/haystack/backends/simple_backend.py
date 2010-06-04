@@ -72,12 +72,12 @@ class SearchBackend(BaseSearchBackend):
                 
                 hits += len(qs)
                 results.extend([match for match in qs])
-        
+
         return {
             'results': results,
             'hits': hits,
         }
-    
+
     def prep_value(self, db_field, value):
         return value
     
@@ -110,7 +110,7 @@ class SearchQuery(BaseSearchQuery):
         
         for child in search_node.children:
             if isinstance(child, SearchNode):
-                tarm_list.append(self._build_query(child))
+                term_list.append(self._build_query(child))
             else:
                 term_list.append(child[1])
         

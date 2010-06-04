@@ -124,20 +124,18 @@ def vote(request, machine_slug):
 
 def search(request):
     query = request.GET.get('q', '')
+    results = []
+
     if query:
         form = MachineSearchForm(request.GET)
         if form.is_valid():
             results = form.get_result_queryset()
-        else:
-            results = []
     else:
         form = MachineSearchForm()
-        results = []
 
     template_context = {'form': form,
                         'results': results,
                         'query': query}
-
     return render_to_response('machines/search.html', template_context,
         context_instance=RequestContext(request))
 

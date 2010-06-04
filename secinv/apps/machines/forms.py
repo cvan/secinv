@@ -5,7 +5,7 @@ from .models import Machine
 class MachineSearchForm(BaseSearchForm):
     class Meta:
         base_qs = Machine.objects
-        search_fields = ['sys_ip', 'hostname', ] 
+        search_fields = ['sys_ip', 'hostname']
 
     """ 
     A custom addition - the absence of a clean_category method means
@@ -13,7 +13,7 @@ class MachineSearchForm(BaseSearchForm):
     """
     '''
     category = forms.ModelChoiceField(
-        queryset = MyCategory.live.all(),
+        queryset = Interface.live.all(),
         required = False
     )
     '''

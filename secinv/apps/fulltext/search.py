@@ -8,12 +8,12 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 
 import re
-    
+
 class BaseSearchForm(forms.Form):
     q = forms.CharField(label='Search', required=False)
     def clean_q(self):
         return self.cleaned_data['q'].strip()
-    
+
     order_by = forms.CharField(
         widget=forms.HiddenInput(),
         required=False,
@@ -27,7 +27,7 @@ class BaseSearchForm(forms.Form):
 
     def get_text_search_query(self, query_string):
         filters = []
-        
+
         def construct_search(field_name):
             if field_name.startswith('^'):
                 return "%s__istartswith" % field_name[1:]
@@ -40,35 +40,34 @@ class BaseSearchForm(forms.Form):
                     return "%s__icontains" % field_name[1:]
             else:
                 return "%s__icontains" % field_name
-        
+
         for bit in smart_split(query_string):
             or_queries = [Q(**{construct_search(str(field_name)): bit}) for field_name in self.Meta.search_fields]
             filters.append(reduce(Q.__or__, or_queries))
-        
-        
+
         return reduce(Q.__and__, filters)
 
 
     def construct_filter_args(self, cleaned_data=None):
         args = []
-        
+
         if not cleaned_data:
             cleaned_data = self.cleaned_data
-        
-        # construct text search
+
+        # Construct text search.
         if cleaned_data['q']:
             args.append(self.get_text_search_query(cleaned_data.pop('q')))
-        
-        # if its an instance of Q, append to filter args
-        # otherwise assume an exact match lookup
+
+        # If it's an instance of Q, append to filter args.
+        # Otherwise, assume an exact match lookup.
         for field in cleaned_data:
             if isinstance(cleaned_data[field], Q):
                 args.append(cleaned_data[field])
             elif field == 'order_by':
-                pass # special case - ordering handled in get_result_queryset
+                pass # Special case: ordering handled in get_result_queryset.
             elif cleaned_data[field]:
                 args.append(Q(**{field: cleaned_data[field]}))
-        
+
         return args
 
 
@@ -78,9 +77,9 @@ class BaseSearchForm(forms.Form):
             if '__' in field_name:
                 qs = qs.distinct()
                 break
-        
+
         if self.cleaned_data['order_by']:
             qs = qs.order_by(self.cleaned_data['order_by'])
-                            
+
         return qs
 

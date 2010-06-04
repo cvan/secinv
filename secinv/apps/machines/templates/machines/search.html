@@ -8,17 +8,17 @@
 {% block content %}
     <h2>Search</h2>
 
-    <!--
-        <table>
-            {{ form.as_table }}
-            <tr>
-                <td>&nbsp;</td>
-                <td>
-                    <input type="submit" value="Search">
-                </td>
-            </tr>
-        </table>
-      -->
+    <form action="." method="get">
+      <table>
+        {{ form.as_table }}
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <input type="submit" value="Search">
+          </td>
+        </tr>
+      </table>
+    </form>
 
 {% if query %}
     <h3>{{ _('Search results:') }} <strong>{{ query|escape }}</strong> ({{ results|length }})</h3>
@@ -32,16 +32,15 @@
       <li>{{ _('No results found.') }}</li>
   {% endfor %}
     </ul>
-
 {% else %}
-
+<!--
             <form action="." method="get">
               <label for="q">{{ _('Search') }}</label>
               <input type="search" name="q" id="q" value="{{ query|escape }}">
               <input type="submit" class="button pill pink" value="Search">
             </form>
+-->
+{% endif %}
 
-          {% endif %}
-    </form>
 {% endblock %}
 
