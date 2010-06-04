@@ -538,11 +538,11 @@
           {% for interface in interfaces %}
               <tr>
                 <td>
-                  {% if interface.id in interfaces_oldest %}<ins>{% endif %}
+                  {% if interface.id in interfaces_added %}<ins>{% endif %}
                   {% if not interface.active %}<del>{% endif %}
                   {{ interface.i_name }}
                   {% if not interface.active %}</del>{% endif %}
-                  {% if interface.id in interfaces_oldest %}</ins>{% endif %}
+                  {% if interface.id in interfaces_added %}</ins>{% endif %}
                 </td>
                 <td>
                   {% if not interface.active %}<del>{% endif %}
@@ -638,11 +638,11 @@
               {% for interface_h in interfaces_history %}
               <tr>
                 <td>
-                  {% if interface_h.id in interfaces_oldest %}<ins>{% endif %}
+                  {% if interface_h.id in interfaces_added %}<ins>{% endif %}
                   {% if not interface_h.active %}<del>{% endif %}
                   {{ interface_h.i_name }}
                   {% if not interface_h.active %}</del>{% endif %}
-                  {% if interface_h.id in interfaces_oldest %}</ins>{% endif %}
+                  {% if interface_h.id in interfaces_added %}</ins>{% endif %}
                 </td>
                 <td>
                   {% if not interface_h.active %}<del>{% endif %}

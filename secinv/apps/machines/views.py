@@ -48,19 +48,24 @@ def detail(request, machine_slug):
         machine__id=p.id).values_list('i_name', flat=True).distinct()
 
     interfaces_latest = []
-    interfaces_oldest_ids = []
+    interfaces_added_ids = []
     for i in distinct_interfaces:
-        i_latest_distinct = Interface.objects.filter(machine__id=p.id,
-                                                     i_name=i).latest()
-        if i_latest_distinct:
-            interfaces_latest.append(i_latest_distinct)
+        i_latest = Interface.objects.filter(machine__id=p.id,
+                                            i_name=i).latest()
+        interfaces_latest.append(i_latest)
 
         i_oldest = Interface.objects.filter(machine__id=p.id,
             i_name=i).order_by('date_added').all()
         if i_oldest.exists():
-            interfaces_oldest_ids.append(i_oldest[0].id)
+            interfaces_added_ids.append(i_oldest[0].id)
 
-    # TODO: if previous interface was inactive, append id to interfaces_now_active_ids
+        i_previous = Interface.objects.filter(machine__id=p.id,
+            i_name=i, active=False).exclude(id=i_latest.id).order_by(
+            '-date_added').all()
+        if i_previous.exists():
+            # If second most recent interface was inactive but the latest
+            # interface is now active, then mark it as "added."
+            interfaces_added_ids.append(i_latest.id)
 
     interfaces_history = Interface.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
@@ -74,7 +79,7 @@ def detail(request, machine_slug):
                         'rpms_history': rpms_history,
                         'interfaces': interfaces_latest,
                         'interfaces_history': interfaces_history,
-                        'interfaces_oldest': interfaces_oldest_ids}
+                        'interfaces_added': interfaces_added_ids}
     return render_to_response('machines/detail.html', template_context,
         context_instance=RequestContext(request))
 
