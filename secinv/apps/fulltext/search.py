@@ -14,10 +14,8 @@ class BaseSearchForm(forms.Form):
     def clean_q(self):
         return self.cleaned_data['q'].strip()
 
-    order_by = forms.CharField(
-        widget=forms.HiddenInput(),
-        required=False,
-    )
+    order_by = forms.CharField(widget=forms.HiddenInput(),
+                               required=False)
 
     class Meta:
         abstract = True

@@ -117,7 +117,10 @@ nav ul li a:visited {
 */
 
 
-body.machines nav ul li.machines a {
+body.machines nav ul li.machines a,
+body.devices nav ul li.devices a,
+body.profiles nav ul li.profiles a,
+body.config nav ul li.config a {
     text-decoration: none;
 	text-shadow: 0 1px 0 #000;
 	line-height: 2.2;

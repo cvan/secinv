@@ -1,16 +1,16 @@
 from ..fulltext.search import BaseSearchForm
 from django.db.models import Q
-from .models import Machine
+from .models import Device
 
-class MachineSearchForm(BaseSearchForm):
+class DeviceSearchForm(BaseSearchForm):
     class Meta:
-        base_qs = Machine.objects
+        base_qs = Device.objects
         search_fields = ['sys_ip', 'hostname', 'ext_ip',
                          'system__kernel_rel', 'system__rh_rel', 'system__nfs',
-                         'services__processes', 'services__ports',
-                         'rpms__rpms',
-                         'interface__i_name', 'interface__i_ip',
-                         'interface__i_mac', 'interface__i_mask']
+	                     'services__processes', 'services__ports',
+	                     'rpms__rpms',
+	                     'interface__i_name', 'interface__i_ip',
+	                     'interface__i_mac', 'interface__i_mask']
 
     """ 
     A custom addition - the absence of a clean_category method means

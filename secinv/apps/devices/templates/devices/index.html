@@ -1,0 +1,76 @@
+{% extends "devices/base.html" %}
+{% load i18n %}
+
+{% block head_title %}{{ _('Devices') }} | {{ block.super }}{% endblock %}
+
+{# TODO: sortable columns #}
+
+{% block content %}
+      <h2>Devices</h2>
+{% if device_list %}
+{# TODO: Pagination #}
+      <table>
+        <caption>{{ _('Devices') }}</caption>
+        <thead>
+          <tr>
+            <th>{{ _('IP address') }}</th>
+            <th>{{ _('Hostname') }}</th>
+            <th>{{ _('External IP address') }}</th>
+            <th>{{ _('Added') }}</th>
+            <th>{{ _('Modified') }}</th>
+            <th>{{ _('Scanned') }}</th>
+            <th>{{ _('View') }}</th>
+{# TODO: add httpd, mysqld, openvpn columns! #}
+          </tr>
+        </thead>
+        <tbody>
+      {% for device in device_list %}
+          <tr>
+            <td>{{ device.sys_ip }}</td>
+            <td>
+              <a href="{% url apps.devices.views.detail device_slug=device.hostname %}">
+                {{ device.hostname }}
+              </a>
+            </td>
+            <td>{{ device.ext_ip }}</td>
+{# TODO: uniform date format #}
+            <td>
+              {% if device.date_added %}
+              <time datetime="{{ device.date_added|date:'c' }}">
+                {{ device.date_added }}
+              </time>
+              {% endif %}
+            </td>
+            <td>
+              {% if device.date_modified %}
+              <time datetime="{{ device.date_modified|date:'c' }}">
+                {{ device.date_modified }}
+              </time>
+              {% endif %}
+            </td>
+            <td>
+              {% if services.date_scanned %}
+              <time datetime="{{ device.date_scanned|date:'c' }}">
+                {{ device.date_scanned }}
+              </time>
+              {% endif %}
+            </td>
+{# TODO: Add #}
+{# TODO: Edit #}
+{# TODO: Delete #}
+            <td>
+              <a href="{% url apps.devices.views.detail device_slug=device.hostname %}">
+                View
+              </a>
+            </td>
+          </tr>
+      {% endfor %}
+        </tbody>
+      </table>
+{# TODO: Pagination #}
+{% else %}
+      <p>No devices are available.</p>
+{% endif %}
+{% endblock %}
+
+

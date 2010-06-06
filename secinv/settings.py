@@ -103,6 +103,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'secinv.apps.machines',
+    'secinv.apps.devices',
     'secinv.apps.haystack',
     'secinv.apps.fulltext',
 )

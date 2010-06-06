@@ -1,10 +1,11 @@
-from .models import Machine
+from .models import Device
 from .models import *
 from django.contrib import admin
 
-#admin.site.register(Machine)
+#admin.site.register(Device)
 
 #class ChoiceInline(admin.StackedInline):
+
 
 class InterfaceInline(admin.TabularInline):
     model = Interface
@@ -22,7 +23,7 @@ class ServicesInline(admin.TabularInline):
 class RPMSInline(admin.TabularInline):
     model = RPMs
 
-class MachineAdmin(admin.ModelAdmin):
+class DeviceAdmin(admin.ModelAdmin):
     #fields = ['sys_ip', 'hostname', 'ext_ip']
     fieldsets = [(None,               {'fields': ['sys_ip',
                                                   'hostname', 'ext_ip']}),
@@ -42,4 +43,5 @@ class MachineAdmin(admin.ModelAdmin):
                      'interface__i_mac', 'interface__i_mask']
     date_hierarchy = 'date_added'
 
-admin.site.register(Machine, MachineAdmin)
+admin.site.register(Device, DeviceAdmin)
+
