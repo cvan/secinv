@@ -1,4 +1,4 @@
-from .models import Device
+#from .models import Device
 from .models import *
 from django.contrib import admin
 

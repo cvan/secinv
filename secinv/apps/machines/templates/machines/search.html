@@ -1,5 +1,6 @@
 {% extends "machines/base.html" %}
 {% load i18n %}
+{% load search %}
 
 {% block head_title %}
 {% if query %}{{ _('Search results: ') }}{{ query|escape }}{% else %}{{ _('Search') }}{% endif %} | {{ block.super }}
@@ -22,11 +23,16 @@
 
 {% if query %}
     <h3>{{ _('Search results:') }} <strong>{{ query|escape }}</strong> ({{ results|length }})</h3>
-
     <ul>
   {% for result in results %}
       <li>
-        <a href="">{{ result.hostname }}</a>
+        <a href="{% url apps.machines.views.detail machine_slug=result.slug %}">
+          {{ result.hostname|highlight:terms }} ({{ result.sys_ip }})
+        </a>
+        {% searchexcerpt terms 6 1 as content %}
+        {{ result.excerpt|striptags }}
+        {% endsearchexcerpt %}
+        <p class="context">{{ content.excerpt|highlight:terms }}</p>
       </li>
   {% empty %}
       <li>{{ _('No results found.') }}</li>

@@ -65,6 +65,11 @@ ins {
     color:#000;
     text-decoration:none;
 }
+.highlight {
+    background-color: #ff6;
+    font-weight: bold;
+}
+
 li ins,
 td ins {
     background-color: #fff;

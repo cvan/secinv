@@ -1,4 +1,4 @@
-from .models import Machine
+#from .models import Machine
 from .models import *
 from django.contrib import admin
 

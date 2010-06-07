@@ -124,34 +124,22 @@ def vote(request, machine_slug):
 
 def search(request):
     query = request.GET.get('q', '')
+    terms = query.split()
     results = []
+    excerpts = {}
 
     if query:
         form = MachineSearchForm(request.GET)
         if form.is_valid():
             results = form.get_result_queryset()
+
+            #m.interface_set.all()[0].__getattribute__('i_name')
     else:
         form = MachineSearchForm()
 
     template_context = {'form': form,
                         'results': results,
-                        'query': query}
+                        'query': query,
+                        'terms': terms}
     return render_to_response('machines/search.html', template_context,
         context_instance=RequestContext(request))
-
-'''
-def search(request):
-    query = request.GET.get('q', '')
-    if query:
-        qset = (
-            Q(sys_ip__icontains=query) |
-            Q(hostname__icontains=query)
-        )
-        results = Machine.objects.filter(qset).distinct()
-    else:
-        results = []
-    template_context = {'results': results,
-                        'query': query}
-    return render_to_response('machines/search.html', template_context,
-        context_instance=RequestContext(request))
-'''

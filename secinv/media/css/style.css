@@ -50,10 +50,10 @@ header .logo a {
     text-decoration: none;
 }
 header .logo a:hover {
-    color: #c66;
+    color: #60cff5;
 }
 header .logo a:hover strong {
-    color: #c33;
+    color: #00648d;
 }
 
 header .logo strong {
@@ -64,19 +64,23 @@ header nav {
     background-color: #cf2a2e;
 /*    e74d61 cf2a2e; */
 
+/*
 	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
 	background: -moz-linear-gradient(top, #e74d61, #cf2a2e);
-
-/* cyan
-background: -webkit-gradient(linear, left top, left bottom, from(#4dcce7), to(#3acf2a));
-background: -moz-linear-gradient(top, #4dcce7, #2acdcf);
+    background: linear-gradient(top, #e74d61, #cf2a2e);
 */
+
+/* cyan */
+background: -webkit-gradient(linear, left top, left bottom, from(#4dcce7), to(#3acf2a));
+background: -moz-linear-gradient(top, #73d2f3, #008cc2);
+
     border-radius: 10px;
     -moz-border-radius-topleft: 10px;
     -moz-border-radius-topright: 10px;
     -webkit-border-top-left-radius: 10px;
     -webkit-border-top-right-radius: 10px;
 
+    border-bottom: #00648d 1px solid;
     color: #fff;
 
     padding: 10px;
@@ -149,7 +153,8 @@ body.config nav ul li.config a {
 
     background: #c42629;
     background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ccc));
-    background: -moz-linear-gradient(top,  #771111,  #c42629);
+    background: -moz-linear-gradient(top, #0a88b8, #30adda);
+    background: linear-gradient(top, #0a88b8, #30adda);
 }
 
 nav ul li a:hover
@@ -347,6 +352,7 @@ header form button {
 	background: #5f5f5f;
 	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#dde1e5));
 	background: -moz-linear-gradient(top,  #fff,  #dde1e5);
+
 	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#9e9e9e', endColorstr='#454545'); /* ie7 */
 	-ms-filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#9e9e9e', endColorstr='#454545'); /* ie8 */
 }
@@ -453,6 +459,16 @@ input[type=submit]:active, input[type=button]:active {
 }
 
 /* Colors/Styles */
+.button.cyan {
+	background-color: #30adda;
+	color: #000;
+	text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
+}
+.button.cyan:hover {
+	background-color: #0a88b8;
+}
+
+
 .button.blue {
 	background-color: #9eb4bf;
 }

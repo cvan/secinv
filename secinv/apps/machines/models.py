@@ -55,12 +55,46 @@ class Machine(models.Model):
     # and tell it which fields to search.
     #objects = SearchManager(('sys_ip', 'hostname'))
 
+    search_fields = ['sys_ip', 'hostname', 'ext_ip',
+                     'system__kernel_rel', 'system__rh_rel', 'system__nfs',
+                     'services__processes', 'services__ports',
+                     'rpms__rpms',
+                     'interface__i_name', 'interface__i_ip',
+                     'interface__i_mac', 'interface__i_mask']
+
+
     def __unicode__(self):
         return u'%s - %s' % (self.sys_ip, self.hostname)
 
+
+    def excerpt(self):
+        excerpt = ""
+
+        i = Interface.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        sys = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        serv = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        r = RPMs.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+
+        for sf in self.search_fields:
+            if not re.search('__', sf):
+                val = self.__getattribute__(sf)
+            elif re.search('interface__', sf):
+                val = i.__getattribute__(re.split('__', sf)[1])
+            elif re.search('system__', sf):
+                val = sys.__getattribute__(re.split('__', sf)[1])
+            elif re.search('services__', sf):
+                val = serv.__getattribute__(re.split('__', sf)[1])
+            elif re.search('rpms__', sf):
+                val = r.__getattribute__(re.split('__', sf)[1])
+
+            excerpt += "%s " % val
+
+        return excerpt
+
+
     @property
     def slug(self):
-        return re.sub('[^a-zA-Z-]', '-', self.hostname)
+        return re.sub('[^a-z0-9A-Z-]', '-', self.hostname)
 
 
 class Interface(models.Model):
