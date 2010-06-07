@@ -297,7 +297,6 @@ class RPMs(models.Model):
 
         return diff_list(r_previous, r_latest)
 
-
     def __unicode__(self):
         return u'%s' % (self.rpms[0:100])
 

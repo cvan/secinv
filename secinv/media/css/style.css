@@ -3,6 +3,7 @@ body {
 	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
 	background: -moz-linear-gradient(top,  #fff,  #ededed);
 	background: linear-gradient(top,  #fff,  #ededed);
+	margin-bottom: 20px;
 }
 
 body, header {
@@ -18,19 +19,7 @@ ul {
 }
 
 /* @group Header */
-header {
-/*
-background-image: -webkit-gradient(linear, left top, left bottom,
-                  from(#9abcfc), to(#3cc), color-stop(1.0, #3cc));
-background-image: -moz-linear-gradient(top, #a7e2f9, #96cee4);
-
-    background-image: -webkit-gradient(linear, left top, left bottom,
-                      from(#9abcfc), to(#3cc), color-stop(1.0, #3cc));
-    background-image: -moz-linear-gradient(right, #ab49a8, #2d1148);
-*/
-}
-
-figure {
+header figure {
     padding: 10px 0;
 }
 
@@ -62,39 +51,30 @@ header .logo strong {
 }
 
 header nav {
-    background-color: #cf2a2e;
-/*    e74d61 cf2a2e; */
-
-/*
-	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
-	background: -moz-linear-gradient(top, #e74d61, #cf2a2e);
-    background: linear-gradient(top, #e74d61, #cf2a2e);
-*/
-
-/* cyan */
-background: -webkit-gradient(linear, left top, left bottom, from(#4dcce7), to(#3acf2a));
-background: -moz-linear-gradient(top, #73d2f3, #008cc2);
-background: linear-gradient(top, #73d2f3, #008cc2);
+    background: #008cc2;
+    background: -webkit-gradient(linear, left top, left bottom, from(#4dcce7), to(#3acf2a));
+    background: -moz-linear-gradient(top, #73d2f3, #008cc2);
+    background: linear-gradient(top, #73d2f3, #008cc2);
 
     -moz-border-radius-topleft: 10px;
     -moz-border-radius-topright: 10px;
     -webkit-border-top-left-radius: 10px;
     -webkit-border-top-right-radius: 10px;
-    border-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 
     border-bottom: #00648d 1px solid;
     color: #fff;
-
     padding: 10px;
     position: relative;
 }
-nav ul {
+header nav ul {
     list-style: none;
 }
-nav ul li:first-child {
+header nav ul li:first-child {
     margin-left: 0;
 }
-nav ul li {
+header nav ul li {
     display: inline-block;
     margin-left: 0.5em;
 }
@@ -123,10 +103,14 @@ nav ul li a:visited {
 */
 
 
-body.machines nav ul li.machines a,
-body.devices nav ul li.devices a,
-body.profiles nav ul li.profiles a,
-body.config nav ul li.config a {
+body.machines header nav ul li.machines a,
+body.machines header nav ul li.machines a:hover,
+body.devices header nav ul li.devices a,
+body.devices header nav ul li.devices a:hover,
+body.profiles header nav ul li.profiles a,
+body.profiles header nav ul li.profiles a:hover,
+body.config header nav ul li.config a,
+body.config header nav ul li.config a:hover {
     text-decoration: none;
 	text-shadow: 0 1px 0 #000;
 	line-height: 2.2;
@@ -159,17 +143,13 @@ body.config nav ul li.config a {
     background: linear-gradient(top, #0a88b8, #30adda);
 }
 
-nav ul li a:hover
-{
-/*    border-color: #fff;     */
-}
 
 /* @group Sidebar */
-aside {
+aside#sidebar {
     padding-top: 10px;
-    min-height: 525px;
+    min-height: 325px;
 }
-aside h2 {
+aside#sidebar h2 {
     position: absolute;
     left: -9999px;
 }
@@ -194,9 +174,32 @@ aside h2 {
 
 footer {
     font-size: 0.8em;
+    position: relative;
     padding: 10px 0;
-}
 
+    background: #333;
+    background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#333));
+    background: -moz-linear-gradient(top, #aaa, #333);
+    background: linear-gradient(top, #aaa, #333);
+
+    border-top: #333 1px solid;
+
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+    color: #fff;
+}
+footer a {
+    color: #ddd;
+    text-decoration: none;
+}
+footer a:hover {
+    color: #bbb;
+}
 
 /* @group Headings */
 
@@ -253,9 +256,10 @@ table {
 }
 
 caption {
+    display: none;
+    font-size: 1.231em; /* 16px */
     font-weight: bold;
     padding-bottom: 0.539em; /* 7px */
-    font-size: 1.231em; /* 16px */
 }
 
 thead th {
@@ -269,7 +273,8 @@ tbody {
     border-top: #666 3px solid; /* not rendered in IE6/7 */
 }
 
-thead tr th, tbody tr td {
+thead tr th,
+tbody tr td {
     border-top: #ddd 1px solid;
 }
 
@@ -644,7 +649,7 @@ hgroup#masthead h3 {
     padding: 0 10px 10px 10px;
     margin-left: 0;
     margin-right: -2px;
-    min-height: 525px;
+    min-height: 325px;
     overflow: visible;
 }
 
@@ -654,20 +659,26 @@ hgroup#masthead h3 {
     width: 100%;
 }
 
+.tabs table thead th {
+    vertical-align: middle;
+}
+.tabs table td {
+    vertical-align: top;
+}
+
 #rpms-latest ul {
     height: 200px;
     overflow: auto;
 }
+
 #rpms-history li {
-    text-indent: 0.5em;
+    padding-left: 1em;
+    text-indent: -1em;
 }
 #rpms-history li:first-line {
-    text-indent: -0.5em;
+    text-indent: 1em;
 }
 
-caption {
-    display: none;
-}
 
 /* Last Modified */
 h4.group {
@@ -677,7 +688,7 @@ p.date {
     float: right;
 }
 
-/* Details legend */
+/* Details legend and diff circles */
 details {
     border: #ccc 1px solid;
 }
