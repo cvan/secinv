@@ -57,14 +57,12 @@ class ServerFunctions:
         #self.logger = logging.getLogger('secinv')
 
     def authenticate(self, auth_key):
-        '''
+        """
         Compare server's auth_key against client's auth_key.
-        '''
+        """
         if self.auth_key != auth_key:
-            print 'failed authentication'
             return False
 
-        print 'ok authentication'
         self.is_authenticated = True
         return True
 

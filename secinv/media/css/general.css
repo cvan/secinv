@@ -17,8 +17,8 @@ body {
 .align_center   { text-align: center; }
 .align_justify  { text-align: justify; }
 
-a {	color: #525252;	}
-a:hover, a:focus { text-decoration: underline; }
+a {	color: #666; }
+a:hover, a:focus { color: #333; text-decoration: underline; }
 a:active, a:visited { }
 
 blockquote {

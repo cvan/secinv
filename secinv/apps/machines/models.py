@@ -81,6 +81,10 @@ class Machine(models.Model):
         processes = re.split(',', s.processes)
         return 'openvpn' in processes
 
+    def nfs(self):
+        s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        return s.nfs
+
     def excerpt(self):
         excerpt = ""
 
