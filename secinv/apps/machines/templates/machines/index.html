@@ -6,20 +6,25 @@
 {# TODO: sortable columns #}
 
 {% block content %}
-      <h2>Machines</h2>
+      <hgroup id="masthead">
+        <h2>{{ _('Machines') }}</h2>
+      </hgroup>
+
 {% if machine_list %}
 {# TODO: Pagination #}
-      <table>
+      <table class="wide">
         <caption>{{ _('Machines') }}</caption>
         <thead>
           <tr>
-            <th>{{ _('IP address') }}</th>
+            <th>{{ _('IP') }}</th>
             <th>{{ _('Hostname') }}</th>
-            <th>{{ _('External IP address') }}</th>
+            <th>{{ _('External IP') }}</th>
+            <th>{{ _('httpd') }}</th>
+            <th>{{ _('mysqld') }}</th>
+            <th>{{ _('openvpn') }}</th>
             <th>{{ _('Added') }}</th>
-            <th>{{ _('Modified') }}</th>
+            <!--<th>{{ _('Modified') }}</th>-->
             <th>{{ _('Scanned') }}</th>
-            <th>{{ _('View') }}</th>
 {# TODO: add httpd, mysqld, openvpn columns! #}
           </tr>
         </thead>
@@ -33,36 +38,45 @@
               </a>
             </td>
             <td>{{ machine.ext_ip }}</td>
+            <td title="{% if machine.httpd %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+                class="{% if machine.httpd %}enabled{% else %}disabled{% endif %}">
+              <mark>{{ machine.httpd }}</mark>
+            </td>
+            <td title="{% if machine.mysqld %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+                class="{% if machine.mysqld %}enabled{% else %}disabled{% endif %}">
+              <mark>{{ machine.mysqld }}</mark>
+            </td>
+            <td title="{% if machine.openvpn %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+                class="{% if machine.openvpn %}enabled{% else %}disabled{% endif %}">
+              <mark>{{ machine.openvpn }}</mark>
+            </td>
 {# TODO: uniform date format #}
             <td>
               {% if machine.date_added %}
               <time datetime="{{ machine.date_added|date:'c' }}">
-                {{ machine.date_added }}
+                {{ machine.date_added|date:'m/d/Y g:s a' }}
               </time>
               {% endif %}
             </td>
+            <!--
             <td>
               {% if machine.date_modified %}
               <time datetime="{{ machine.date_modified|date:'c' }}">
-                {{ machine.date_modified }}
+                {{ machine.date_modified|date:'m/d/Y' }}
               </time>
               {% endif %}
             </td>
+            -->
             <td>
-              {% if services.date_scanned %}
+              {% if machine.date_scanned %}
               <time datetime="{{ machine.date_scanned|date:'c' }}">
-                {{ machine.date_scanned }}
+                {{ machine.date_scanned|date:'m/d/Y g:s a' }}
               </time>
               {% endif %}
             </td>
 {# TODO: Add #}
 {# TODO: Edit #}
 {# TODO: Delete #}
-            <td>
-              <a href="{% url apps.machines.views.detail machine_slug=machine.hostname %}">
-                View
-              </a>
-            </td>
           </tr>
       {% endfor %}
         </tbody>

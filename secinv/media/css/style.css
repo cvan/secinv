@@ -2,6 +2,7 @@ body {
     background: #f1f1f1;
 	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
 	background: -moz-linear-gradient(top,  #fff,  #ededed);
+	background: linear-gradient(top,  #fff,  #ededed);
 }
 
 body, header {
@@ -73,12 +74,13 @@ header nav {
 /* cyan */
 background: -webkit-gradient(linear, left top, left bottom, from(#4dcce7), to(#3acf2a));
 background: -moz-linear-gradient(top, #73d2f3, #008cc2);
+background: linear-gradient(top, #73d2f3, #008cc2);
 
-    border-radius: 10px;
     -moz-border-radius-topleft: 10px;
     -moz-border-radius-topright: 10px;
     -webkit-border-top-left-radius: 10px;
     -webkit-border-top-right-radius: 10px;
+    border-radius: 10px;
 
     border-bottom: #00648d 1px solid;
     color: #fff;
@@ -162,9 +164,16 @@ nav ul li a:hover
 /*    border-color: #fff;     */
 }
 
+/* @group Sidebar */
 aside {
+    padding-top: 10px;
     min-height: 525px;
 }
+aside h2 {
+    position: absolute;
+    left: -9999px;
+}
+/* @end */
 
 .submit, .submit:visited {
     background: #525252; 
@@ -240,6 +249,7 @@ h3 em {
 
 table {
     border-bottom: #665 1px solid;
+    width: 100%;
 }
 
 caption {
@@ -256,16 +266,65 @@ thead th {
 }
 
 tbody {
-    border-top: 3px solid #666; /* not rendered in IE6/7 */
+    border-top: #666 3px solid; /* not rendered in IE6/7 */
 }
 
-tbody tr th, tbody tr td {
-    border-top: 1px solid #ddd;
+thead tr th, tbody tr td {
+    border-top: #ddd 1px solid;
 }
 
 th, td {
     text-align: left;
     padding: 0.308em 0.537em 0.214em 0.231em; /* 4px 7px 3px 7px */
+}
+
+td {
+    vertical-align: middle;
+}
+
+table.wide {
+    border-bottom-color: #ddd;
+    margin: -10px -10px 0 -10px;
+    width: 660px; /* .col_11 width + 10px margins */
+}
+
+/* TODO: temporary */
+table.wide thead tr th {
+    background-color: #ededed;
+    white-space: nowrap;
+}
+
+table.wide thead tr th,
+table.wide tbody td {
+    text-align: center;
+    padding: 4px 8px;
+}
+
+table.wide thead th {
+    border-bottom-width: 1px;
+}
+
+table.wide tbody {
+    border-top-width: 0;
+}
+
+table.wide thead tr th,
+table.wide tbody tr td {
+    border-top-width: 0;
+    border-right: #ddd 1px solid;
+}
+
+table.wide thead tr th:last-child,
+table.wide tbody tr td:last-child {
+    border-right-width: 0;
+}
+
+table.wide thead tr th {
+    border-right-color: #666;
+}
+
+table.wide time {
+    font-size: 0.9em;
 }
 
 /* @end */
@@ -301,6 +360,9 @@ header nav form label {
     padding-right: 0.5em;
 }
 
+fieldset {
+    padding: 1em;
+}
 
 nav form {
 	display: inline-block;
@@ -317,19 +379,22 @@ header form input {
 }
 
 input#q, input[type=text], input[type=search] {
-	background: #fff;
-	color: #666;
-	padding: 4px 6px 4px 8px;
-	width: 202px;
+	background-color: #fff;
 	border: #333 1px solid;
+	color: #666;
+
 	-webkit-border-radius: 2em;
 	-moz-border-radius: 2em;
 	border-radius: 2em;
+
 	-moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 	-webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+
+	padding: 4px 6px 4px 8px;
+	width: 202px;
 }
-input#search:focus {
+input#q:focus {
     border-color: #000;
     color: #000;
 }
@@ -374,7 +439,7 @@ http://somadesign.ca/demos/buttons-redux.html
 	cursor: pointer;
 	outline: none;
 	color: #111;
-	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", "Segoe UI", Verdana, sans-serif;
+	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", "Segoe UI", Verdana, sans-serif; /* TODO: revise */
 	display: inline-block;
 	vertical-align: top;
 	position: relative;
@@ -382,7 +447,7 @@ http://somadesign.ca/demos/buttons-redux.html
 	font-weight: bold;
 	text-align: center;
 	background-color: #aaa;
-	background-image: url(gradient.png);
+	background-image: url(gradient.png); /* TODO: Remove */
 	background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
 	background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
@@ -540,9 +605,10 @@ input[type=submit]:active, input[type=button]:active {
 hgroup#masthead {
     background: #f1f1f1;
 	background: -webkit-gradient(radial, left top, left bottom, from(#000), to(#666));
-	background: -moz-radial-gradient(top left,  #666,  #000);
+	background: -moz-radial-gradient(top left, #666, #000);
+	background: radial-gradient(top left, #666, #000);
     margin: 0 -10px 10px -11px;
-    padding: 20px 10px 10px 10px;
+    padding: 20px 10px 20px 10px;
     position: relative;
 }
 hgroup#masthead h2 {
@@ -558,11 +624,13 @@ hgroup#masthead h3 {
     font-size: 3em;
     font-weight: bold;
     text-shadow: #999 0 0 1px;
+    line-height: 1;
     margin: 0;
 }
 
 #wrap {
     background-color: #fff;
+    background: #ededed;
 }
 #content-wrap {
     border: #999 1px solid;
@@ -570,28 +638,31 @@ hgroup#masthead h3 {
 }
 
 #content.col {
-    overflow: visible;
+    background-color: #fff;
     border: #999 1px solid;
-    border-width: 1px;
+    border-width: 0 1px;
     padding: 0 10px 10px 10px;
     margin-left: 0;
     margin-right: -2px;
     min-height: 525px;
-}
-
-table {
-    width: 100%;
+    overflow: visible;
 }
 
 .tabs table {
-    width: 100%;
     max-height: 200px;
     overflow: auto;
+    width: 100%;
 }
 
 #rpms-latest ul {
     height: 200px;
     overflow: auto;
+}
+#rpms-history li {
+    text-indent: 0.5em;
+}
+#rpms-history li:first-line {
+    text-indent: -0.5em;
 }
 
 caption {
@@ -612,6 +683,7 @@ details {
 }
 
 details.differences {
+    line-height: 1.5em;
     margin-bottom: 1.5em;
     position: relative;
 }
@@ -631,10 +703,18 @@ details.differences dd {
 
 details.differences dl {
     position: absolute;
-    top: 0.25em;
+    top: 0.4em;
     right: 0;
 }
 
+.enabled mark,
+.disabled mark {
+    margin: 0 auto;
+    text-indent: -9999px;
+}
+
+.enabled mark,
+.disabled mark,
 figure.added,
 figure.changed,
 figure.deleted {
@@ -648,18 +728,22 @@ figure.deleted {
     padding: 5px;
 }
 
+.enabled mark,
 figure.added {
     background-color: #080;
 }
 figure.changed {
     background-color: #c50;
 }
+.disabled mark,
 figure.deleted {
     background-color: #800;
 }
 
 details.differences dd {
     margin-right: 1em;
+    position: relative;
+    top: -1px;
 }
 
 /* @end */

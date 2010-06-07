@@ -66,6 +66,20 @@ class Machine(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.sys_ip, self.hostname)
 
+    def httpd(self):
+        s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        processes = re.split(',', s.processes)
+        return 'httpd' in processes
+
+    def mysqld(self):
+        s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        processes = re.split(',', s.processes)
+        return 'mysqld' in processes
+
+    def openvpn(self):
+        s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        processes = re.split(',', s.processes)
+        return 'openvpn' in processes
 
     def excerpt(self):
         excerpt = ""
