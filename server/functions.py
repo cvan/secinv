@@ -34,7 +34,7 @@ try:
 except ImportError:
     sys.exit('Error: Could not import Django settings')
 
-# To suppress MySQLdb and haystack warnings.
+# To suppress MySQLdb warning.
 import warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
@@ -157,8 +157,6 @@ class ServerFunctions:
                     i_object = Interface.objects.create(**i_dict)
 
             except Interface.DoesNotExist:
-                print 'interface does not exist'
-
                 i_dict = {'machine': self.machine_obj,
                           'i_name': interface,
                           'i_ip': ip_dict[interface]['i_ip'],
@@ -172,10 +170,8 @@ class ServerFunctions:
         distinct_interfaces = Interface.objects.filter(
             machine__id=self.machine_id).values_list(
             'i_name', flat=True).distinct()
-        print 'distinct_interfaces:', distinct_interfaces
 
         i_diff = diff_list(distinct_interfaces, ip_dict.keys())
-        print 'i_diff:', i_diff
 
         # Update each interface as inactive.
         for i in i_diff['deleted']:
@@ -222,8 +218,6 @@ class ServerFunctions:
                 sys_object = System.objects.create(**sys_dict)
 
         except System.DoesNotExist:
-            print 'system does not exist'
-
             sys_dict = {'machine': self.machine_obj,
                         'kernel_rel': system_dict['kernel_rel'],
                         'rh_rel': system_dict['rh_rel'],
@@ -253,18 +247,12 @@ class ServerFunctions:
 
                 s1 = set(old)
                 s2 = set(new)
-                print s1
-                print s2
 
                 new_procs = s2.difference(s1)
                 del_procs = s1.difference(s2)
-                print new_procs
-                print del_procs
 
                 s_diff_ins_processes = list(s2.difference(s1))
                 s_diff_del_processes = list(s1.difference(s2))
-                print s_diff_ins_processes
-                print s_diff_del_processes
 
                 s_diff.append('processes')
 
@@ -290,8 +278,6 @@ class ServerFunctions:
                 s_object = Services.objects.create(**s_dict)
 
         except Services.DoesNotExist:
-            print 'services does not exist'
-
             s_dict = {'machine': self.machine_obj,
                       'processes': csv_procs,
                       'ports': csv_ports}
@@ -312,8 +298,6 @@ class ServerFunctions:
                 r_object = RPMs.objects.create(**r_dict)
 
         except RPMs.DoesNotExist:
-            print 'RPMs does not exist'
-
             r_dict = {'machine': self.machine_obj,
                       'rpms': rpms_dict['list']}
             r_object = RPMs.objects.create(**r_dict)

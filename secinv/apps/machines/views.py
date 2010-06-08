@@ -132,8 +132,6 @@ def search(request):
         form = MachineSearchForm(request.GET)
         if form.is_valid():
             results = form.get_result_queryset()
-
-            #m.interface_set.all()[0].__getattribute__('i_name')
     else:
         form = MachineSearchForm()
 
