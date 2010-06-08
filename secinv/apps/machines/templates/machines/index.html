@@ -39,19 +39,19 @@
             <td>{{ machine.ext_ip }}</td>
             <td title="{% if machine.httpd %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
                 class="{% if machine.httpd %}enabled{% else %}disabled{% endif %}">
-              <mark>{{ machine.httpd }}</mark>
+              <mark>{% if machine.httpd %}&#10004;{% else %}&#10006;{% endif %}</mark>
             </td>
             <td title="{% if machine.mysqld %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
                 class="{% if machine.mysqld %}enabled{% else %}disabled{% endif %}">
-              <mark>{{ machine.mysqld }}</mark>
+              <mark>{% if machine.mysqld %}&#10004;{% else %}&#10006;{% endif %}</mark>
             </td>
             <td title="{% if machine.openvpn %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
                 class="{% if machine.openvpn %}enabled{% else %}disabled{% endif %}">
-              <mark>{{ machine.openvpn }}</mark>
+              <mark>{% if machine.openvpn %}&#10004;{% else %}&#10006;{% endif %}</mark>
             </td>
-            <td title="{% if machine.nfs %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+            <td title="{% if machine.nfs %}{{ _('yes') }}{% else %}{{ _('no') }}{% endif %}"
                 class="{% if machine.nfs %}enabled{% else %}disabled{% endif %}">
-              <mark>{{ machine.nfs }}</mark>
+              <mark>{% if machine.nfs %}&#10004;{% else %}&#10006;{% endif %}</mark>
             </td>
 {# TODO: uniform date format #}
             <td>

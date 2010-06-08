@@ -718,14 +718,8 @@ details.differences dl {
     right: 0;
 }
 
-.enabled mark,
-.disabled mark {
-    margin: 0 auto;
-    text-indent: -9999px;
-}
-
-.enabled mark,
-.disabled mark,
+/*.enabled mark,
+.disabled mark,*/
 figure.added,
 figure.changed,
 figure.deleted {
@@ -739,16 +733,30 @@ figure.deleted {
     padding: 5px;
 }
 
-.enabled mark,
+/*.enabled mark,*/
 figure.added {
     background-color: #080;
 }
 figure.changed {
     background-color: #c50;
 }
-.disabled mark,
+/*.disabled mark,*/
 figure.deleted {
     background-color: #800;
+}
+
+.enabled mark {
+    color: #080;
+    display: block;
+}
+.disabled mark {
+    color: #800;
+}
+
+.enabled mark,
+.disabled mark {
+    margin: 0 auto;
+/*    text-indent: -9999px; */
 }
 
 details.differences dd {
