@@ -1,13 +1,14 @@
 from django.db.models import Q
+from django.core import serializers
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from .models import Machine, Services, System, RPMs, Interface
 
+from .models import Machine, Services, System, RPMs, Interface
 from .forms import MachineSearchForm
 
-#from django.http import HttpResponse
-
 import re
+
 
 def index(request):
     machine_list = Machine.objects.all()
@@ -15,6 +16,24 @@ def index(request):
     return render_to_response('machines/index.html',
         {'machine_list': machine_list, 'query': query},
         context_instance=RequestContext(request))
+
+
+# View that that returns the JSON result.
+def history(request, machine_slug):
+    # TODO: prevent calls
+    #if not request.is_ajax():
+    #    return HttpResponse(status=400)
+
+    p = get_object_or_404(Machine, hostname=machine_slug)
+
+    # Retrieve all the system history.
+    system_history = System.objects.filter(machine__id=p.id).order_by(
+        '-date_added').all()
+
+    # Serialize the result of the database retrieval to JSON and send an
+    # application/json response.
+    return HttpResponse(serializers.serialize('json', system_history),
+                        mimetype='application/json')
 
 
 def detail(request, machine_slug):
