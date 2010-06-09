@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 import datetime
 import re
 
+# TODO: Move functions.
+
 def diff_dict(d_old, d_new):
     """
     Creates a new dict representing a diff between two dicts.
@@ -51,10 +53,7 @@ class Machine(models.Model):
                                         default=datetime.datetime.now)
     date_scanned = models.DateTimeField(_('date scanned'))
 
-    # Use a SearchManager for retrieving objects,
-    # and tell it which fields to search.
-    #objects = SearchManager(('sys_ip', 'hostname'))
-
+    # TODO: DRY. Keep in one place.
     search_fields = ['sys_ip', 'hostname', 'ext_ip',
                      'system__kernel_rel', 'system__rh_rel', 'system__nfs',
                      'services__processes', 'services__ports',
@@ -258,6 +257,8 @@ class Services(models.Model):
         """
         Merge and return latest and previous dictionaries of process/ports.
         """
+        # TODO: merge_diff(s_older, self, fields=['processes', 'ports'], delimeter='')
+
         s_older = Services.objects.filter(
             machine__id=self.machine_id).exclude(id=self.id).filter(
             date_added__lt=self.date_added).order_by('-date_added').all()
@@ -308,4 +309,5 @@ class RPMs(models.Model):
         verbose_name = _('RPMs')
         verbose_name_plural = _('RPMs')
         get_latest_by = 'date_added'
+
 
