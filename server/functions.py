@@ -211,18 +211,23 @@ class ServerFunctions:
             if sys_object.nfs != system_dict['nfs']:
                 sys_diff = True
 
+            if sys_object.ip_fwd != system_dict['ip_fwd']:
+                sys_diff = True
+
             if sys_diff:
                 sys_dict = {'machine': self.machine_obj,
                             'kernel_rel': system_dict['kernel_rel'],
                             'rh_rel': system_dict['rh_rel'],
-                            'nfs': system_dict['nfs']}
+                            'nfs': system_dict['nfs'],
+                            'ip_fwd': system_dict['ip_fwd']}
                 sys_object = System.objects.create(**sys_dict)
 
         except System.DoesNotExist:
             sys_dict = {'machine': self.machine_obj,
                         'kernel_rel': system_dict['kernel_rel'],
                         'rh_rel': system_dict['rh_rel'],
-                        'nfs': system_dict['nfs']}
+                        'nfs': system_dict['nfs'],
+                        'ip_fwd': system_dict['ip_fwd']}
             sys_object = System.objects.create(**sys_dict)
 
 

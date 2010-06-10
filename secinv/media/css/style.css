@@ -287,6 +287,45 @@ td {
     vertical-align: middle;
 }
 
+td.timestamp {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.timestamp {
+    width: 25%;
+}
+
+tbody tr.every_other td {
+    border-top-color: #fff;
+}
+
+th.pair_name,
+td.pair_name {
+    width: 215px;
+}
+.pair_value {
+}
+
+/* @group Nested tables */
+table.nested>tbody>tr>td {
+    border-top-color: #666;
+}
+
+tbody tbody tr:first-child td {
+    border-top-width: 0;
+}
+tbody td[colspan] {
+    padding: 0;
+}
+table table {
+    border-bottom-width: 0;
+}
+tbody tbody {
+    border-top-width: 0;
+}
+/* @end */
+
 table.wide {
     border-bottom-color: #ddd;
     margin: -10px -10px 0 -10px;

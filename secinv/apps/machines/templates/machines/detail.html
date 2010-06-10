@@ -34,7 +34,7 @@ function getTabs(section) {
             newHTML += "<th>{{ _('Kernel release') }}</th>\n";
             newHTML += "<th>{{ _('RedHat release') }}</th>\n";
             newHTML += "<th>{{ _('NFS') }}</th>\n";
-            newHTML += "<th>{{ _('Modified') }}</th>\n";
+            newHTML += "<th class="timestamp">{{ _('Modified') }}</th>\n";
             newHTML += "</tr>\n</thead>\n<tbody>\n";
 
             $.each(data, function(key, value) {
@@ -123,8 +123,9 @@ function getTabs(section) {
               {% endif %}
             </td>
           </tr>
+          <!--
           <tr>
-            <th>{{ _('Modified') }}</th>
+            <th class="timestamp">{{ _('Modified') }}</th>
             <td>
             {% if machine.date_modified %}
               <time datetime="{{ machine.date_modified|date:'c'|default:'0000-00-00T00:00:00.000000' }}">
@@ -133,6 +134,7 @@ function getTabs(section) {
             {% endif %}
             </td>
           </tr>
+          -->
           <tr>
             <th>{{ _('Scanned') }}</th>
             <td>
@@ -204,10 +206,11 @@ function getTabs(section) {
               <tr>
                 <th>{{ _('NFS mounted?') }}</th>
                 <td>
+
                   {% spaceless %}
                   {% if 'nfs' in system.differences %}
                     {% with system.differences.nfs as system_dict %}
-                      {% if system_dict.new and not system_dict.old %}
+                      {% if not system_dict.old %}
                           <ins>{{ system.nfs_mounted }}</ins>
                       {% else %}
                         {% if system_dict.old %}
@@ -222,7 +225,27 @@ function getTabs(section) {
                 </td>
               </tr>
               <tr>
-                <th>{{ _('Modified') }}</th>
+                <th>{{ _('IP forwarding') }}</th>
+                <td>
+                  {% spaceless %}
+                  {% if 'ip_fwd' in system.differences %}
+                    {% with system.differences.ip_fwd as system_dict %}
+                      {% if not system_dict.old %}
+                          <ins>{{ system.ip_fwd_enabled }}</ins>
+                      {% else %}
+                        {% if system_dict.old %}
+                          <mark>{{ system.ip_fwd_enabled }}</mark>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+                  {% else %}
+                          {{ system.ip_fwd_enabled }}
+                  {% endif %}
+                  {% endspaceless %}
+                </td>
+              </tr>
+              <tr>
+                <th class="timestamp">{{ _('Modified') }}</th>
                 <td>
                   {% if system.date_added %}
                   <time datetime="{{ system.date_added|date:'c' }}">
@@ -244,7 +267,8 @@ function getTabs(section) {
                 <th>{{ _('Kernel release') }}</th>
                 <th>{{ _('RedHat release') }}</th>
                 <th>{{ _('NFS') }}</th>
-                <th>{{ _('Modified') }}</th>
+                <th>{{ _('IP forwarding') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -288,7 +312,7 @@ function getTabs(section) {
                   {% spaceless %}
                   {% if 'nfs' in system_h.differences %}
                     {% with system_h.differences.nfs as system_dict %}
-                      {% if system_dict.new and not system_dict.old %}
+                      {% if not system_dict.old %}
                           <ins>{{ system_h.nfs_mounted }}</ins>
                       {% else %}
                         {% if system_dict.old %}
@@ -302,6 +326,23 @@ function getTabs(section) {
                   {% endspaceless %}
                 </td>
                 <td>
+                  {% spaceless %}
+                  {% if 'ip_fwd' in system_h.differences %}
+                    {% with system_h.differences.ip_fwd as system_h_dict %}
+                      {% if not system_h_dict.old %}
+                          <ins>{{ system_h.ip_fwd_enabled }}</ins>
+                      {% else %}
+                        {% if system_h_dict.old %}
+                          <mark>{{ system_h.ip_fwd_enabled }}</mark>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+                  {% else %}
+                          {{ system_h.ip_fwd_enabled }}
+                  {% endif %}
+                  {% endspaceless %}
+                </td>
+                <td class="timestamp">
                   <time datetime="{{ system_h.date_added|date:'c' }}">
                     {{ system_h.date_added }}
                   </time>
@@ -335,7 +376,7 @@ function getTabs(section) {
                 <th>{{ _('IP address') }}</th>
                 <th>{{ _('MAC address') }}</th>
                 <th>{{ _('Netmask') }}</th>
-                <th>{{ _('Modified') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -411,12 +452,10 @@ function getTabs(section) {
 
                   {% if not interface.active %}</del>{% endif %}
                 </td>
-                <td>
-                  {% if interface.date_added %}
+                <td class="timestamp">
                   <time datetime="{{ interface.date_added|date:'c' }}">
                     {{ interface.date_added }}
                   </time>
-                  {% endif %}
                 </td>
               </tr>
           {% endfor %}
@@ -435,7 +474,7 @@ function getTabs(section) {
                 <th>{{ _('IP address') }}</th>
                 <th>{{ _('MAC address') }}</th>
                 <th>{{ _('Netmask') }}</th>
-                <th>{{ _('Modified') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -511,7 +550,7 @@ function getTabs(section) {
 
                   {% if not interface_h.active %}</del>{% endif %}
                 </td>
-                <td>
+                <td class="timestamp">
                   <time datetime="{{ interface_h.date_added|date:'c' }}">
                     {{ interface_h.date_added }}
                   </time>
@@ -524,7 +563,7 @@ function getTabs(section) {
         </div><!-- #interfaces-history -->
       </section>
 
-
+<!--
       <h3>{{ _('Services listening') }}</h3>
 
       <section class="tabs">
@@ -540,7 +579,7 @@ function getTabs(section) {
               <tr>
                 <th>{{ _('Process') }}</th>
                 <th>{{ _('Port') }}</th>
-                <th>{{ _('Modified') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -609,7 +648,7 @@ function getTabs(section) {
                   </ul>
                   {% endif %}
                 </td>
-                <td>
+                <td class="timestamp">
                   <time datetime="{{ services.date_added|date:'c' }}">
                     {{ services.date_added }}
                   </time>
@@ -618,16 +657,16 @@ function getTabs(section) {
             </tbody>
           </table>
 
-        </div><!-- #services-latest -->
+        </div>
         <div id="services-history" class="history">
 
-          <table>
+          <table class="nested">
             <caption>{{ _('History') }}</caption>
             <thead>
               <tr>
                 <th>{{ _('Process') }}</th>
                 <th>{{ _('Port') }}</th>
-                <th>{{ _('Modified') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -647,11 +686,11 @@ function getTabs(section) {
                             <ins>{{ process }}</ins>
                         {% else %}
                           {% if process_dict.new and process_dict.old %}
-                            <mark>{{ process }}</mark> <!-- {{ process_dict.new }} -->
+                            <mark>{{ process }}</mark>
                           {% endif %}
 
                           {% if process_dict.deleted %}
-                            <del>{{ process }}</del> <!--{{ process_dict.deleted }} -->
+                            <del>{{ process }}</del>
                           {% endif %}
                         {% endif %}
                       {% endwith %}
@@ -680,11 +719,11 @@ function getTabs(section) {
                               <ins>{{ port }}</ins>
                           {% else %}
                             {% if process_dict.new and process_dict.old %}
-                              <mark>{{ process_dict.new }}</mark>
+                              <mark>{{ port }}</mark>
                             {% endif %}
 
                             {% if process_dict.deleted %}
-                              <del>{{ port }}</del> <!--{{ process_dict.deleted }} -->
+                              <del>{{ port }}</del>
                             {% endif %}
                           {% endif %}
                         {% endwith %}
@@ -698,7 +737,7 @@ function getTabs(section) {
                   </ul>
                   {% endif %}
                 </td>
-                <td>
+                <td class="timestamp">
                   <time datetime="{{ services_h.date_added|date:'c' }}">
                     {{ services_h.date_added }}
                   </time>
@@ -712,8 +751,373 @@ function getTabs(section) {
             </tbody>
           </table>
 
+        </div>
+      </section>
+-->
+
+      <h3>{{ _('Services listening') }}</h3>
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#serv-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#serv-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="serv-latest" class="latest">
+
+          <table>
+            <caption>{{ _('Current') }}</caption>
+            <thead>
+              <tr>
+                <th class="pair_name">{{ _('Process') }}</th>
+                <th class="pair_port">{{ _('Port') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+
+    {% if services %}
+        <tr>
+          <td colspan="2">
+            <table>
+            {% for process, port in services.processes_dict.items %}
+              <tr>
+                <td class="pair_name">
+                {% spaceless %}
+                  {% if process in services.differences %}
+
+                    {% with services.differences|dict_get:process as process_dict %}
+                      {% if process_dict.new and not process_dict.old %}
+                          <ins>{{ process }}</ins>
+                      {% else %}
+                        {% if process_dict.new and process_dict.old %}
+                          <mark>{{ process }}</mark>
+                        {% endif %}
+
+                        {% if process_dict.deleted %}
+                          <del>{{ process }}</del>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ process }}
+                  {% endif %}
+                {% endspaceless %}
+                </td>
+                <td class="pair_port">
+                {% spaceless %}
+                  {% if process in services.differences %}
+
+                    {% with services.differences|dict_get:process as process_dict %}
+                      {% if process_dict.new and not process_dict.old %}
+                          <ins>{{ port }}</ins>
+                      {% else %}
+                        {% if process_dict.new and process_dict.old %}
+                          <mark>{{ process_dict.new }}</mark>
+                        {% endif %}
+
+                        {% if process_dict.deleted %}
+                          <del>{{ port }}</del>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ port }}
+                  {% endif %}
+                {% endspaceless %}
+                </td>
+              </tr>
+            {% endfor %}
+            </table>
+          </td>
+          <td class="timestamp">
+            <time datetime="{{ services.date_added|date:'c' }}">
+              {{ services.date_added }}
+            </time>
+          </td>
+        </tr>
+
+    {% else %}
+              <tr>
+                <td></td>
+              </tr>
+    {% endif %}
+
+            </tbody>
+          </table>
+
+        </div><!-- #services-latest -->
+        <div id="serv-history" class="history">
+
+          <table class="nested">
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th class="pair_name">{{ _('Process') }}</th>
+                <th class="pair_port">{{ _('Port') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+    {% for services_h in services_history %}
+
+        <tr>
+          <td colspan="2">
+            <table>
+            {% for process, port in services_h.processes_dict.items %}
+              <tr>
+                <td class="pair_name">
+                {% spaceless %}
+                  {% if process in services_h.differences %}
+
+                    {% with services_h.differences|dict_get:process as process_dict %}
+                      {% if process_dict.new and not process_dict.old %}
+                          <ins>{{ process }}</ins>
+                      {% else %}
+                        {% if process_dict.new and process_dict.old %}
+                          <mark>{{ process }}</mark>
+                        {% endif %}
+
+                        {% if process_dict.deleted %}
+                          <del>{{ process }}</del>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ process }}
+                  {% endif %}
+                {% endspaceless %}
+                </td>
+                <td class="pair_port">
+                {% spaceless %}
+                  {% if process in services_h.differences %}
+
+                    {% with services_h.differences|dict_get:process as process_dict %}
+                      {% if process_dict.new and not process_dict.old %}
+                          <ins>{{ port }}</ins>
+                      {% else %}
+                        {% if process_dict.new and process_dict.old %}
+                          <mark>{{ process_dict.new }}</mark>
+                        {% endif %}
+
+                        {% if process_dict.deleted %}
+                          <del>{{ port }}</del>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ port }}
+                  {% endif %}
+                {% endspaceless %}
+                </td>
+              </tr>
+            {% endfor %}
+            </table>
+          </td>
+          <td class="timestamp">
+            <time datetime="{{ services_h.date_added|date:'c' }}">
+              {{ services_h.date_added }}
+            </time>
+          </td>
+        </tr>
+
+    {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+    {% endfor %}
+
+            </tbody>
+          </table>
+
         </div><!-- #services-history -->
       </section>
+
+
+      <h3>{{ _('SSH configuration') }}</h3>
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#sshconfig-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#sshconfig-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="sshconfig-latest" class="latest">
+
+          <table class="nested">
+            <caption>{{ _('Current') }}</caption>
+            <thead>
+              <tr>
+                <th class="pair_name">{{ _('Parameter') }}</th>
+                <th class="pair_value">{{ _('Value') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+
+    {% if sshconfig %}
+        <tr>
+          <td colspan="2">
+            <table>
+            {% for parameter, value in sshconfig.parameters_dict.items %}
+              <tr>
+                <td class="pair_name">
+                {% spaceless %}
+                  {% if parameter in sshconfig.differences %}
+
+                    {% with sshconfig.differences|dict_get:parameter as parameter_dict %}
+                      {% if parameter_dict.new and not parameter_dict.old %}
+                          <ins>{{ parameter }}</ins>
+                      {% else %}
+                        {% if parameter_dict.new and parameter_dict.old %}
+                          <mark>{{ parameter }}</mark>
+                        {% endif %}
+
+                        {% if parameter_dict.deleted %}
+                          <del>{{ parameter }}</del>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ parameter }}
+                  {% endif %}
+                {% endspaceless %}
+                </td>
+                <td class="pair_value">
+                {% spaceless %}
+                  {% if parameter in sshconfig.differences %}
+
+                    {% with sshconfig.differences|dict_get:parameter as parameter_dict %}
+                      {% if parameter_dict.new and not parameter_dict.old %}
+                          <ins>{{ parameter_dict.new }}</ins>
+                      {% else %}
+                        {% if parameter_dict.new and parameter_dict.old %}
+                          <mark>{{ parameter_dict.new }}</mark>
+                        {% endif %}
+
+                        {% if parameter_dict.deleted %}
+                          <del>{{ parameter_dict.deleted }}</del>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ value }}
+                  {% endif %}
+                {% endspaceless %}
+                </td>
+              </tr>
+            {% endfor %}
+            </table>
+          </td>
+          <td class="timestamp">
+            <time datetime="{{ sshconfig.date_added|date:'c' }}">
+              {{ sshconfig.date_added }}
+            </time>
+          </td>
+        </tr>
+
+    {% else %}
+              <tr>
+                <td></td>
+              </tr>
+    {% endif %}
+
+            </tbody>
+          </table>
+
+        </div><!-- #sshconfig-latest -->
+        <div id="sshconfig-history" class="history">
+
+          <table class="nested">
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th class="pair_name">{{ _('Parameter') }}</th>
+                <th class="pair_value">{{ _('Value') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+    {% for sshconfig_h in sshconfig_history %}
+
+        <tr>
+          <td colspan="2">
+            <table>
+            {% for parameter, value in sshconfig_h.parameters_dict.items %}
+              <tr>
+                <td class="pair_name">
+                {% spaceless %}
+                  {% if parameter in sshconfig_h.differences %}
+
+                    {% with sshconfig_h.differences|dict_get:parameter as parameter_dict %}
+                      {% if parameter_dict.new and not parameter_dict.old %}
+                          <ins>{{ parameter }}</ins>
+                      {% else %}
+                        {% if parameter_dict.new and parameter_dict.old %}
+                          <mark>{{ parameter }}</mark>
+                        {% endif %}
+
+                        {% if parameter_dict.deleted %}
+                          <del>{{ parameter }}</del>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ parameter }}
+                  {% endif %}
+                {% endspaceless %}
+                </td>
+                <td class="pair_value">
+                {% spaceless %}
+                  {% if parameter in sshconfig_h.differences %}
+
+                    {% with sshconfig_h.differences|dict_get:parameter as parameter_dict %}
+                      {% if parameter_dict.new and not parameter_dict.old %}
+                          <ins>{{ parameter_dict.new }}</ins>
+                      {% else %}
+                        {% if parameter_dict.new and parameter_dict.old %}
+                          <mark>{{ parameter_dict.new }}</mark>
+                        {% endif %}
+
+                        {% if parameter_dict.deleted %}
+                          <del>{{ parameter_dict.deleted }}</del>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+
+                  {% else %}
+                          {{ value }}
+                  {% endif %}
+                {% endspaceless %}
+                </td>
+              </tr>
+            {% endfor %}
+            </table>
+          </td>
+          <td class="timestamp">
+            <time datetime="{{ sshconfig_h.date_added|date:'c' }}">
+              {{ sshconfig_h.date_added }}
+            </time>
+          </td>
+        </tr>
+
+    {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+    {% endfor %}
+
+            </tbody>
+          </table>
+
+        </div><!-- #sshconfig-history -->
+      </section>
+
 
 
       <h3>{{ _('RPMs') }}</h3>
@@ -751,7 +1155,7 @@ function getTabs(section) {
               <tr>
                 <th>{{ _('Installed') }}</th>
                 <th>{{ _('Removed') }}</th>
-                <th>{{ _('Modified') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -775,7 +1179,7 @@ function getTabs(section) {
                   </ul>
                   {% endif %}
                 </td>
-                <td>
+                <td class="timestamp">
                   <time datetime="{{ rpms_h.date_added|date:'c' }}">
                     {{ rpms_h.date_added }}
                   </time>

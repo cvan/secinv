@@ -58,6 +58,7 @@ class Machine(models.Model):
     # TODO: DRY. Keep in one place.
     search_fields = ['sys_ip', 'hostname', 'ext_ip',
                      'system__kernel_rel', 'system__rh_rel', 'system__nfs',
+                     'system__ip_fwd',
                      'services__processes', 'services__ports',
                      'rpms__rpms',
                      'interface__i_name', 'interface__i_ip',
@@ -85,6 +86,10 @@ class Machine(models.Model):
     def nfs(self):
         s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
         return s.nfs
+
+    def ip_fwd(self):
+        s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        return s.ip_fwd
 
     def excerpt(self):
         excerpt = ""
@@ -187,11 +192,15 @@ class System(models.Model):
     rh_rel = models.CharField(_('RedHat release'), max_length=255,
                               blank=True)
     nfs = models.BooleanField(_('NFS?'), default=0)
+    ip_fwd = models.BooleanField(_('IP forwarding'), default=0)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
     def nfs_mounted(self):
         return _('Yes') if self.nfs else _('No')
+
+    def ip_fwd_enabled(self):
+        return _('Enabled') if self.ip_fwd else _('Disabled')
 
     def differences(self):
         """
@@ -202,20 +211,22 @@ class System(models.Model):
             id=self.id).filter(date_added__lt=self.date_added).order_by(
             '-date_added').all()
 
-        s_fields = ['kernel_rel', 'rh_rel', 'nfs']
+        s_fields = ['kernel_rel', 'rh_rel', 'nfs', 'ip_fwd']
 
         s_previous = {}
         if s_older.exists():
-            s_values = [s_older[0].kernel_rel, s_older[0].rh_rel, s_older[0].nfs]
+            s_values = [s_older[0].kernel_rel, s_older[0].rh_rel,
+                        s_older[0].nfs, s_older[0].ip_fwd]
             s_previous = dict(zip(s_fields, s_values))
 
-        s_values = [self.kernel_rel, self.rh_rel, self.nfs]
+        s_values = [self.kernel_rel, self.rh_rel, self.nfs, self.ip_fwd]
         s_latest = dict(zip(s_fields, s_values))
 
         return diff_dict(s_previous, s_latest)
 
     def __unicode__(self):
-        return u'%s - %s - %s' % (self.kernel_rel, self.rh_rel, self.nfs)
+        return u'%s - %s - %s - %s' % (self.kernel_rel, self.rh_rel, self.nfs,
+                                       self.ip_fwd)
 
     class Meta:
         verbose_name_plural = _('System')
@@ -332,21 +343,21 @@ class SSHConfig(models.Model):
 
         s_previous = {}
         if s_older.exists():
-            s_params = re.split('\n', s_older[0].parameters)
-            s_values = re.split('\n', s_older[0].values)
+            s_params = re.split('\n', s_older[0].parameters.replace('\r', ''))
+            s_values = re.split('\n', s_older[0].values.replace('\r', ''))
             s_previous = dict(zip(s_params, s_values))
 
-        s_params = re.split('\n', self.parameters)
-        s_values = re.split('\n', self.values)
+        s_params = re.split('\n', self.parameters.replace('\r', ''))
+        s_values = re.split('\n', self.values.replace('\r', ''))
         s_latest = dict(zip(s_params, s_values))
 
         return diff_dict(s_previous, s_latest)
 
     def parameters_split(self):
-        return re.split('\n', self.parameters)
+        return re.split('\n', self.parameters.replace('\r', ''))
 
     def values_split(self):
-        return re.split('\n', self.values)
+        return re.split('\n', self.values.replace('\r', ''))
 
     def parameters_dict(self):
         """
@@ -360,12 +371,12 @@ class SSHConfig(models.Model):
 
         s_previous = {}
         if s_older.exists():
-            s_params = re.split('\n', s_older[0].parameters)
-            s_values = re.split('\n', s_older[0].values)
+            s_params = re.split('\n', s_older[0].parameters.replace('\r', ''))
+            s_values = re.split('\n', s_older[0].values.replace('\r', ''))
             s_previous = dict(zip(s_params, s_values))
 
-        s_params = re.split('\n', self.parameters)
-        s_values = re.split('\n', self.values)
+        s_params = re.split('\n', self.parameters.replace('\r', ''))
+        s_values = re.split('\n', self.values.replace('\r', ''))
         s_latest = dict(zip(s_params, s_values))
 
         return dict(s_latest, **s_previous)
@@ -378,4 +389,11 @@ class SSHConfig(models.Model):
         verbose_name_plural = _('SSHConfig')
         get_latest_by = 'date_added'
 
-
+'''
+class SSHConfig(models.Model):
+    machine = models.ForeignKey('Machine')
+    parameters = models.TextField(blank=True)
+    values = models.TextField(blank=True)
+    date_added = models.DateTimeField(_('date added'), editable=False,
+                                      default=datetime.datetime.now)
+'''

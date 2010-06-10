@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 
-from .models import Machine, Services, System, RPMs, Interface
+from .models import Machine, Services, System, RPMs, Interface, SSHConfig
 from .forms import MachineSearchForm
 
 import re
@@ -70,6 +70,7 @@ def detail(request, machine_slug):
 
     rpms_latest = {'installed': rpms_list, 'date_added': rpms_date_added}
 
+
     # Get latest interfaces (select by distinct interface name).
     distinct_interfaces = Interface.objects.filter(
         machine__id=p.id).values_list('i_name', flat=True).distinct()
@@ -97,6 +98,15 @@ def detail(request, machine_slug):
     interfaces_history = Interface.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
 
+
+    sshconfig_latest = []
+    sshconfig_history = SSHConfig.objects.filter(machine__id=p.id).order_by(
+        '-date_added').all()
+
+    if sshconfig_history.exists():
+        sshconfig_latest = SSHConfig.objects.filter(machine__id=p.id).latest()
+
+
     template_context = {'query': query,
                         'machine': p,
                         'system': system_latest,
@@ -107,7 +117,9 @@ def detail(request, machine_slug):
                         'rpms_history': rpms_history,
                         'interfaces': interfaces_latest,
                         'interfaces_history': interfaces_history,
-                        'interfaces_added': interfaces_added_ids}
+                        'interfaces_added': interfaces_added_ids,
+                        'sshconfig': sshconfig_latest,
+                        'sshconfig_history': sshconfig_history}
     return render_to_response('machines/detail.html', template_context,
         context_instance=RequestContext(request))
 
