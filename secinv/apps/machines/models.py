@@ -45,8 +45,10 @@ def diff_list(l_old, l_new):
 class Machine(models.Model):
     sys_ip = models.IPAddressField(_('IP address'))
     hostname = models.CharField(max_length=255)
-    ext_ip = models.IPAddressField(_('external IP address'))
-    diff = models.CharField(_('differences'), max_length=255)
+    ext_ip = models.IPAddressField(_('external IP address'), blank=True)
+
+    # TODO: get rid of 'diff' field.
+    diff = models.CharField(_('differences'), max_length=255, blank=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
     date_modified = models.DateTimeField(_('date modified'),
@@ -108,7 +110,6 @@ class Machine(models.Model):
 
         return excerpt
 
-
     @property
     def slug(self):
         return re.sub('[^a-z0-9A-Z-]', '-', self.hostname)
@@ -117,9 +118,9 @@ class Machine(models.Model):
 class Interface(models.Model):
     machine = models.ForeignKey('Machine')
     i_name = models.CharField(_('interface name'), max_length=50)
-    i_ip = models.IPAddressField(_('IP address'))
-    i_mac = models.CharField(_('MAC address'), max_length=17)
-    i_mask = models.IPAddressField(_('netmask'))
+    i_ip = models.IPAddressField(_('IP address'), blank=True)
+    i_mac = models.CharField(_('MAC address'), max_length=17, blank=True)
+    i_mask = models.IPAddressField(_('netmask'), blank=True)
     active = models.BooleanField(_('active'), default=1)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
@@ -181,11 +182,13 @@ class Interface(models.Model):
 
 class System(models.Model):
     machine = models.ForeignKey('Machine')
-    kernel_rel = models.CharField(_('kernel release'), max_length=255)
-    rh_rel = models.CharField(_('RedHat release'), max_length=255)
+    kernel_rel = models.CharField(_('kernel release'), max_length=255,
+                                  blank=True)
+    rh_rel = models.CharField(_('RedHat release'), max_length=255,
+                              blank=True)
     nfs = models.BooleanField(_('NFS?'), default=0)
     date_added = models.DateTimeField(_('date added'), editable=False,
-                                        default=datetime.datetime.now)
+                                      default=datetime.datetime.now)
 
     def nfs_mounted(self):
         return _('Yes') if self.nfs else _('No')
@@ -221,8 +224,8 @@ class System(models.Model):
 
 class Services(models.Model):
     machine = models.ForeignKey('Machine')
-    processes = models.CharField(max_length=255)
-    ports = models.CommaSeparatedIntegerField(max_length=255)
+    processes = models.CharField(max_length=255, blank=True)
+    ports = models.CommaSeparatedIntegerField(max_length=255, blank=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
@@ -285,7 +288,7 @@ class Services(models.Model):
 
 class RPMs(models.Model):
     machine = models.ForeignKey('Machine')
-    rpms = models.TextField(_('RPMs'))
+    rpms = models.TextField(_('RPMs'), blank=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
@@ -308,6 +311,71 @@ class RPMs(models.Model):
     class Meta:
         verbose_name = _('RPMs')
         verbose_name_plural = _('RPMs')
+        get_latest_by = 'date_added'
+
+
+class SSHConfig(models.Model):
+    machine = models.ForeignKey('Machine')
+    parameters = models.TextField(blank=True)
+    values = models.TextField(blank=True)
+    date_added = models.DateTimeField(_('date added'), editable=False,
+                                      default=datetime.datetime.now)
+
+    def differences(self):
+        """
+        Create a dictionary of the differences between the latest
+        and the previous SSH configuration files.
+        """
+        s_older = SSHConfig.objects.filter(
+            machine__id=self.machine_id).exclude(id=self.id).filter(
+            date_added__lt=self.date_added).order_by('-date_added').all()
+
+        s_previous = {}
+        if s_older.exists():
+            s_params = re.split('\n', s_older[0].parameters)
+            s_values = re.split('\n', s_older[0].values)
+            s_previous = dict(zip(s_params, s_values))
+
+        s_params = re.split('\n', self.parameters)
+        s_values = re.split('\n', self.values)
+        s_latest = dict(zip(s_params, s_values))
+
+        return diff_dict(s_previous, s_latest)
+
+    def parameters_split(self):
+        return re.split('\n', self.parameters)
+
+    def values_split(self):
+        return re.split('\n', self.values)
+
+    def parameters_dict(self):
+        """
+        Merge and return latest and previous dictionaries of parameters/values.
+        """
+        # TODO: merge_diff(s_older, self, fields=['parameters', 'values'], delimeter='')
+
+        s_older = SSHConfig.objects.filter(
+            machine__id=self.machine_id).exclude(id=self.id).filter(
+            date_added__lt=self.date_added).order_by('-date_added').all()
+
+        s_previous = {}
+        if s_older.exists():
+            s_params = re.split('\n', s_older[0].parameters)
+            s_values = re.split('\n', s_older[0].values)
+            s_previous = dict(zip(s_params, s_values))
+
+        s_params = re.split('\n', self.parameters)
+        s_values = re.split('\n', self.values)
+        s_latest = dict(zip(s_params, s_values))
+
+        return dict(s_latest, **s_previous)
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.parameters, self.values)
+
+    class Meta:
+        verbose_name = _('SSHConfig')
+        verbose_name_plural = _('SSHConfig')
         get_latest_by = 'date_added'
 
 

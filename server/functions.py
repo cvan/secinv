@@ -66,7 +66,8 @@ class ServerFunctions:
         self.is_authenticated = True
         return True
 
-    def machine(self, ip_dict, system_dict, services_dict, rpms_dict):
+    def machine(self, ip_dict, system_dict, services_dict, rpms_dict,
+                sshconfig_dict):
         if not self.is_authenticated:
             return False
 
@@ -199,16 +200,16 @@ class ServerFunctions:
             sys_object = System.objects.filter(
                 machine__id=self.machine_id).latest()
 
-            sys_diff = []
+            sys_diff = False
 
             if sys_object.kernel_rel != system_dict['kernel_rel']:
-                sys_diff.append('kernel_rel')
+                sys_diff = True
 
             if sys_object.rh_rel != system_dict['rh_rel']:
-                sys_diff.append('rh_rel')
+                sys_diff = True
 
             if sys_object.nfs != system_dict['nfs']:
-                sys_diff.append('nfs')
+                sys_diff = True
 
             if sys_diff:
                 sys_dict = {'machine': self.machine_obj,
@@ -235,41 +236,13 @@ class ServerFunctions:
             s_object = Services.objects.filter(
                 machine__id=self.machine_id).latest()
 
-            s_diff = []
-            s_diff_ins_processes = []
-            s_diff_del_processes = []
-            s_diff_ins_ports = []
-            s_diff_del_ports = []
+            s_diff = False
 
             if s_object.processes != csv_procs:
-                old = re.split(',', s_object.processes)
-                new = procs
-
-                s1 = set(old)
-                s2 = set(new)
-
-                new_procs = s2.difference(s1)
-                del_procs = s1.difference(s2)
-
-                s_diff_ins_processes = list(s2.difference(s1))
-                s_diff_del_processes = list(s1.difference(s2))
-
-                s_diff.append('processes')
+                s_diff = True
 
             if s_object.ports != csv_ports:
-                old = re.split(',', s_object.ports)
-                new = ports
-
-                s1 = set(old)
-                s2 = set(new)
-
-                new_procs = s2.difference(s1)
-                del_procs = s1.difference(s2)
-
-                s_diff_ins_ports = list(s2.difference(s1))
-                s_diff_del_ports = list(s1.difference(s2))
-
-                s_diff.append('ports')
+                s_diff = True
 
             if s_diff:
                 s_dict = {'machine': self.machine_obj,
@@ -288,9 +261,10 @@ class ServerFunctions:
         try:
             r_object = RPMs.objects.filter(machine__id=self.machine_id).latest()
 
-            r_diff = []
+            r_diff = False
+
             if r_object.rpms != rpms_dict['list']:
-                r_diff.append('rpms')
+                r_diff = True
 
             if r_diff:
                 r_dict = {'machine': self.machine_obj,
@@ -302,4 +276,37 @@ class ServerFunctions:
                       'rpms': rpms_dict['list']}
             r_object = RPMs.objects.create(**r_dict)
 
+
+        ## SSH configuration file.
+        params = sshconfig_dict.keys()
+        csv_params = '\n'.join(params)
+        values = sshconfig_dict.values()
+        csv_values = '\n'.join(values)
+
+        try:
+            s_object = SSHConfig.objects.filter(
+                machine__id=self.machine_id).latest()
+
+            s_diff = False
+
+            if s_object.parameters != csv_params:
+                s_diff = True
+
+            if s_object.values != csv_values:
+                s_diff = True
+
+            if s_diff:
+                s_dict = {'machine': self.machine_obj,
+                          'parameters': csv_params,
+                          'values': csv_values}
+                s_object = SSHConfig.objects.create(**s_dict)
+
+        except SSHConfig.DoesNotExist:
+            s_dict = {'machine': self.machine_obj,
+                      'parameters': csv_params,
+                      'values': csv_values}
+            s_object = SSHConfig.objects.create(**s_dict)
+
+
         return True
+
