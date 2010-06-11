@@ -45,10 +45,10 @@ def diff_list(l_old, l_new):
 class Machine(models.Model):
     sys_ip = models.IPAddressField(_('IP address'))
     hostname = models.CharField(max_length=255)
-    ext_ip = models.IPAddressField(_('external IP address'), blank=True)
+    ext_ip = models.IPAddressField(_('external IP address'), blank=True, null=True)
 
     # TODO: get rid of 'diff' field.
-    diff = models.CharField(_('differences'), max_length=255, blank=True)
+    diff = models.CharField(_('differences'), max_length=255, blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
     date_modified = models.DateTimeField(_('date modified'),
@@ -127,9 +127,9 @@ class Machine(models.Model):
 class Interface(models.Model):
     machine = models.ForeignKey('Machine')
     i_name = models.CharField(_('interface name'), max_length=50)
-    i_ip = models.IPAddressField(_('IP address'), blank=True)
-    i_mac = models.CharField(_('MAC address'), max_length=17, blank=True)
-    i_mask = models.IPAddressField(_('netmask'), blank=True)
+    i_ip = models.IPAddressField(_('IP address'), blank=True, null=True)
+    i_mac = models.CharField(_('MAC address'), max_length=17, blank=True, null=True)
+    i_mask = models.IPAddressField(_('netmask'), blank=True, null=True)
     active = models.BooleanField(_('active'), default=1)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
@@ -192,9 +192,9 @@ class Interface(models.Model):
 class System(models.Model):
     machine = models.ForeignKey('Machine')
     kernel_rel = models.CharField(_('kernel release'), max_length=255,
-                                  blank=True)
+                                  blank=True, null=True)
     rh_rel = models.CharField(_('RedHat release'), max_length=255,
-                              blank=True)
+                              blank=True, null=True)
     nfs = models.BooleanField(_('NFS?'), default=0)
     ip_fwd = models.BooleanField(_('IP forwarding'), default=0)
     iptables = models.BooleanField(_('iptables'), default=0)
@@ -249,8 +249,8 @@ class System(models.Model):
 
 class Services(models.Model):
     machine = models.ForeignKey('Machine')
-    processes = models.CharField(max_length=255, blank=True)
-    ports = models.CommaSeparatedIntegerField(max_length=255, blank=True)
+    processes = models.CharField(max_length=255, blank=True, null=True)
+    ports = models.CommaSeparatedIntegerField(max_length=255, blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
@@ -313,7 +313,7 @@ class Services(models.Model):
 
 class RPMs(models.Model):
     machine = models.ForeignKey('Machine')
-    rpms = models.TextField(_('RPMs'), blank=True)
+    rpms = models.TextField(_('RPMs'), blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
@@ -341,8 +341,8 @@ class RPMs(models.Model):
 
 class SSHConfig(models.Model):
     machine = models.ForeignKey('Machine')
-    parameters = models.TextField(_('parameters'), blank=True)
-    values = models.TextField(_('values'), blank=True)
+    parameters = models.TextField(_('parameters'), blank=True, null=True)
+    values = models.TextField(_('values'), blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
@@ -407,8 +407,8 @@ class SSHConfig(models.Model):
 '''
 class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
-    parameters = models.TextField(blank=True)
-    values = models.TextField(blank=True)
+    parameters = models.TextField(blank=True, null=True)
+    values = models.TextField(blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 '''
@@ -433,7 +433,7 @@ class IPTable(models.Model):
 class IPTableChain(models.Model):
     table = models.ForeignKey('IPTable')
     name = models.CharField(_('chain name'), max_length=255)
-    policy = models.TextField(_('chain policy'), max_length=255, blank=True)
+    policy = models.TextField(_('chain policy'), max_length=255, blank=True, null=True)
     packets = models.BigIntegerField(_('packets counter'))
     bytes = models.BigIntegerField(_('bytes counter'))
     date_added = models.DateTimeField(_('date added'), editable=False,
