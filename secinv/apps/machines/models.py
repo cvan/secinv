@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 #from ..fulltext.search import SearchManager
+import reversion
 
 import datetime
 import re
@@ -123,6 +124,10 @@ class Machine(models.Model):
     def slug(self):
         return re.sub('[^a-z0-9A-Z-]', '-', self.hostname)
 
+if not reversion.is_registered(Machine):
+    #reversion.register(Machine, fields=['sys_ip', 'hostname', 'ext_ip'])
+    reversion.register(Machine)
+
 
 class Interface(models.Model):
     machine = models.ForeignKey('Machine')
@@ -188,6 +193,9 @@ class Interface(models.Model):
     class Meta:
         get_latest_by = 'date_added'
 
+if not reversion.is_registered(Interface):
+    reversion.register(Interface)
+
 
 class System(models.Model):
     machine = models.ForeignKey('Machine')
@@ -245,6 +253,9 @@ class System(models.Model):
     class Meta:
         verbose_name_plural = _('System')
         get_latest_by = 'date_added'
+
+if not reversion.is_registered(System):
+    reversion.register(System)
 
 
 class Services(models.Model):
@@ -310,6 +321,9 @@ class Services(models.Model):
         verbose_name_plural = _('Services')
         get_latest_by = 'date_added'
 
+if not reversion.is_registered(Services):
+    reversion.register(Services)
+
 
 class RPMs(models.Model):
     machine = models.ForeignKey('Machine')
@@ -337,6 +351,9 @@ class RPMs(models.Model):
         verbose_name = _('RPMs')
         verbose_name_plural = _('RPMs')
         get_latest_by = 'date_added'
+
+if not reversion.is_registered(RPMs):
+    reversion.register(RPMs)
 
 
 class SSHConfig(models.Model):
@@ -404,6 +421,9 @@ class SSHConfig(models.Model):
         verbose_name_plural = _('SSHConfig')
         get_latest_by = 'date_added'
 
+#if not reversion.is_registered(SSHConfig):
+#    reversion.register(SSHConfig)
+
 '''
 class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
@@ -429,6 +449,9 @@ class IPTable(models.Model):
         verbose_name_plural = _('IPTables')
         get_latest_by = 'date_added'
 
+#if not reversion.is_registered(IPTable):
+#    reversion.register(IPTable)
+
 
 class IPTableChain(models.Model):
     table = models.ForeignKey('IPTable')
@@ -444,6 +467,9 @@ class IPTableChain(models.Model):
         verbose_name_plural = _('IPTableChains')
         get_latest_by = 'date_added'
 
+#if not reversion.is_registered(IPTableChain):
+#    reversion.register(IPTableChain)
+
 
 class IPTableRule(models.Model):
     table = models.ForeignKey('IPTable')
@@ -455,4 +481,7 @@ class IPTableRule(models.Model):
         verbose_name = _('IPTableRules')
         verbose_name_plural = _('IPTableRules')
         get_latest_by = 'date_added'
+
+#if not reversion.is_registered(IPTableRule):
+#    reversion.register(IPTableRule)
 

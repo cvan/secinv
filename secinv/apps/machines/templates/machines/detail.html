@@ -294,6 +294,103 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
+    {% for sys_ver in system_versions %}
+              <tr>
+                <td>
+                {{ sys_ver.diff.kernel_rel }}
+
+                {% if 'kernel_rel' in sys_ver.diff.added %}
+                  <ins>{{ sys_ver.fields.kernel_rel }}</ins>
+                {% endif %}
+                
+                {% if 'kernel_rel' in sys_ver.diff.changed %}
+                  <mark>{{ sys_ver.fields.kernel_rel }}</mark>
+                {% endif %}
+                
+                {% if 'kernel_rel' in sys_ver.diff.unchanged %}
+                  {{ sys_ver.fields.kernel_rel }}
+                {% endif %}
+                </td>
+                <td>
+                {% if 'rh_rel' in sys_ver.diff.added %}
+                  <ins>{{ sys_ver.fields.rh_rel }}</ins>
+                {% endif %}
+                
+                {% if 'rh_rel' in sys_ver.diff.changed %}
+                  <mark>{{ sys_ver.fields.rh_rel }}</mark>
+                {% endif %}
+                
+                {% if 'rh_rel' in sys_ver.diff.unchanged %}
+                  {{ sys_ver.fields.rh_rel }}
+                {% endif %}
+                </td>
+                <td>
+                {% if 'nfs' in sys_ver.diff.added %}
+                  <ins>{{ sys_ver.fields.nfs }}</ins>
+                {% endif %}
+                
+                {% if 'nfs' in sys_ver.diff.changed %}
+                  <mark>{{ sys_ver.fields.nfs }}</mark>
+                {% endif %}
+                
+                {% if 'nfs' in sys_ver.diff.unchanged %}
+                  {{ sys_ver.fields.nfs }}
+                {% endif %}
+                </td>
+                <td>
+                {% if 'ip_fwd' in sys_ver.diff.added %}
+                  <ins>{{ sys_ver.fields.ip_fwd }}</ins>
+                {% endif %}
+                
+                {% if 'ip_fwd' in sys_ver.diff.changed %}
+                  <mark>{{ sys_ver.fields.ip_fwd }}</mark>
+                {% endif %}
+                
+                {% if 'ip_fwd' in sys_ver.diff.unchanged %}
+                  {{ sys_ver.fields.ip_fwd }}
+                {% endif %}
+                </td>
+                <td>
+                {% if 'iptables' in sys_ver.diff.added %}
+                  <ins>{{ sys_ver.fields.iptables }}</ins>
+                {% endif %}
+                
+                {% if 'iptables' in sys_ver.diff.changed %}
+                  <mark>{{ sys_ver.fields.iptables }}</mark>
+                {% endif %}
+                
+                {% if 'iptables' in sys_ver.diff.unchanged %}
+                  {{ sys_ver.fields.iptables }}
+                {% endif %}
+                </td>
+                <td class="timestamp">
+                  <time datetime="{{ sys_ver.fields.date_added|date:'c' }}">
+                    {{ sys_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+    {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+    {% endfor %}
+            </tbody>
+          </table>
+
+<!--
+          <table>
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th>{{ _('Kernel release') }}</th>
+                <th>{{ _('RedHat release') }}</th>
+                <th>{{ _('NFS') }}</th>
+                <th>{{ _('IP forwarding') }}</th>
+                <th>{{ _('iptables') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
     {% for system_h in system_history %}
               <tr>
                 <td>
@@ -394,6 +491,7 @@ function getTabs(section) {
     {% endfor %}
             </tbody>
           </table>
+-->
 
         </div><!-- #system-history -->
       </section>

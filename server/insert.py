@@ -1,5 +1,7 @@
 #!/usr/bin/env python26
 
+from __future__ import with_statement
+
 import datetime
 import os
 import sys
@@ -42,8 +44,10 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 from django.core.management import setup_environ
 setup_environ(settings)
 
+import reversion
 
 from apps.machines.models import *
+
 
 ip_dict = {'sit0': {'i_mac': '00:00:00:00', 'i_mask': '', 'i_ip': ''}, 'lo': {'i_mac': '00:00:00:00:00:06', 'i_mask': '255.0.0.0', 'i_ip': '127.0.0.1'}, 'eth0': {'i_mac': '01:50:56:a5:11:39', 'i_mask': '255.255.255.0', 'i_ip': '10.2.72.89'}}
 ip_dict = {'sit0': {'i_mac': '00:00:00:00', 'i_mask': '', 'i_ip': ''}, 'eth0': {'i_mac': '01:50:56:a5:11:39', 'i_mask': '255.255.255.0', 'i_ip': '10.2.72.89'}}
@@ -342,6 +346,12 @@ getattr(sf, 'machine')(ip_dict, system_dict, services_dict, rpms_dict, sshconfig
 
 services_list = Services.objects.all()
 print services_list
+
+s1 = Services.objects.get(id=1)
+s1.processes = 'sendmail'
+s1.ports = '23'
+with reversion.revision:
+    s1.save()
 
 #rpms_list = RPMs.objects.all()
 #print rpms_list

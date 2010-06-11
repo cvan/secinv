@@ -8,7 +8,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 path = lambda *a: os.path.join(ROOT, *a)
 
 # Base URL path.
-BASE_URL = '/secinv/'
+BASE_URL = '/secinv2/'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -22,7 +22,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'secinv2',
+        'NAME': 'secinv3',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '',
@@ -86,6 +86,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.transaction.TransactionMiddleware',
+    'reversion.middleware.RevisionMiddleware',
 )
 
 ROOT_URLCONF = 'secinv.urls'
@@ -106,6 +108,7 @@ INSTALLED_APPS = (
     'secinv.apps.devices',
     'secinv.apps.haystack',
     'secinv.apps.fulltext',
+    'reversion',
 )
 
 HAYSTACK_SITECONF = 'secinv.search_sites'

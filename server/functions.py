@@ -1,5 +1,7 @@
 #!/usr/bin/env python26
 
+from __future__ import with_statement
+
 import datetime
 import os
 import sys
@@ -40,6 +42,9 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 from django.core.management import setup_environ
 setup_environ(settings)
+
+import reversion
+
 
 from apps.machines.models import *
 #from apps.machines.models import Interface, System, Services, RPMs, \
@@ -106,7 +111,8 @@ class ServerFunctions:
                 m_obj.diff = ','.join(m_diff)
                 m_obj.date_modified = datetime.datetime.now()
 
-            m_obj.save()
+            with reversion.revision:
+                m_obj.save()
 
             self.machine_obj = m_obj
             self.machine_id = self.machine_obj.id
@@ -150,12 +156,15 @@ class ServerFunctions:
                     i_diff.append('i_mask')
 
                 if i_diff:
-                    i_dict = {'machine': self.machine_obj,
-                              'i_name': interface,
-                              'i_ip': ip_dict[interface]['i_ip'],
-                              'i_mac': ip_dict[interface]['i_mac'],
-                              'i_mask': ip_dict[interface]['i_mask']}
-                    i_object = Interface.objects.create(**i_dict)
+                    i_object.machine = self.machine_obj
+                    i_object.i_name = interface
+                    i_object.i_ip = ip_dict[interface]['i_ip']
+                    i_object.i_mac = ip_dict[interface]['i_mac']
+                    i_object.i_mask = ip_dict[interface]['i_mask']
+                    with reversion.revision:
+                        i_object.save()
+
+                    #i_object = Interface.objects.create(**i_dict)
 
             except Interface.DoesNotExist:
                 i_dict = {'machine': self.machine_obj,
@@ -176,6 +185,13 @@ class ServerFunctions:
 
         # Update each interface as inactive.
         for i in i_diff['deleted']:
+            
+            #
+            #
+            # TODO: delete revision object.
+            #
+            #
+
             i_latest = Interface.objects.filter(machine__id=self.machine_id,
                                                 i_name=i, active=True).latest()
 
@@ -197,6 +213,7 @@ class ServerFunctions:
 
         ## System.
         try:
+            print 'getting system'
             sys_object = System.objects.filter(
                 machine__id=self.machine_id).latest()
 
@@ -214,23 +231,42 @@ class ServerFunctions:
             if sys_object.ip_fwd != system_dict['ip_fwd']:
                 sys_diff = True
 
+            print sys_diff
             if sys_diff:
-                sys_dict = {'machine': self.machine_obj,
-                            'kernel_rel': system_dict['kernel_rel'],
-                            'rh_rel': system_dict['rh_rel'],
-                            'nfs': system_dict['nfs'],
-                            'ip_fwd': system_dict['ip_fwd'],
-                            'iptables': ipt_dict['status']}
-                sys_object = System.objects.create(**sys_dict)
+                print 'updating system'
+                sys_object.machine = self.machine_obj
+                sys_object.kernel_rel = system_dict['kernel_rel']
+                sys_object.rh_rel = system_dict['rh_rel']
+                sys_object.nfs = system_dict['nfs']
+                sys_object.ip_fwd = system_dict['ip_fwd']
+                sys_object.iptables = ipt_dict['status']
+                with reversion.revision:
+                    sys_object.save()
+
+                #sys_dict = {'machine': self.machine_obj,
+                #            'kernel_rel': system_dict['kernel_rel'],
+                #            'rh_rel': system_dict['rh_rel'],
+                #            'nfs': system_dict['nfs'],
+                #            'ip_fwd': system_dict['ip_fwd'],
+                #            'iptables': ipt_dict['status']}
+                #sys_object = System.objects.create(**sys_dict)
 
         except System.DoesNotExist:
+            print 'system does not exist'
             sys_dict = {'machine': self.machine_obj,
                         'kernel_rel': system_dict['kernel_rel'],
                         'rh_rel': system_dict['rh_rel'],
                         'nfs': system_dict['nfs'],
                         'ip_fwd': system_dict['ip_fwd'],
                         'iptables': ipt_dict['status']}
-            sys_object = System.objects.create(**sys_dict)
+            with reversion.revision:
+                sys_object = System.objects.create(machine=self.machine_obj,
+                        kernel_rel=system_dict['kernel_rel'],
+                        rh_rel=system_dict['rh_rel'],
+                        nfs=system_dict['nfs'],
+                        ip_fwd=system_dict['ip_fwd'],
+                        iptables=ipt_dict['status'])
+                sys_object.save()
 
 
         ## Services.
@@ -252,10 +288,16 @@ class ServerFunctions:
                 s_diff = True
 
             if s_diff:
-                s_dict = {'machine': self.machine_obj,
-                          'processes': csv_procs,
-                          'ports': csv_ports}
-                s_object = Services.objects.create(**s_dict)
+                s_object.machine = self.machine_obj
+                s_object.processes = csv_procs
+                s_object.ports = csv_ports
+                with reversion.revision:
+                    s_object.save()
+
+                #s_dict = {'machine': self.machine_obj,
+                #          'processes': csv_procs,
+                #          'ports': csv_ports}
+                #s_object = Services.objects.create(**s_dict)
 
         except Services.DoesNotExist:
             s_dict = {'machine': self.machine_obj,
@@ -274,9 +316,15 @@ class ServerFunctions:
                 r_diff = True
 
             if r_diff:
-                r_dict = {'machine': self.machine_obj,
-                          'rpms': rpms_dict['list']}
-                r_object = RPMs.objects.create(**r_dict)
+                r_object.machine = self.machine_obj
+                r_object.rpms = rpms_dict['list']
+                with reversion.revision:
+                    r_object.save()
+
+                #r_dict = {'machine': self.machine_obj,
+                #          'rpms': rpms_dict['list']}
+
+                #r_object = RPMs.objects.create(**r_dict)
 
         except RPMs.DoesNotExist:
             r_dict = {'machine': self.machine_obj,
@@ -303,10 +351,16 @@ class ServerFunctions:
                 s_diff = True
 
             if s_diff:
-                s_dict = {'machine': self.machine_obj,
-                          'parameters': csv_params,
-                          'values': csv_values}
-                s_object = SSHConfig.objects.create(**s_dict)
+                s_object.machine = self.machine_obj
+                s_object.parameters = csv_params
+                s_object.values = csv_values
+                with reversion.revision:
+                    s_object.save()
+
+                #s_dict = {'machine': self.machine_obj,
+                #          'parameters': csv_params,
+                #          'values': csv_values}
+                #s_object = SSHConfig.objects.create(**s_dict)
 
         except SSHConfig.DoesNotExist:
             s_dict = {'machine': self.machine_obj,
@@ -318,7 +372,7 @@ class ServerFunctions:
         ## iptables.
         print 'Received iptables dictionary:\n'
         iptables_rules = ipt_dict['rules']
-        print iptables_rules
+        #print iptables_rules
 
         # TODO: If unique table names in DB are not in tables_rules --> set as inactive.
 
@@ -349,7 +403,7 @@ class ServerFunctions:
                         IPTableChain.objects.create(**i_dict)
                 except IPTableChain.DoesNotExist:
                     print 'inserting IP TABLE CHAIN'
-                    print chain
+                    #print chain
                     i_dict = {'table': ipt_table,
                               'name': chain['name'],
                               'policy': chain['policy'],
@@ -372,7 +426,7 @@ class ServerFunctions:
 
                 except IPTableRule.DoesNotExist:
                     print 'inserting IP TABLE RULE'
-                    print rule
+                    #print rule
                     i_dict = {'table': ipt_table,
                               'rule': rule}
                     IPTableRule.objects.create(**i_dict)

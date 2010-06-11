@@ -7,7 +7,78 @@ from django.template import RequestContext
 from .models import Machine, Services, System, RPMs, Interface, SSHConfig
 from .forms import MachineSearchForm
 
+from reversion.models import Version
+#from reversion.helpers import generate_patch
+
 import re
+
+'''
+def diff_dict(d_old, d_new):
+    """
+    Creates a new dict representing a diff between two dicts.
+    """
+    # Added and changed items.
+    diff = {}
+    for k, v in d_new.items():
+        old_v = d_old.get(k, None)
+        if v == old_v:
+            continue
+        diff.update({k: {'old': old_v, 'new': v}})
+
+    # Deleted items.
+    for k, v in d_old.items():
+        if k not in d_new.keys():
+            diff.update({k: {'deleted': v}})
+
+    return diff
+'''
+
+def diff_dict(a, b):
+    """Return differences from dictionaries a to b.
+
+    Return a tuple of three dicts: (removed, added, changed).
+    'removed' has all keys and values removed from a. 'added' has
+    all keys and values that were added to b. 'changed' has all
+    keys and their values in b that are different from the corresponding
+    key in a.
+    """
+
+    removed = dict()
+    added = dict()
+    changed = dict()
+    unchanged = dict()
+
+    for key, value in a.iteritems():
+        if key not in b:
+            removed[key] = value
+        elif b[key] != value:
+            changed[key] = b[key]
+        elif b[key] == value:
+            unchanged[key] = b[key]
+    for key, value in b.iteritems():
+        if key not in a:
+            added[key] = value
+
+    return {'removed': removed, 'added': added, 'changed': changed, 'unchanged': unchanged}
+
+def get_version_diff(obj_item):
+    obj_version = Version.objects.get_for_object(obj_item)
+    versions = []
+    for index, ver in enumerate(obj_version):
+        try:
+            old_v = obj_version[index - 1].field_dict
+        except AssertionError, IndexError:
+            old_v = {}
+        new_v = ver.field_dict
+        patch = diff_dict(old_v, new_v)
+
+        '''
+        field_diffs = {}
+        for status, field in patch:
+            field_diffs[field] = status
+        '''
+        versions.append({'fields': ver.field_dict, 'diff': patch})
+    return versions
 
 
 def index(request):
@@ -44,8 +115,29 @@ def detail(request, machine_slug):
     system_history = System.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
 
+    system_versions = get_version_diff(system_history[0])
+
+    """
+    system_versioning = []
+    for index, ver in enumerate(system_version):
+        try:
+            old_v = system_version[index - 1].field_dict
+        except AssertionError, IndexError:
+            old_v = {}
+        new_v = ver.field_dict
+        patch = diff_dict(old_v, new_v)
+
+        '''
+        field_diffs = {}
+        for status, field in patch:
+            field_diffs[field] = status
+        '''
+        system_versioning.append({'fields': ver.field_dict, 'diff': patch})
+    """
+
     if system_history.exists():
         system_latest = System.objects.filter(machine__id=p.id).latest()
+
 
 
     services_latest = []
@@ -111,6 +203,7 @@ def detail(request, machine_slug):
                         'machine': p,
                         'system': system_latest,
                         'system_history': system_history,
+                        'system_versions': system_versions,
                         'services': services_latest,
                         'services_history': services_history,
                         'rpms': rpms_latest,
