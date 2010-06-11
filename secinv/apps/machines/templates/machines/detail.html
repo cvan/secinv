@@ -211,15 +211,15 @@ function getTabs(section) {
                   {% if 'nfs' in system.differences %}
                     {% with system.differences.nfs as system_dict %}
                       {% if not system_dict.old %}
-                          <ins>{{ system.nfs_mounted }}</ins>
+                          <ins>{{ system.nfs_status }}</ins>
                       {% else %}
                         {% if system_dict.old %}
-                          <mark>{{ system.nfs_mounted }}</mark>
+                          <mark>{{ system.nfs_status }}</mark>
                         {% endif %}
                       {% endif %}
                     {% endwith %}
                   {% else %}
-                          {{ system.nfs_mounted }}
+                          {{ system.nfs_status }}
                   {% endif %}
                   {% endspaceless %}
                 </td>
@@ -227,19 +227,40 @@ function getTabs(section) {
               <tr>
                 <th>{{ _('IP forwarding') }}</th>
                 <td>
+
                   {% spaceless %}
                   {% if 'ip_fwd' in system.differences %}
-                    {% with system.differences.ip_fwd as system_dict %}
+                    {% with system.differences.ip_fwd as system_dict %}                    
                       {% if not system_dict.old %}
-                          <ins>{{ system.ip_fwd_enabled }}</ins>
+                          <ins>{{ system.ip_fwd_status }}</ins>
                       {% else %}
                         {% if system_dict.old %}
-                          <mark>{{ system.ip_fwd_enabled }}</mark>
+                          <mark>{{ system.ip_fwd_status }}</mark>
                         {% endif %}
                       {% endif %}
                     {% endwith %}
                   {% else %}
-                          {{ system.ip_fwd_enabled }}
+                          {{ system.ip_fwd_status }}
+                  {% endif %}
+                  {% endspaceless %}
+                </td>
+              </tr>
+              <tr>
+                <th>{{ _('iptables') }}</th>
+                <td>
+                  {% spaceless %}
+                  {% if 'iptables' in system.differences %}
+                    {% with system.differences.iptables as system_dict %}
+                      {% if not system_dict.old %}
+                          <ins>{{ system.iptables_status }}</ins>
+                      {% else %}
+                        {% if system_dict.old %}
+                          <mark>{{ system.iptables_status }}</mark>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+                  {% else %}
+                          {{ system.iptables_status }}
                   {% endif %}
                   {% endspaceless %}
                 </td>
@@ -268,6 +289,7 @@ function getTabs(section) {
                 <th>{{ _('RedHat release') }}</th>
                 <th>{{ _('NFS') }}</th>
                 <th>{{ _('IP forwarding') }}</th>
+                <th>{{ _('iptables') }}</th>
                 <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
@@ -313,15 +335,15 @@ function getTabs(section) {
                   {% if 'nfs' in system_h.differences %}
                     {% with system_h.differences.nfs as system_dict %}
                       {% if not system_dict.old %}
-                          <ins>{{ system_h.nfs_mounted }}</ins>
+                          <ins>{{ system_h.nfs_status }}</ins>
                       {% else %}
                         {% if system_dict.old %}
-                          <mark>{{ system_h.nfs_mounted }}</mark>
+                          <mark>{{ system_h.nfs_status }}</mark>
                         {% endif %}
                       {% endif %}
                     {% endwith %}
                   {% else %}
-                          {{ system_h.nfs_mounted }}
+                          {{ system_h.nfs_status }}
                   {% endif %}
                   {% endspaceless %}
                 </td>
@@ -330,15 +352,32 @@ function getTabs(section) {
                   {% if 'ip_fwd' in system_h.differences %}
                     {% with system_h.differences.ip_fwd as system_h_dict %}
                       {% if not system_h_dict.old %}
-                          <ins>{{ system_h.ip_fwd_enabled }}</ins>
+                          <ins>{{ system_h.ip_fwd_status }}</ins>
                       {% else %}
                         {% if system_h_dict.old %}
-                          <mark>{{ system_h.ip_fwd_enabled }}</mark>
+                          <mark>{{ system_h.ip_fwd_status }}</mark>
                         {% endif %}
                       {% endif %}
                     {% endwith %}
                   {% else %}
-                          {{ system_h.ip_fwd_enabled }}
+                          {{ system_h.ip_fwd_status }}
+                  {% endif %}
+                  {% endspaceless %}
+                </td>
+                <td>
+                  {% spaceless %}
+                  {% if 'iptables' in system_h.differences %}
+                    {% with system_h.differences.ip_fwd as system_h_dict %}
+                      {% if not system_h_dict.old %}
+                          <ins>{{ system_h.iptables_status }}</ins>
+                      {% else %}
+                        {% if system_h_dict.old %}
+                          <mark>{{ system_h.iptables_status }}</mark>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+                  {% else %}
+                          {{ system_h.iptables_status }}
                   {% endif %}
                   {% endspaceless %}
                 </td>
@@ -1194,7 +1233,6 @@ function getTabs(section) {
 
         </div><!-- #rpms-history -->
       </section>
-
 
 
 {% endblock %}

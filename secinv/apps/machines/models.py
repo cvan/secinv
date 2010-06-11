@@ -58,7 +58,7 @@ class Machine(models.Model):
     # TODO: DRY. Keep in one place.
     search_fields = ['sys_ip', 'hostname', 'ext_ip',
                      'system__kernel_rel', 'system__rh_rel', 'system__nfs',
-                     'system__ip_fwd',
+                     'system__ip_fwd', 'system__iptables',
                      'services__processes', 'services__ports',
                      'rpms__rpms',
                      'interface__i_name', 'interface__i_ip',
@@ -90,6 +90,10 @@ class Machine(models.Model):
     def ip_fwd(self):
         s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
         return s.ip_fwd
+
+    def iptables(self):
+        s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        return s.iptables
 
     def excerpt(self):
         excerpt = ""
@@ -193,14 +197,22 @@ class System(models.Model):
                               blank=True)
     nfs = models.BooleanField(_('NFS?'), default=0)
     ip_fwd = models.BooleanField(_('IP forwarding'), default=0)
+    iptables = models.BooleanField(_('iptables'), default=0)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
-    def nfs_mounted(self):
+    def nfs_status(self):
         return _('Yes') if self.nfs else _('No')
 
-    def ip_fwd_enabled(self):
+    # TODO: Can be ambiguous with color coding (i.e., disabled as green,
+    # if new change).
+    def ip_fwd_status(self):
         return _('Enabled') if self.ip_fwd else _('Disabled')
+        #return _('Yes') if self.ip_fwd else _('Disabled')
+
+    def iptables_status(self):
+        return _('Enabled') if self.iptables else _('Disabled')
+        #return _('Yes') if self.iptables else _('Disabled')
 
     def differences(self):
         """
@@ -211,22 +223,24 @@ class System(models.Model):
             id=self.id).filter(date_added__lt=self.date_added).order_by(
             '-date_added').all()
 
-        s_fields = ['kernel_rel', 'rh_rel', 'nfs', 'ip_fwd']
+        s_fields = ['kernel_rel', 'rh_rel', 'nfs', 'ip_fwd', 'iptables']
 
         s_previous = {}
         if s_older.exists():
             s_values = [s_older[0].kernel_rel, s_older[0].rh_rel,
-                        s_older[0].nfs, s_older[0].ip_fwd]
+                        s_older[0].nfs, s_older[0].ip_fwd, s_older[0].iptables]
             s_previous = dict(zip(s_fields, s_values))
 
-        s_values = [self.kernel_rel, self.rh_rel, self.nfs, self.ip_fwd]
+        s_values = [self.kernel_rel, self.rh_rel, self.nfs, self.ip_fwd,
+                    self.iptables]
         s_latest = dict(zip(s_fields, s_values))
 
         return diff_dict(s_previous, s_latest)
 
     def __unicode__(self):
-        return u'%s - %s - %s - %s' % (self.kernel_rel, self.rh_rel, self.nfs,
-                                       self.ip_fwd)
+        return u'%s - %s - %s - %s - %s' % (self.kernel_rel, self.rh_rel,
+                                            self.nfs, self.ip_fwd,
+                                            self.iptables)
 
     class Meta:
         verbose_name_plural = _('System')
@@ -327,8 +341,8 @@ class RPMs(models.Model):
 
 class SSHConfig(models.Model):
     machine = models.ForeignKey('Machine')
-    parameters = models.TextField(blank=True)
-    values = models.TextField(blank=True)
+    parameters = models.TextField(_('parameters'), blank=True)
+    values = models.TextField(_('values'), blank=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
@@ -343,6 +357,7 @@ class SSHConfig(models.Model):
 
         s_previous = {}
         if s_older.exists():
+            # TODO: remove carriage returns?
             s_params = re.split('\n', s_older[0].parameters.replace('\r', ''))
             s_values = re.split('\n', s_older[0].values.replace('\r', ''))
             s_previous = dict(zip(s_params, s_values))
@@ -390,10 +405,54 @@ class SSHConfig(models.Model):
         get_latest_by = 'date_added'
 
 '''
-class SSHConfig(models.Model):
+class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
     parameters = models.TextField(blank=True)
     values = models.TextField(blank=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 '''
+
+
+class IPTable(models.Model):
+    machine = models.ForeignKey('Machine')
+    name = models.TextField(_('name'), max_length=255)
+    #active = models.BooleanField(_('active'), default=1)
+    date_added = models.DateTimeField(_('date added'), editable=False,
+                                      default=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u'%s' % (self.name)
+
+    class Meta:
+        verbose_name = _('IPTable')
+        verbose_name_plural = _('IPTables')
+        get_latest_by = 'date_added'
+
+
+class IPTableChain(models.Model):
+    table = models.ForeignKey('IPTable')
+    name = models.CharField(_('chain name'), max_length=255)
+    policy = models.TextField(_('chain policy'), max_length=255, blank=True)
+    packets = models.BigIntegerField(_('packets counter'))
+    bytes = models.BigIntegerField(_('bytes counter'))
+    date_added = models.DateTimeField(_('date added'), editable=False,
+                                      default=datetime.datetime.now)
+
+    class Meta:
+        verbose_name = _('IPTableChain')
+        verbose_name_plural = _('IPTableChains')
+        get_latest_by = 'date_added'
+
+
+class IPTableRule(models.Model):
+    table = models.ForeignKey('IPTable')
+    rule = models.CharField(_('rule'), max_length=255)
+    date_added = models.DateTimeField(_('date added'), editable=False,
+                                      default=datetime.datetime.now)
+
+    class Meta:
+        verbose_name = _('IPTableRules')
+        verbose_name_plural = _('IPTableRules')
+        get_latest_by = 'date_added'
+

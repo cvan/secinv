@@ -42,9 +42,9 @@ from django.core.management import setup_environ
 setup_environ(settings)
 
 from apps.machines.models import *
+#from apps.machines.models import Interface, System, Services, RPMs, \
+#                                 SSHConfig, IPTable, IPTableChain, IPTableRules
 
-
-# TODO: generate auth_keys
 
 class ServerFunctions:
     def __init__(self, AUTH_KEY):
@@ -67,7 +67,7 @@ class ServerFunctions:
         return True
 
     def machine(self, ip_dict, system_dict, services_dict, rpms_dict,
-                sshconfig_dict):
+                sshconfig_dict, ipt_dict):
         if not self.is_authenticated:
             return False
 
@@ -219,7 +219,8 @@ class ServerFunctions:
                             'kernel_rel': system_dict['kernel_rel'],
                             'rh_rel': system_dict['rh_rel'],
                             'nfs': system_dict['nfs'],
-                            'ip_fwd': system_dict['ip_fwd']}
+                            'ip_fwd': system_dict['ip_fwd'],
+                            'iptables': ipt_dict['status']}
                 sys_object = System.objects.create(**sys_dict)
 
         except System.DoesNotExist:
@@ -227,7 +228,8 @@ class ServerFunctions:
                         'kernel_rel': system_dict['kernel_rel'],
                         'rh_rel': system_dict['rh_rel'],
                         'nfs': system_dict['nfs'],
-                        'ip_fwd': system_dict['ip_fwd']}
+                        'ip_fwd': system_dict['ip_fwd'],
+                        'iptables': ipt_dict['status']}
             sys_object = System.objects.create(**sys_dict)
 
 
@@ -311,6 +313,69 @@ class ServerFunctions:
                       'parameters': csv_params,
                       'values': csv_values}
             s_object = SSHConfig.objects.create(**s_dict)
+
+
+        ## iptables.
+        print 'Received iptables dictionary:\n'
+        iptables_rules = ipt_dict['rules']
+        print iptables_rules
+
+        # TODO: If unique table names in DB are not in tables_rules --> set as inactive.
+
+        for table_name, v in iptables_rules.iteritems():
+            try:
+                ipt_table = IPTable.objects.filter(
+                    machine__id=self.machine_id, name=table_name).latest()
+                ipt_table_id = ipt_table.id
+            except IPTable.DoesNotExist:
+                i_dict = {'machine': self.machine_obj,
+                          'name': table_name}
+                ipt_table = IPTable.objects.create(**i_dict)
+
+                ipt_table_id = ipt_table.id
+
+
+            for chain in v['chains']:
+                try:
+                    i_object = IPTableChain.objects.filter(
+                        table__id=ipt_table_id, name=chain['name']).latest()
+
+                    i_diff = False
+
+                    # TODO: Check differences.
+
+                    if i_diff:
+                        i_dict = {}
+                        IPTableChain.objects.create(**i_dict)
+                except IPTableChain.DoesNotExist:
+                    print 'inserting IP TABLE CHAIN'
+                    print chain
+                    i_dict = {'table': ipt_table,
+                              'name': chain['name'],
+                              'policy': chain['policy'],
+                              'packets': chain['packets'],
+                              'bytes': chain['bytes']}
+                    i_obj = IPTableChain.objects.create(**i_dict)
+
+            for rule in v['rules']:
+                try:
+                    i_object = IPTableRule.objects.filter(
+                        table__id=ipt_table_id, rule=rule).latest()
+
+                    i_diff = False
+
+                    # TODO: Check differences.
+
+                    if i_diff:
+                        i_dict = {}
+                        IPTableRule.objects.create(**i_dict)
+
+                except IPTableRule.DoesNotExist:
+                    print 'inserting IP TABLE RULE'
+                    print rule
+                    i_dict = {'table': ipt_table,
+                              'rule': rule}
+                    IPTableRule.objects.create(**i_dict)
 
 
         return True
