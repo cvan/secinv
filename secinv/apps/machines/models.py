@@ -6,7 +6,81 @@ import reversion
 import datetime
 import re
 
+from reversion.models import Version
+
 # TODO: Move functions.
+
+
+def get_version_diff(obj_item):
+    obj_version = Version.objects.get_for_object(obj_item).order_by('revision')
+    versions = []
+    for index, ver in enumerate(obj_version):
+        '''
+        try:
+            old_v = obj_version[index + 1].field_dict
+        #except AssertionError:
+        except IndexError:
+            old_v = {}
+        new_v = ver.field_dict
+        patch = diff_dict(old_v, new_v)
+        '''
+        try:
+            old_v = obj_version[index - 1].field_dict
+        except AssertionError:
+        #except IndexError:
+            old_v = {}
+        new_v = ver.field_dict
+        patch = diff_dict2(old_v, new_v)
+
+        '''
+        field_diffs = {}
+        for status, field in patch:
+            field_diffs[field] = status
+        '''
+        versions.append({'fields': ver.field_dict, 'diff': patch,
+                         'timestamp': ver.field_dict['date_added']})
+    versions.reverse()
+    return versions
+
+
+def diff_dict2(a, b):
+    """Return differences from dictionaries a to b.
+
+    Return a tuple of three dicts: (removed, added, changed).
+    'removed' has all keys and values removed from a. 'added' has
+    all keys and values that were added to b. 'changed' has all
+    keys and their values in b that are different from the corresponding
+    key in a.
+    """
+
+    removed = dict()
+    added = dict()
+    changed = dict()
+    unchanged = dict()
+
+
+    # If inactive object is now active, mark each field as 'added'.
+    if 'active' in a and a['active'] == False and 'active' in b and b['active'] == True:
+        for key, value in b.iteritems():
+            added[key] = value
+    # If object is inactive, mark each field as 'removed'.
+    elif 'active' in b and b['active'] == False:
+        for key, value in b.iteritems():
+            removed[key] = value
+    else:
+        for key, value in a.iteritems():
+            if key not in b:
+                removed[key] = value
+            elif b[key] != value:
+                changed[key] = b[key]
+            elif b[key] == value:
+                unchanged[key] = b[key]
+        for key, value in b.iteritems():
+            if key not in a:
+                added[key] = value
+
+    return {'removed': removed, 'added': added, 'changed': changed,
+            'unchanged': unchanged}
 
 def diff_dict(d_old, d_new):
     """
@@ -65,7 +139,6 @@ class Machine(models.Model):
                      'interface__i_name', 'interface__i_ip',
                      'interface__i_mac', 'interface__i_mask']
 
-
     def __unicode__(self):
         return u'%s - %s' % (self.sys_ip, self.hostname)
 
@@ -97,7 +170,7 @@ class Machine(models.Model):
         return s.iptables
 
     def excerpt(self):
-        excerpt = ""
+        excerpt = ''
 
         i = Interface.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
         sys = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
@@ -116,7 +189,7 @@ class Machine(models.Model):
             elif re.search('rpms__', sf):
                 val = r.__getattribute__(re.split('__', sf)[1])
 
-            excerpt += "%s " % val
+            excerpt += '%s ' % val
 
         return excerpt
 
@@ -136,60 +209,31 @@ class Interface(models.Model):
     i_mac = models.CharField(_('MAC address'), max_length=17, blank=True, null=True)
     i_mask = models.IPAddressField(_('netmask'), blank=True, null=True)
     active = models.BooleanField(_('active'), default=1)
-    date_added = models.DateTimeField(_('date added'), editable=False,
+    date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
-
-    def diff_split(self):
-        return re.split(',', self.diff)
-
-    def differences(self):
-        """
-        Create a dictionary of the differences between the latest
-        interface of the same interface name.
-        """
-        i_older = Interface.objects.filter(machine__id=self.machine_id,
-            i_name=self.i_name).exclude(id=self.id).filter(
-            date_added__lt=self.date_added).order_by('-date_added').all()
-
-        i_fields = ['i_ip', 'i_mac', 'i_mask']
-
-        i_previous = {}
-        if i_older.exists():
-            i_values = [i_older[0].i_ip, i_older[0].i_mac, i_older[0].i_mask]
-
-            if not i_older[0].active:
-                i_values = ['', '', '']
-
-            i_previous = dict(zip(i_fields, i_values))
-
-        i_values = [self.i_ip, self.i_mac, self.i_mask]
-        i_latest = dict(zip(i_fields, i_values))
-
-        return diff_dict(i_previous, i_latest)
-
-    def interfaces_dict(self):
-        """
-        Merge and return latest and previous dictionaries of interfaces.
-        """
-        i_older = Interface.objects.filter(machine__id=self.machine_id,
-            i_name=self.i_name).exclude(id=self.id).filter(
-            date_added__lt=self.date_added).order_by('-date_added').all()
-
-        i_fields = ['i_ip', 'i_mac', 'i_mask']
-
-        i_previous = {}
-        if i_older.exists():
-            i_values = [i_older[0].i_ip, i_older[0].i_mac, i_older[0].i_mask]
-            i_previous = dict(zip(i_fields, i_values))
-
-        i_values = [self.i_ip, self.i_mac, self.i_mask]
-        i_latest = dict(zip(i_fields, i_values))
-
-        return dict(i_latest, **i_previous)
 
     def __unicode__(self):
         return u'%s - %s - %s - %s' % (self.i_name, self.i_ip, self.i_mac,
                                        self.i_mask)
+
+    def diff(self):
+        """
+        Create a dictionary of the differences between the current and previous
+        interface of the same interface name.
+        """
+        i_diff = {}
+
+        try:
+            i_latest = Interface.objects.filter(machine__id=self.machine_id,
+                i_name=self.i_name).latest()
+            i_v = get_version_diff(i_latest)
+            if i_v:
+                i_diff = i_v[0]['diff']
+        except Interface.DoesNotExist:
+            pass
+
+        return i_diff
+
     class Meta:
         get_latest_by = 'date_added'
 
@@ -206,49 +250,31 @@ class System(models.Model):
     nfs = models.BooleanField(_('NFS?'), default=0)
     ip_fwd = models.BooleanField(_('IP forwarding'), default=0)
     iptables = models.BooleanField(_('iptables'), default=0)
-    date_added = models.DateTimeField(_('date added'), editable=False,
+    date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
-
-    def nfs_status(self):
-        return _('Yes') if self.nfs else _('No')
-
-    # TODO: Can be ambiguous with color coding (i.e., disabled as green,
-    # if new change).
-    def ip_fwd_status(self):
-        return _('Enabled') if self.ip_fwd else _('Disabled')
-        #return _('Yes') if self.ip_fwd else _('Disabled')
-
-    def iptables_status(self):
-        return _('Enabled') if self.iptables else _('Disabled')
-        #return _('Yes') if self.iptables else _('Disabled')
-
-    def differences(self):
-        """
-        Create a dictionary of the differences between the latest
-        and the previous system info.
-        """
-        s_older = System.objects.filter(machine__id=self.machine_id).exclude(
-            id=self.id).filter(date_added__lt=self.date_added).order_by(
-            '-date_added').all()
-
-        s_fields = ['kernel_rel', 'rh_rel', 'nfs', 'ip_fwd', 'iptables']
-
-        s_previous = {}
-        if s_older.exists():
-            s_values = [s_older[0].kernel_rel, s_older[0].rh_rel,
-                        s_older[0].nfs, s_older[0].ip_fwd, s_older[0].iptables]
-            s_previous = dict(zip(s_fields, s_values))
-
-        s_values = [self.kernel_rel, self.rh_rel, self.nfs, self.ip_fwd,
-                    self.iptables]
-        s_latest = dict(zip(s_fields, s_values))
-
-        return diff_dict(s_previous, s_latest)
 
     def __unicode__(self):
         return u'%s - %s - %s - %s - %s' % (self.kernel_rel, self.rh_rel,
                                             self.nfs, self.ip_fwd,
                                             self.iptables)
+
+    def diff(self):
+        """
+        Create a dictionary of the differences between the current and previous
+        entry of the system info.
+        """
+        i_diff = {}
+
+        try:
+            s_latest = System.objects.filter(
+                machine__id=self.machine_id).latest()
+            s_v = get_version_diff(s_latest)
+            if s_v:
+                s_diff = s_v[0]['diff']
+        except System.DoesNotExist:
+            pass
+
+        return s_diff
 
     class Meta:
         verbose_name_plural = _('System')

@@ -48,26 +48,47 @@ def diff_dict(a, b):
     changed = dict()
     unchanged = dict()
 
-    for key, value in a.iteritems():
-        if key not in b:
-            removed[key] = value
-        elif b[key] != value:
-            changed[key] = b[key]
-        elif b[key] == value:
-            unchanged[key] = b[key]
-    for key, value in b.iteritems():
-        if key not in a:
-            added[key] = value
 
-    return {'removed': removed, 'added': added, 'changed': changed, 'unchanged': unchanged}
+    # If inactive object is now active, mark each field as 'added'.
+    if 'active' in a and a['active'] == False and 'active' in b and b['active'] == True:
+        for key, value in b.iteritems():
+            added[key] = value
+    # If object is inactive, mark each field as 'removed'.
+    elif 'active' in b and b['active'] == False:
+        for key, value in b.iteritems():
+            removed[key] = value
+    else:
+        for key, value in a.iteritems():
+            if key not in b:
+                removed[key] = value
+            elif b[key] != value:
+                changed[key] = b[key]
+            elif b[key] == value:
+                unchanged[key] = b[key]
+        for key, value in b.iteritems():
+            if key not in a:
+                added[key] = value
+
+    return {'removed': removed, 'added': added, 'changed': changed,
+            'unchanged': unchanged}
 
 def get_version_diff(obj_item):
-    obj_version = Version.objects.get_for_object(obj_item)
+    obj_version = Version.objects.get_for_object(obj_item).order_by('revision')
     versions = []
     for index, ver in enumerate(obj_version):
+        '''
+        try:
+            old_v = obj_version[index + 1].field_dict
+        #except AssertionError:
+        except IndexError:
+            old_v = {}
+        new_v = ver.field_dict
+        patch = diff_dict(old_v, new_v)
+        '''
         try:
             old_v = obj_version[index - 1].field_dict
-        except AssertionError, IndexError:
+        except AssertionError:
+        #except IndexError:
             old_v = {}
         new_v = ver.field_dict
         patch = diff_dict(old_v, new_v)
@@ -77,7 +98,9 @@ def get_version_diff(obj_item):
         for status, field in patch:
             field_diffs[field] = status
         '''
-        versions.append({'fields': ver.field_dict, 'diff': patch})
+        versions.append({'fields': ver.field_dict, 'diff': patch,
+                         'timestamp': ver.field_dict['date_added']})
+    versions.reverse()
     return versions
 
 
@@ -115,29 +138,12 @@ def detail(request, machine_slug):
     system_history = System.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
 
+    # Get historical versions of System objects.
     system_versions = get_version_diff(system_history[0])
-
-    """
-    system_versioning = []
-    for index, ver in enumerate(system_version):
-        try:
-            old_v = system_version[index - 1].field_dict
-        except AssertionError, IndexError:
-            old_v = {}
-        new_v = ver.field_dict
-        patch = diff_dict(old_v, new_v)
-
-        '''
-        field_diffs = {}
-        for status, field in patch:
-            field_diffs[field] = status
-        '''
-        system_versioning.append({'fields': ver.field_dict, 'diff': patch})
-    """
 
     if system_history.exists():
         system_latest = System.objects.filter(machine__id=p.id).latest()
-
+        #system_latest = system_versions[0]
 
 
     services_latest = []
@@ -174,21 +180,46 @@ def detail(request, machine_slug):
                                             i_name=i).latest()
         interfaces_latest.append(i_latest)
 
+        # *** add to dict_diff: Mark oldest of each interface as 'added'. ***
         i_oldest = Interface.objects.filter(machine__id=p.id,
             i_name=i).order_by('date_added').all()
         if i_oldest.exists():
             interfaces_added_ids.append(i_oldest[0].id)
 
-        i_previous = Interface.objects.filter(machine__id=p.id,
-            i_name=i, active=False).exclude(id=i_latest.id).order_by(
-            '-date_added').all()
-        if i_previous.exists():
+        v_previous = Version.objects.get_for_object(i_latest).order_by('-revision')
+
+        #i_previous = Interface.objects.filter(machine__id=p.id,
+        #    i_name=i, active=False).exclude(id=i_latest.id).order_by(
+        #    '-date_added').all()
+        if v_previous:
             # If second most recent interface was inactive but the latest
             # interface is now active, then mark it as "added."
-            interfaces_added_ids.append(i_latest.id)
+            #interfaces_added_ids.append(v_previous.object_id)
+            pass
 
     interfaces_history = Interface.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
+
+
+    #interfaces_versions = get_version_diff(interfaces_history[0])
+
+    # Get all unique interfaces.
+    interfaces_versions = []
+    for i in interfaces_latest:
+        i_v = get_version_diff(i)
+        interfaces_versions += i_v
+
+    #interfaces_newest = interfaces_versions[0]
+
+    interfaces_versions = sorted(interfaces_versions,
+                                 key=lambda k: k['timestamp'], reverse=True)
+
+    #for i in interfaces_versions:
+    #    i['fields']['date_added']
+
+    #interfaces_versions = [get_version_diff(i) for i in interfaces_latest]
+
+    #interfaces_versions = Version.objects.get_deleted(Interface)
 
 
     sshconfig_latest = []
@@ -210,6 +241,7 @@ def detail(request, machine_slug):
                         'rpms_history': rpms_history,
                         'interfaces': interfaces_latest,
                         'interfaces_history': interfaces_history,
+                        'interfaces_versions': interfaces_versions,
                         'interfaces_added': interfaces_added_ids,
                         'sshconfig': sshconfig_latest,
                         'sshconfig_history': sshconfig_history}

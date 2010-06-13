@@ -160,119 +160,37 @@ function getTabs(section) {
 
           <table>
             <caption>{{ _('Current') }}</caption>
-            <tbody>
+            <thead>
               <tr>
                 <th>{{ _('Kernel release') }}</th>
-                {# TODO: dict differences #}
-                {# ins, mark #}
-                <td>
-                  {% spaceless %}
-                  {% if 'kernel_rel' in system.differences %}
-                    {% with system.differences.kernel_rel as system_dict %}
-                      {% if system_dict.new and not system_dict.old %}
-                          <ins>{{ system.kernel_rel }}</ins>
-                      {% else %}
-                        {% if system_dict.new and system_dict.old %}
-                          <mark>{{ system.kernel_rel }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system.kernel_rel }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-              </tr>
-              <tr>
                 <th>{{ _('RedHat release') }}</th>
-                <td>
-                  {% spaceless %}
-                  {% if 'rh_rel' in system.differences %}
-                    {% with system.differences.rh_rel as system_dict %}
-                      {% if system_dict.new and not system_dict.old %}
-                          <ins>{{ system.rh_rel }}</ins>
-                      {% else %}
-                        {% if system_dict.new and system_dict.old %}
-                          <mark>{{ system.rh_rel }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system.rh_rel }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-              </tr>
-              <tr>
-                <th>{{ _('NFS mounted?') }}</th>
-                <td>
-
-                  {% spaceless %}
-                  {% if 'nfs' in system.differences %}
-                    {% with system.differences.nfs as system_dict %}
-                      {% if not system_dict.old %}
-                          <ins>{{ system.nfs_status }}</ins>
-                      {% else %}
-                        {% if system_dict.old %}
-                          <mark>{{ system.nfs_status }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system.nfs_status }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-              </tr>
-              <tr>
+                <th>{{ _('NFS') }}</th>
                 <th>{{ _('IP forwarding') }}</th>
-                <td>
-
-                  {% spaceless %}
-                  {% if 'ip_fwd' in system.differences %}
-                    {% with system.differences.ip_fwd as system_dict %}                    
-                      {% if not system_dict.old %}
-                          <ins>{{ system.ip_fwd_status }}</ins>
-                      {% else %}
-                        {% if system_dict.old %}
-                          <mark>{{ system.ip_fwd_status }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system.ip_fwd_status }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-              </tr>
-              <tr>
                 <th>{{ _('iptables') }}</th>
-                <td>
-                  {% spaceless %}
-                  {% if 'iptables' in system.differences %}
-                    {% with system.differences.iptables as system_dict %}
-                      {% if not system_dict.old %}
-                          <ins>{{ system.iptables_status }}</ins>
-                      {% else %}
-                        {% if system_dict.old %}
-                          <mark>{{ system.iptables_status }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system.iptables_status }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-              </tr>
-              <tr>
                 <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
                 <td>
-                  {% if system.date_added %}
+                  {% differ system.diff 'kernel_rel' %}{{ system.kernel_rel }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ system.diff 'rh_rel' %}{{ system.rh_rel }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ system.diff 'nfs' %}{{ system.nfs|enum:'Yes,No' }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ system.diff 'ip_fwd' %}{{ system.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ system.diff 'iptables' %}{{ system.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
+                </td>
+                <td class="timestamp">
                   <time datetime="{{ system.date_added|date:'c' }}">
                     {{ system.date_added }}
                   </time>
-                  {% endif %}
                 </td>
               </tr>
             </tbody>
@@ -294,74 +212,22 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
-    {% for sys_ver in system_versions %}
+            {% for sys_ver in system_versions %}
               <tr>
                 <td>
-                {{ sys_ver.diff.kernel_rel }}
-
-                {% if 'kernel_rel' in sys_ver.diff.added %}
-                  <ins>{{ sys_ver.fields.kernel_rel }}</ins>
-                {% endif %}
-                
-                {% if 'kernel_rel' in sys_ver.diff.changed %}
-                  <mark>{{ sys_ver.fields.kernel_rel }}</mark>
-                {% endif %}
-                
-                {% if 'kernel_rel' in sys_ver.diff.unchanged %}
-                  {{ sys_ver.fields.kernel_rel }}
-                {% endif %}
+                  {% differ sys_ver.diff 'kernel_rel' %}{{ sys_ver.fields.kernel_rel }}{% enddiffer %}
                 </td>
                 <td>
-                {% if 'rh_rel' in sys_ver.diff.added %}
-                  <ins>{{ sys_ver.fields.rh_rel }}</ins>
-                {% endif %}
-                
-                {% if 'rh_rel' in sys_ver.diff.changed %}
-                  <mark>{{ sys_ver.fields.rh_rel }}</mark>
-                {% endif %}
-                
-                {% if 'rh_rel' in sys_ver.diff.unchanged %}
-                  {{ sys_ver.fields.rh_rel }}
-                {% endif %}
+                  {% differ sys_ver.diff 'rh_rel' %}{{ sys_ver.fields.rh_rel }}{% enddiffer %}
                 </td>
                 <td>
-                {% if 'nfs' in sys_ver.diff.added %}
-                  <ins>{{ sys_ver.fields.nfs }}</ins>
-                {% endif %}
-                
-                {% if 'nfs' in sys_ver.diff.changed %}
-                  <mark>{{ sys_ver.fields.nfs }}</mark>
-                {% endif %}
-                
-                {% if 'nfs' in sys_ver.diff.unchanged %}
-                  {{ sys_ver.fields.nfs }}
-                {% endif %}
+                  {% differ sys_ver.diff 'nfs' %}{{ sys_ver.fields.nfs|enum:'Yes,No' }}{% enddiffer %}
                 </td>
                 <td>
-                {% if 'ip_fwd' in sys_ver.diff.added %}
-                  <ins>{{ sys_ver.fields.ip_fwd }}</ins>
-                {% endif %}
-                
-                {% if 'ip_fwd' in sys_ver.diff.changed %}
-                  <mark>{{ sys_ver.fields.ip_fwd }}</mark>
-                {% endif %}
-                
-                {% if 'ip_fwd' in sys_ver.diff.unchanged %}
-                  {{ sys_ver.fields.ip_fwd }}
-                {% endif %}
+                  {% differ sys_ver.diff 'ip_fwd' %}{{ sys_ver.fields.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td>
-                {% if 'iptables' in sys_ver.diff.added %}
-                  <ins>{{ sys_ver.fields.iptables }}</ins>
-                {% endif %}
-                
-                {% if 'iptables' in sys_ver.diff.changed %}
-                  <mark>{{ sys_ver.fields.iptables }}</mark>
-                {% endif %}
-                
-                {% if 'iptables' in sys_ver.diff.unchanged %}
-                  {{ sys_ver.fields.iptables }}
-                {% endif %}
+                  {% differ sys_ver.diff 'iptables' %}{{ sys_ver.fields.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td class="timestamp">
                   <time datetime="{{ sys_ver.fields.date_added|date:'c' }}">
@@ -369,129 +235,13 @@ function getTabs(section) {
                   </time>
                 </td>
               </tr>
-    {% empty %}
+            {% empty %}
               <tr>
                 <td></td>
               </tr>
-    {% endfor %}
+            {% endfor %}
             </tbody>
           </table>
-
-<!--
-          <table>
-            <caption>{{ _('History') }}</caption>
-            <thead>
-              <tr>
-                <th>{{ _('Kernel release') }}</th>
-                <th>{{ _('RedHat release') }}</th>
-                <th>{{ _('NFS') }}</th>
-                <th>{{ _('IP forwarding') }}</th>
-                <th>{{ _('iptables') }}</th>
-                <th class="timestamp">{{ _('Modified') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-    {% for system_h in system_history %}
-              <tr>
-                <td>
-                  {% spaceless %}
-                  {% if 'kernel_rel' in system_h.differences %}
-                    {% with system_h.differences.kernel_rel as system_dict %}
-                      {% if system_dict.new and not system_dict.old %}
-                          <ins>{{ system_h.kernel_rel }}</ins>
-                      {% else %}
-                        {% if system_dict.new and system_dict.old %}
-                          <mark>{{ system_h.kernel_rel }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system_h.kernel_rel }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-                <td>
-                  {% spaceless %}
-                  {% if 'rh_rel' in system_h.differences %}
-                    {% with system_h.differences.rh_rel as system_dict %}
-                      {% if system_dict.new and not system_dict.old %}
-                          <ins>{{ system_h.rh_rel }}</ins>
-                      {% else %}
-                        {% if system_dict.new and system_dict.old %}
-                          <mark>{{ system_h.rh_rel }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system_h.rh_rel }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-                <td>
-                  {% spaceless %}
-                  {% if 'nfs' in system_h.differences %}
-                    {% with system_h.differences.nfs as system_dict %}
-                      {% if not system_dict.old %}
-                          <ins>{{ system_h.nfs_status }}</ins>
-                      {% else %}
-                        {% if system_dict.old %}
-                          <mark>{{ system_h.nfs_status }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system_h.nfs_status }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-                <td>
-                  {% spaceless %}
-                  {% if 'ip_fwd' in system_h.differences %}
-                    {% with system_h.differences.ip_fwd as system_h_dict %}
-                      {% if not system_h_dict.old %}
-                          <ins>{{ system_h.ip_fwd_status }}</ins>
-                      {% else %}
-                        {% if system_h_dict.old %}
-                          <mark>{{ system_h.ip_fwd_status }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system_h.ip_fwd_status }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-                <td>
-                  {% spaceless %}
-                  {% if 'iptables' in system_h.differences %}
-                    {% with system_h.differences.ip_fwd as system_h_dict %}
-                      {% if not system_h_dict.old %}
-                          <ins>{{ system_h.iptables_status }}</ins>
-                      {% else %}
-                        {% if system_h_dict.old %}
-                          <mark>{{ system_h.iptables_status }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ system_h.iptables_status }}
-                  {% endif %}
-                  {% endspaceless %}
-                </td>
-                <td class="timestamp">
-                  <time datetime="{{ system_h.date_added|date:'c' }}">
-                    {{ system_h.date_added }}
-                  </time>
-                </td>
-              </tr>
-    {% empty %}
-              <tr>
-                <td></td>
-              </tr>
-    {% endfor %}
-            </tbody>
-          </table>
--->
 
         </div><!-- #system-history -->
       </section>
@@ -504,7 +254,7 @@ function getTabs(section) {
           <li><a href="#interfaces-history" class="history">{{ _('History') }}</a></li>
         </ul>
         <div id="interfaces-latest" class="latest">
-        {% if interfaces %}
+
           <table>
             <caption>{{ _('Current') }}</caption>
             <thead>
@@ -519,86 +269,23 @@ function getTabs(section) {
             <tbody>
           {% for interface in interfaces %}
               <tr>
-                <td>
-                  {% if interface.id in interfaces_added %}<ins>{% endif %}
-                  {% if not interface.active %}<del>{% endif %}
-                  {{ interface.i_name }}
-                  {% if not interface.active %}</del>{% endif %}
-                  {% if interface.id in interfaces_added %}</ins>{% endif %}
-                </td>
-                <td>
-                  {% if not interface.active %}<del>{% endif %}
-
-                  {% spaceless %}
-                  {% if 'i_ip' in interface.differences %}
-                    {% with interface.differences.i_ip as interface_dict %}
-                      {% if interface_dict.new and not interface_dict.old %}
-                          <ins>{{ interface.i_ip }}</ins>
-                      {% else %}
-                        {% if interface_dict.new and interface_dict.old %}
-                          <mark>{{ interface.i_ip }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ interface.i_ip }}
-                  {% endif %}
-                  {% endspaceless %}
-
-                  {% if not interface.active %}</del>{% endif %}
-                </td>
-                <td>
-                  {% if not interface.active %}<del>{% endif %}
-
-                  {% spaceless %}
-                  {% if 'i_mac' in interface.differences %}
-                    {% with interface.differences.i_mac as interface_dict %}
-                      {% if interface_dict.new and not interface_dict.old %}
-                          <ins>{{ interface.i_mac }}</ins>
-                      {% else %}
-                        {% if interface_dict.new and interface_dict.old %}
-                          <mark>{{ interface.i_mac }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ interface.i_mac }}
-                  {% endif %}
-                  {% endspaceless %}
-
-                  {% if not interface.active %}</del>{% endif %}
-                </td>
-                <td>
-                  {% if not interface.active %}<del>{% endif %}
-
-                  {% spaceless %}
-                  {% if 'i_mask' in interface.differences %}
-                    {% with interface.differences.i_mask as interface_dict %}
-                      {% if interface_dict.new and not interface_dict.old %}
-                          <ins>{{ interface.i_mask }}</ins>
-                      {% else %}
-                        {% if interface_dict.new and interface_dict.old %}
-                          <mark>{{ interface.i_mask }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ interface.i_mask }}
-                  {% endif %}
-                  {% endspaceless %}
-
-                  {% if not interface.active %}</del>{% endif %}
-                </td>
+                <td>{% differ interface.diff 'i_name' %}{{ interface.i_name }}{% enddiffer %}</td>
+                <td>{% differ interface.diff 'i_ip' %}{{ interface.i_ip }}{% enddiffer %}</td>
+                <td>{% differ interface.diff 'i_mac' %}{{ interface.i_mac }}{% enddiffer %}</td>
+                <td>{% differ interface.diff 'i_mask' %}{{ interface.i_mask }}{% enddiffer %}</td>
                 <td class="timestamp">
                   <time datetime="{{ interface.date_added|date:'c' }}">
                     {{ interface.date_added }}
                   </time>
                 </td>
               </tr>
-          {% endfor %}
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
             </tbody>
           </table>
-        {% endif %}
 
         </div><!-- #interfaces-latest -->
         <div id="interfaces-history" class="history">
@@ -615,282 +302,29 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
-              {% for interface_h in interfaces_history %}
+            {% for interface_ver in interfaces_versions %}
               <tr>
-                <td>
-                  {% if interface_h.id in interfaces_added %}<ins>{% endif %}
-                  {% if not interface_h.active %}<del>{% endif %}
-                  {{ interface_h.i_name }}
-                  {% if not interface_h.active %}</del>{% endif %}
-                  {% if interface_h.id in interfaces_added %}</ins>{% endif %}
-                </td>
-                <td>
-                  {% if not interface_h.active %}<del>{% endif %}
-
-                  {% spaceless %}
-                  {% if 'i_ip' in interface_h.differences %}
-                    {% with interface_h.differences.i_ip as interface_dict %}
-                      {% if interface_dict.new and not interface_dict.old %}
-                          <ins>{{ interface_h.i_ip }}</ins>
-                      {% else %}
-                        {% if interface_dict.new and interface_dict.old %}
-                          <mark>{{ interface_h.i_ip }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ interface_h.i_ip }}
-                  {% endif %}
-                  {% endspaceless %}
-
-                  {% if not interface_h.active %}</del>{% endif %}
-                </td>
-                <td>
-                  {% if not interface_h.active %}<del>{% endif %}
-
-                  {% spaceless %}
-                  {% if 'i_mac' in interface_h.differences %}
-                    {% with interface_h.differences.i_mac as interface_dict %}
-                      {% if interface_dict.new and not interface_dict.old %}
-                          <ins>{{ interface_h.i_mac }}</ins>
-                      {% else %}
-                        {% if interface_dict.new and interface_dict.old %}
-                          <mark>{{ interface_h.i_mac }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ interface_h.i_mac }}
-                  {% endif %}
-                  {% endspaceless %}
-
-                  {% if not interface_h.active %}</del>{% endif %}
-                </td>
-                <td>
-                  {% if not interface_h.active %}<del>{% endif %}
-
-                  {% spaceless %}
-                  {% if 'i_mask' in interface_h.differences %}
-                    {% with interface_h.differences.i_mask as interface_dict %}
-                      {% if interface_dict.new and not interface_dict.old %}
-                          <ins>{{ interface_h.i_mask }}</ins>
-                      {% else %}
-                        {% if interface_dict.new and interface_dict.old %}
-                          <mark>{{ interface_h.i_mask }}</mark>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-                  {% else %}
-                          {{ interface_h.i_mask }}
-                  {% endif %}
-                  {% endspaceless %}
-
-                  {% if not interface_h.active %}</del>{% endif %}
-                </td>
+                <td>{% differ interface_ver.diff 'i_name' %}{{ interface_ver.fields.i_name }}{% enddiffer %}</td>
+                <td>{% differ interface_ver.diff 'i_ip' %}{{ interface_ver.fields.i_ip }}{% enddiffer %}</td>
+                <td>{% differ interface_ver.diff 'i_mac' %}{{ interface_ver.fields.i_mac }}{% enddiffer %}</td>
+                <td>{% differ interface_ver.diff 'i_mask' %}{{ interface_ver.fields.i_mask }}{% enddiffer %}</td>
                 <td class="timestamp">
-                  <time datetime="{{ interface_h.date_added|date:'c' }}">
-                    {{ interface_h.date_added }}
+                  <time datetime="{{ interface_ver.fields.date_added|date:'c' }}">
+                    {{ interface_ver.fields.date_added }}
                   </time>
                 </td>
               </tr>
-              {% endfor %}
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
             </tbody>
           </table>
 
         </div><!-- #interfaces-history -->
       </section>
 
-<!--
-      <h3>{{ _('Services listening') }}</h3>
-
-      <section class="tabs">
-        <ul>
-          <li><a href="#services-latest" class="latest">{{ _('Current') }}</a></li>
-          <li><a href="#services-history" class="history">{{ _('History') }}</a></li>
-        </ul>
-        <div id="services-latest" class="latest">
-
-          <table>
-            <caption>{{ _('Current') }}</caption>
-            <thead>
-              <tr>
-                <th>{{ _('Process') }}</th>
-                <th>{{ _('Port') }}</th>
-                <th class="timestamp">{{ _('Modified') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  {% if services.processes_split %}
-                  <ul>
-                    {% for process, port in services.processes_dict.items %}
-                    {% spaceless %}
-                    <li>
-                    {# Check if key has been changed. #}
-                    {% if process in services.differences %}
-
-                      {% with services.differences|dict_get:process as process_dict %}
-                        {% if process_dict.new and not process_dict.old %}
-                            <ins>{{ process }}</ins>
-                        {% else %}
-                          {% if process_dict.new and process_dict.old %}
-                            <mark>{{ process }}</mark>
-                          {% endif %}
-
-                          {% if process_dict.deleted %}
-                            <del>{{ process }}</del>
-                          {% endif %}
-                        {% endif %}
-                      {% endwith %}
-
-                    {% else %}
-                            {{ process }}
-                    {% endif %}
-                    </li>
-                    {% endspaceless %}
-                    {% endfor %}
-                  </ul>
-                  {% endif %}
-                </td>
-                <td>
-                  {% if services.ports_split %}
-                  <ul>
-                    {% for process, port in services.processes_dict.items %}
-                    {% spaceless %}
-                    <li>
-                      {# Check if key has been changed. #}
-                      {% if process in services.differences %}
-
-                        {% with services.differences|dict_get:process as process_dict %}
-                          {% if process_dict.new and not process_dict.old %}
-                              <ins>{{ port }}</ins>
-                          {% else %}
-                            {% if process_dict.new and process_dict.old %}
-                              <mark>{{ process_dict.new }}</mark>
-                            {% endif %}
-
-                            {% if process_dict.deleted %}
-                              <del>{{ port }}</del>
-                            {% endif %}
-                          {% endif %}
-                        {% endwith %}
-
-                      {% else %}
-                              {{ port }}
-                      {% endif %}
-                    </li>
-                    {% endspaceless %}
-                    {% endfor %}
-                  </ul>
-                  {% endif %}
-                </td>
-                <td class="timestamp">
-                  <time datetime="{{ services.date_added|date:'c' }}">
-                    {{ services.date_added }}
-                  </time>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-        </div>
-        <div id="services-history" class="history">
-
-          <table class="nested">
-            <caption>{{ _('History') }}</caption>
-            <thead>
-              <tr>
-                <th>{{ _('Process') }}</th>
-                <th>{{ _('Port') }}</th>
-                <th class="timestamp">{{ _('Modified') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-    {% for services_h in services_history %}
-              <tr>
-                <td>
-                  {% if services_h.processes_split %}
-                  <ul>
-                    {% for process, port in services_h.processes_dict.items %}
-                    {% spaceless %}
-                    <li>
-                    {# Check if key has been changed. #}
-                    {% if process in services_h.differences %}
-
-                      {% with services_h.differences|dict_get:process as process_dict %}
-                        {% if process_dict.new and not process_dict.old %}
-                            <ins>{{ process }}</ins>
-                        {% else %}
-                          {% if process_dict.new and process_dict.old %}
-                            <mark>{{ process }}</mark>
-                          {% endif %}
-
-                          {% if process_dict.deleted %}
-                            <del>{{ process }}</del>
-                          {% endif %}
-                        {% endif %}
-                      {% endwith %}
-
-                    {% else %}
-                            {{ process }}
-                    {% endif %}
-
-                    </li>
-                    {% endspaceless %}
-                    {% endfor %}
-                  </ul>
-                  {% endif %}
-                </td>
-                <td>
-                  {% if services_h.ports_split %}
-                  <ul>
-                    {% for process, port in services_h.processes_dict.items %}
-                    {% spaceless %}
-                    <li>
-                      {# Check if key has been changed. #}
-                      {% if process in services_h.differences %}
-
-                        {% with services_h.differences|dict_get:process as process_dict %}
-                          {% if process_dict.new and not process_dict.old %}
-                              <ins>{{ port }}</ins>
-                          {% else %}
-                            {% if process_dict.new and process_dict.old %}
-                              <mark>{{ port }}</mark>
-                            {% endif %}
-
-                            {% if process_dict.deleted %}
-                              <del>{{ port }}</del>
-                            {% endif %}
-                          {% endif %}
-                        {% endwith %}
-
-                      {% else %}
-                              {{ port }}
-                      {% endif %}
-                    </li>
-                    {% endspaceless %}
-                    {% endfor %}
-                  </ul>
-                  {% endif %}
-                </td>
-                <td class="timestamp">
-                  <time datetime="{{ services_h.date_added|date:'c' }}">
-                    {{ services_h.date_added }}
-                  </time>
-                </td>
-              </tr>
-    {% empty %}
-              <tr>
-                <td></td>
-              </tr>
-    {% endfor %}
-            </tbody>
-          </table>
-
-        </div>
-      </section>
--->
 
       <h3>{{ _('Services listening') }}</h3>
 
@@ -923,6 +357,8 @@ function getTabs(section) {
                   {% if process in services.differences %}
 
                     {% with services.differences|dict_get:process as process_dict %}
+
+
                       {% if process_dict.new and not process_dict.old %}
                           <ins>{{ process }}</ins>
                       {% else %}
@@ -934,6 +370,8 @@ function getTabs(section) {
                           <del>{{ process }}</del>
                         {% endif %}
                       {% endif %}
+
+
                     {% endwith %}
 
                   {% else %}
