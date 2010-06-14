@@ -57,6 +57,9 @@ def diff_dict(a, b, delimiter=None):
             if key not in a:
                 added[key] = value
 
+    diffs = {'removed': removed, 'added': added, 'changed': changed,
+             'unchanged': unchanged}
+
     # To determine the differences of key/value pairs, the key and value fields
     # are split, merged as dictionaries, and subsequently compared.
 
@@ -74,22 +77,22 @@ def diff_dict(a, b, delimiter=None):
                 a_pair_v = re.split(delimiter, a[key]) if key in a else []
                 b_pair_v = re.split(delimiter, value)
 
+
         if key_name and value_name:
             a_pair_dict = dict(zip(a_pair_k, a_pair_v))
             b_pair_dict = dict(zip(b_pair_k, b_pair_v))
             pair = diff_dict(a_pair_dict, b_pair_dict)
+
+            # Merge previous and current dictionaries.
+            b = dict(a_pair_dict, **b_pair_dict)
         elif value_name:
             pair = diff_list(a_pair_v, b_pair_v)
 
-    diffs = {'removed': removed, 'added': added, 'changed': changed,
-             'unchanged': unchanged}
+            # Similarly, merge lists.
+            b = list(a_pair_v, **b_pair_v)
 
-    if delimiter:
-        if b_pair_dict:
-            b = b_pair_dict
-        elif b_pair_v:
-            b = b_pair_v
-        diffs['pair'] = {'merged': b, 'diff': pair}
+        if value_name:
+            diffs['pair'] = {'merged': b, 'diff': pair}
 
     return diffs
 

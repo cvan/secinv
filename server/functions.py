@@ -84,13 +84,11 @@ class ServerFunctions:
 
         ## Machine.
         try:
-            m_obj = None
-
             m_objs = Machine.objects.filter(sys_ip=self.machine_ip).all()
-            if m_objs:
+            if m_objs.exists():
                 m_obj = m_objs[0]
             else:
-                # Find machine by hostname if we cannot find by ip address.
+                # Find machine by hostname if it cannot be found by IP address.
                 m_obj = Machine.objects.filter(
                     hostname=system_dict['hostname']).all()[0]
 
@@ -109,20 +107,18 @@ class ServerFunctions:
             if m_diff:
                 m_obj.date_modified = datetime.datetime.now()
 
-            with reversion.revision:
+                # To update `sys_ip` and `hostname`.
+                with reversion.revision:
+                    m_obj.save()
+            else:
+                # To update `date_scanned`.
                 m_obj.save()
 
             self.machine_obj = m_obj
             self.machine_id = self.machine_obj.id
+
         except IndexError:
             # Add machine if not in table.
-
-            #mach_dict = {'sys_ip': self.machine_ip,
-            #             'hostname': system_dict['hostname'],
-            #             'ext_ip': '',
-            #             'date_scanned': datetime.datetime.now()}
-            #m_new = Machine.objects.create(**mach_dict)
-
             m_new = Machine.objects.create(sys_ip=self.machine_ip,
                 hostname=system_dict['hostname'],
                 date_scanned=datetime.datetime.now())
@@ -151,21 +147,11 @@ class ServerFunctions:
                 i_object = Interface.objects.filter(machine__id=self.machine_id,
                                                     i_name=interface).latest()
 
-                i_diff = False
-                if i_object.i_ip != ip_dict[interface]['i_ip']:
-                    i_diff = True
+                if i_object.i_ip != ip_dict[interface]['i_ip'] or \
+                   i_object.i_mac != ip_dict[interface]['i_mac'] or \
+                   i_object.i_mask != ip_dict[interface]['i_mask'] or \
+                   not i_object.active:
 
-                if i_object.i_mac != ip_dict[interface]['i_mac']:
-                    i_diff = True
-
-                if i_object.i_mask != ip_dict[interface]['i_mask']:
-                    i_diff = True
-
-                # If it was inactive, it's active now.
-                if not i_object.active:
-                    i_diff = True
-
-                if i_diff:
                     i_object.machine = self.machine_obj
                     i_object.i_name = interface
                     i_object.i_ip = ip_dict[interface]['i_ip']
@@ -176,16 +162,7 @@ class ServerFunctions:
                     with reversion.revision:
                         i_object.save()
 
-                    #i_object = Interface.objects.create(**i_dict)
-
             except Interface.DoesNotExist:
-                #i_dict = {'machine': self.machine_obj,
-                #          'i_name': interface,
-                #          'i_ip': ip_dict[interface]['i_ip'],
-                #          'i_mac': ip_dict[interface]['i_mac'],
-                #          'i_mask': ip_dict[interface]['i_mask']}
-                #i_object = Interface.objects.create(**i_dict)
-
                 i_new = Interface.objects.create(machine=self.machine_obj,
                     i_name=interface,
                     i_ip=ip_dict[interface]['i_ip'],
@@ -194,8 +171,6 @@ class ServerFunctions:
                 with reversion.revision:
                     i_new.save()
 
-        # See if any interfaces have since been deactivated.
-
         # Get latest interfaces (select by distinct interface name).
         distinct_interfaces = Interface.objects.filter(
             machine__id=self.machine_id, active=True).values_list(
@@ -203,7 +178,7 @@ class ServerFunctions:
 
         i_diff = diff_list(distinct_interfaces, ip_dict.keys())
 
-        # Update each interface as inactive.
+        # Update each deactivated interface as inactive.
         for i in i_diff['deleted']:
             try:
                 i_latest = Interface.objects.filter(machine__id=self.machine_id,
@@ -211,47 +186,21 @@ class ServerFunctions:
             except Interface.DoesNotExist:
                 continue
 
-            #i_latest = Interface.objects.filter(machine__id=self.machine_id,
-            #                                    i_name=i).latest()
-            print '- deleting', i
-            #i_latest.delete()
-
             i_latest.active = False
             with reversion.revision:
                 i_latest.save()
 
-            #i_dict = {'machine': self.machine_obj,
-            #          'i_name': i_latest.i_name,
-            #          'i_ip': i_latest.i_ip,
-            #          'i_mac': i_latest.i_mac,
-            #          'i_mask': i_latest.i_mask,
-            #          'active': False}
-            #i_object = Interface.objects.create(**i_dict)
-
 
         ## System.
         try:
-            print 'getting system'
             sys_object = System.objects.filter(
                 machine__id=self.machine_id).latest()
 
-            sys_diff = False
+            if sys_object.kernel_rel != system_dict['kernel_rel'] or \
+               sys_object.rh_rel != system_dict['rh_rel'] or \
+               sys_object.nfs != system_dict['nfs'] or \
+               sys_object.ip_fwd != system_dict['ip_fwd']:
 
-            if sys_object.kernel_rel != system_dict['kernel_rel']:
-                sys_diff = True
-
-            if sys_object.rh_rel != system_dict['rh_rel']:
-                sys_diff = True
-
-            if sys_object.nfs != system_dict['nfs']:
-                sys_diff = True
-
-            if sys_object.ip_fwd != system_dict['ip_fwd']:
-                sys_diff = True
-
-            print sys_diff
-            if sys_diff:
-                print 'updating system'
                 sys_object.machine = self.machine_obj
                 sys_object.kernel_rel = system_dict['kernel_rel']
                 sys_object.rh_rel = system_dict['rh_rel']
@@ -262,22 +211,7 @@ class ServerFunctions:
                 with reversion.revision:
                     sys_object.save()
 
-                #sys_dict = {'machine': self.machine_obj,
-                #            'kernel_rel': system_dict['kernel_rel'],
-                #            'rh_rel': system_dict['rh_rel'],
-                #            'nfs': system_dict['nfs'],
-                #            'ip_fwd': system_dict['ip_fwd'],
-                #            'iptables': ipt_dict['status']}
-                #sys_object = System.objects.create(**sys_dict)
-
         except System.DoesNotExist:
-            print 'system does not exist'
-            #sys_dict = {'machine': self.machine_obj,
-            #            'kernel_rel': system_dict['kernel_rel'],
-            #            'rh_rel': system_dict['rh_rel'],
-            #            'nfs': system_dict['nfs'],
-            #            'ip_fwd': system_dict['ip_fwd'],
-            #            'iptables': ipt_dict['status']}
             sys_object = System.objects.create(machine=self.machine_obj,
                 kernel_rel=system_dict['kernel_rel'],
                 rh_rel=system_dict['rh_rel'],
@@ -298,15 +232,9 @@ class ServerFunctions:
             s_object = Services.objects.filter(
                 machine__id=self.machine_id).latest()
 
-            s_diff = False
+            if s_object.k_processes != csv_procs or \
+               s_object.v_ports != csv_ports:
 
-            if s_object.k_processes != csv_procs:
-                s_diff = True
-
-            if s_object.v_ports != csv_ports:
-                s_diff = True
-
-            if s_diff:
                 s_object.machine = self.machine_obj
                 s_object.k_processes = csv_procs
                 s_object.v_ports = csv_ports
@@ -335,30 +263,16 @@ class ServerFunctions:
         try:
             r_object = RPMs.objects.filter(machine__id=self.machine_id).latest()
 
-            r_diff = False
-
             # TODO: Change rpms_dict.
-            # TODO: Get rid of _diff booleans.
 
             if r_object.v_rpms != rpms_dict['list']:
-                r_diff = True
-
-            if r_diff:
                 r_object.machine = self.machine_obj
                 r_object.v_rpms = rpms_dict['list']
                 r_object.date_added = datetime.datetime.now()
                 with reversion.revision:
                     r_object.save()
 
-                #r_dict = {'machine': self.machine_obj,
-                #          'rpms': rpms_dict['list']}
-
-                #r_object = RPMs.objects.create(**r_dict)
-
         except RPMs.DoesNotExist:
-            #r_dict = {'machine': self.machine_obj,
-            #          'rpms': rpms_dict['list']}
-            #r_object = RPMs.objects.create(**r_dict)
             r_object = RPMs.objects.create(machine=self.machine_obj,
                                            v_rpms=rpms_dict['list'])
             with reversion.revision:
@@ -375,15 +289,9 @@ class ServerFunctions:
             s_object = SSHConfig.objects.filter(
                 machine__id=self.machine_id).latest()
 
-            s_diff = False
+            if s_object.k_parameters != csv_params or \
+               s_object.v_values != csv_values:
 
-            if s_object.parameters != csv_params:
-                s_diff = True
-
-            if s_object.values != csv_values:
-                s_diff = True
-
-            if s_diff:
                 s_object.machine = self.machine_obj
                 s_object.k_parameters = csv_params
                 s_object.v_values = csv_values
@@ -391,16 +299,7 @@ class ServerFunctions:
                 with reversion.revision:
                     s_object.save()
 
-                #s_dict = {'machine': self.machine_obj,
-                #          'parameters': csv_params,
-                #          'values': csv_values}
-                #s_object = SSHConfig.objects.create(**s_dict)
-
         except SSHConfig.DoesNotExist:
-            #s_dict = {'machine': self.machine_obj,
-            #          'parameters': csv_params,
-            #          'values': csv_values}
-            #s_object = SSHConfig.objects.create(**s_dict)
             s_object = SSHConfig.objects.create(machine=self.machine_obj,
                                                 k_parameters=csv_params,
                                                 v_values=csv_values)
@@ -409,7 +308,7 @@ class ServerFunctions:
 
 
         ## iptables.
-        print 'Received iptables dictionary:\n'
+        #print 'Received iptables dictionary:\n'
         iptables_rules = ipt_dict['rules']
         #print iptables_rules
 
@@ -441,8 +340,6 @@ class ServerFunctions:
                         i_dict = {}
                         IPTableChain.objects.create(**i_dict)
                 except IPTableChain.DoesNotExist:
-                    print 'inserting IP TABLE CHAIN'
-                    #print chain
                     i_dict = {'table': ipt_table,
                               'name': chain['name'],
                               'policy': chain['policy'],
@@ -464,8 +361,6 @@ class ServerFunctions:
                         IPTableRule.objects.create(**i_dict)
 
                 except IPTableRule.DoesNotExist:
-                    print 'inserting IP TABLE RULE'
-                    #print rule
                     i_dict = {'table': ipt_table,
                               'rule': rule}
                     IPTableRule.objects.create(**i_dict)

@@ -153,10 +153,11 @@ class DifferNode(template.Node):
         if 'removed' in diff_dict and field_name in diff_dict['removed']:
             emphasis_tag = 'del'
 
+        output = self.nodelist.render(context)
+
         emphasis_start = ('<%s>' % emphasis_tag) if len(emphasis_tag) else ''
         emphasis_end = ('</%s>' % emphasis_tag) if len(emphasis_tag) else ''
 
-        output = self.nodelist.render(context)
         return '%s%s%s' % (emphasis_start, output, emphasis_end)
 
 
