@@ -174,19 +174,19 @@ function getTabs(section) {
             <tbody>
               <tr>
                 <td>
-                  {% differ system.diff.diff 'kernel_rel' %}{{ system.kernel_rel }}{% enddiffer %}
+                  {% differ system.version_changes.diff 'kernel_rel' %}{{ system.kernel_rel }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.diff.diff 'rh_rel' %}{{ system.rh_rel }}{% enddiffer %}
+                  {% differ system.version_changes.diff 'rh_rel' %}{{ system.rh_rel }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.diff.diff 'nfs' %}{{ system.nfs|enum:'Yes,No' }}{% enddiffer %}
+                  {% differ system.version_changes.diff 'nfs' %}{{ system.nfs|enum:'Yes,No' }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.diff.diff 'ip_fwd' %}{{ system.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
+                  {% differ system.version_changes.diff 'ip_fwd' %}{{ system.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.diff.diff 'iptables' %}{{ system.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
+                  {% differ system.version_changes.diff 'iptables' %}{{ system.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td class="timestamp">
                   <time datetime="{{ system.date_added|date:'c' }}">
@@ -270,10 +270,10 @@ function getTabs(section) {
             <tbody>
           {% for interface in interfaces %}
               <tr>
-                <td>{% differ interface.diff.diff 'i_name' %}{{ interface.i_name }}{% enddiffer %}</td>
-                <td>{% differ interface.diff.diff 'i_ip' %}{{ interface.i_ip }}{% enddiffer %}</td>
-                <td>{% differ interface.diff.diff 'i_mac' %}{{ interface.i_mac }}{% enddiffer %}</td>
-                <td>{% differ interface.diff.diff 'i_mask' %}{{ interface.i_mask }}{% enddiffer %}</td>
+                <td>{% differ interface.version_changes.diff 'i_name' %}{{ interface.i_name }}{% enddiffer %}</td>
+                <td>{% differ interface.version_changes.diff 'i_ip' %}{{ interface.i_ip }}{% enddiffer %}</td>
+                <td>{% differ interface.version_changes.diff 'i_mac' %}{{ interface.i_mac }}{% enddiffer %}</td>
+                <td>{% differ interface.version_changes.diff 'i_mask' %}{{ interface.i_mask }}{% enddiffer %}</td>
                 <td class="timestamp">
                   <time datetime="{{ interface.date_added|date:'c' }}">
                     {{ interface.date_added }}
@@ -350,13 +350,13 @@ function getTabs(section) {
               <tr>
                 <td colspan="2">
                   <table>
-                  {% for process, port in services.diff.diff.pair.merged.items %}
+                  {% for process, port in services.version_changes.diff.pair.merged.items %}
                     <tr>
                       <td class="pair_name">
-                        {% differ services.diff.diff.pair.diff process %}{{ process }}{% enddiffer %}
+                        {% differ services.version_changes.diff.pair.diff process %}{{ process }}{% enddiffer %}
                       </td>
                       <td class="pair_port">
-                        {% differ services.diff.diff.pair.diff process %}{{ port }}{% enddiffer %}
+                        {% differ services.version_changes.diff.pair.diff process %}{{ port }}{% enddiffer %}
                       </td>
                     </tr>
                   {% endfor %}
@@ -442,76 +442,33 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
-
-    {% if sshconfig %}
-        <tr>
-          <td colspan="2">
-            <table>
-            {% for parameter, value in sshconfig.parameters_dict.items %}
+            {% if sshconfig %}
               <tr>
-                <td class="pair_name">
-                {% spaceless %}
-                  {% if parameter in sshconfig.differences %}
-
-                    {% with sshconfig.differences|dict_get:parameter as parameter_dict %}
-                      {% if parameter_dict.new and not parameter_dict.old %}
-                          <ins>{{ parameter }}</ins>
-                      {% else %}
-                        {% if parameter_dict.new and parameter_dict.old %}
-                          <mark>{{ parameter }}</mark>
-                        {% endif %}
-
-                        {% if parameter_dict.deleted %}
-                          <del>{{ parameter }}</del>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-
-                  {% else %}
-                          {{ parameter }}
-                  {% endif %}
-                {% endspaceless %}
+                <td colspan="2">
+                  <table>
+                  {% for process, port in sshconfig.version_changes.diff.pair.merged.items %}
+                    <tr>
+                      <td class="pair_name">
+                        {% differ sshconfig.version_changes.diff.pair.diff process %}{{ process }}{% enddiffer %}
+                      </td>
+                      <td class="pair_port">
+                        {% differ sshconfig.version_changes.diff.pair.diff process %}{{ port }}{% enddiffer %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  </table>
                 </td>
-                <td class="pair_value">
-                {% spaceless %}
-                  {% if parameter in sshconfig.differences %}
-
-                    {% with sshconfig.differences|dict_get:parameter as parameter_dict %}
-                      {% if parameter_dict.new and not parameter_dict.old %}
-                          <ins>{{ parameter_dict.new }}</ins>
-                      {% else %}
-                        {% if parameter_dict.new and parameter_dict.old %}
-                          <mark>{{ parameter_dict.new }}</mark>
-                        {% endif %}
-
-                        {% if parameter_dict.deleted %}
-                          <del>{{ parameter_dict.deleted }}</del>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-
-                  {% else %}
-                          {{ value }}
-                  {% endif %}
-                {% endspaceless %}
+                <td class="timestamp">
+                  <time datetime="{{ sshconfig.date_added|date:'c' }}">
+                    {{ sshconfig.date_added }}
+                  </time>
                 </td>
               </tr>
-            {% endfor %}
-            </table>
-          </td>
-          <td class="timestamp">
-            <time datetime="{{ sshconfig.date_added|date:'c' }}">
-              {{ sshconfig.date_added }}
-            </time>
-          </td>
-        </tr>
-
-    {% else %}
+            {% else %}
               <tr>
                 <td></td>
               </tr>
-    {% endif %}
-
+            {% endif %}
             </tbody>
           </table>
 
@@ -528,76 +485,33 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
-    {% for sshconfig_h in sshconfig_history %}
-
-        <tr>
-          <td colspan="2">
-            <table>
-            {% for parameter, value in sshconfig_h.parameters_dict.items %}
+            {% for sshconfig_h in sshconfig_versions %}
               <tr>
-                <td class="pair_name">
-                {% spaceless %}
-                  {% if parameter in sshconfig_h.differences %}
-
-                    {% with sshconfig_h.differences|dict_get:parameter as parameter_dict %}
-                      {% if parameter_dict.new and not parameter_dict.old %}
-                          <ins>{{ parameter }}</ins>
-                      {% else %}
-                        {% if parameter_dict.new and parameter_dict.old %}
-                          <mark>{{ parameter }}</mark>
-                        {% endif %}
-
-                        {% if parameter_dict.deleted %}
-                          <del>{{ parameter }}</del>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-
-                  {% else %}
-                          {{ parameter }}
-                  {% endif %}
-                {% endspaceless %}
+                <td colspan="2">
+                  <table>
+                  {% for process, port in sshconfig_h.diff.pair.merged.items %}
+                    <tr>
+                      <td class="pair_name">
+                        {% differ sshconfig_h.diff.pair.diff process %}{{ process }}{% enddiffer %}
+                      </td>
+                      <td class="pair_port">
+                        {% differ sshconfig_h.diff.pair.diff process %}{{ port }}{% enddiffer %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  </table>
                 </td>
-                <td class="pair_value">
-                {% spaceless %}
-                  {% if parameter in sshconfig_h.differences %}
-
-                    {% with sshconfig_h.differences|dict_get:parameter as parameter_dict %}
-                      {% if parameter_dict.new and not parameter_dict.old %}
-                          <ins>{{ parameter_dict.new }}</ins>
-                      {% else %}
-                        {% if parameter_dict.new and parameter_dict.old %}
-                          <mark>{{ parameter_dict.new }}</mark>
-                        {% endif %}
-
-                        {% if parameter_dict.deleted %}
-                          <del>{{ parameter_dict.deleted }}</del>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-
-                  {% else %}
-                          {{ value }}
-                  {% endif %}
-                {% endspaceless %}
+                <td class="timestamp">
+                  <time datetime="{{ sshconfig_h.fields.date_added|date:'c' }}">
+                    {{ sshconfig_h.fields.date_added }}
+                  </time>
                 </td>
               </tr>
-            {% endfor %}
-            </table>
-          </td>
-          <td class="timestamp">
-            <time datetime="{{ sshconfig_h.date_added|date:'c' }}">
-              {{ sshconfig_h.date_added }}
-            </time>
-          </td>
-        </tr>
-
-    {% empty %}
+            {% empty %}
               <tr>
                 <td></td>
               </tr>
-    {% endfor %}
-
+            {% endfor %}
             </tbody>
           </table>
 

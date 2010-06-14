@@ -77,7 +77,6 @@ def diff_dict(a, b, delimiter=None):
                 a_pair_v = re.split(delimiter, a[key]) if key in a else []
                 b_pair_v = re.split(delimiter, value)
 
-
         if key_name and value_name:
             a_pair_dict = dict(zip(a_pair_k, a_pair_v))
             b_pair_dict = dict(zip(b_pair_k, b_pair_v))
@@ -159,6 +158,7 @@ def detail(request, machine_slug):
     p = get_object_or_404(Machine, hostname=machine_slug)
     query = request.GET.get('q', '')
 
+    ## System.
     system_latest = []
     system_history = System.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
@@ -167,10 +167,10 @@ def detail(request, machine_slug):
     system_versions = get_version_diff(system_history[0])
 
     if system_history.exists():
-        system_latest = System.objects.filter(machine__id=p.id).latest()
-        #system_latest = system_versions[0]
+        system_latest = system_history[0]
 
 
+    ## Services.
     services_latest = []
     services_history = Services.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
@@ -179,9 +179,45 @@ def detail(request, machine_slug):
     services_versions = get_version_diff(services_history[0], ',')
 
     if services_history.exists():
-        services_latest = Services.objects.filter(machine__id=p.id).latest()
+        services_latest = services_history[0]
 
 
+    ## Interfaces.
+
+    # Get latest interfaces (select by distinct interface name).
+    distinct_interfaces = Interface.objects.filter(
+        machine__id=p.id).values_list('i_name', flat=True).distinct()
+
+    interfaces_latest = []
+    interfaces_added_ids = []
+    for i in distinct_interfaces:
+        i_latest = Interface.objects.filter(machine__id=p.id,
+                                            i_name=i).latest()
+        interfaces_latest.append(i_latest)
+
+    # Get all unique interfaces.
+    interfaces_versions = []
+    for i in interfaces_latest:
+        i_v = get_version_diff(i)
+        interfaces_versions += i_v
+
+    interfaces_versions = sorted(interfaces_versions,
+                                 key=lambda k: k['timestamp'], reverse=True)
+
+
+    ## SSHConfig.
+    sshconfig_latest = []
+    sshconfig_history = SSHConfig.objects.filter(machine__id=p.id).order_by(
+        '-date_added').all()
+
+    # Get historical versions of SSHConfig objects.
+    sshconfig_versions = get_version_diff(sshconfig_history[0], '\n')
+
+    if sshconfig_history.exists():
+        sshconfig_latest = sshconfig_history[0]
+
+
+    # RPMs.
     rpms_list = []
     rpms_date_added = None
     rpms_history = RPMs.objects.filter(machine__id=p.id).order_by(
@@ -197,83 +233,19 @@ def detail(request, machine_slug):
     rpms_latest = {'installed': rpms_list, 'date_added': rpms_date_added}
 
 
-    # Get latest interfaces (select by distinct interface name).
-    distinct_interfaces = Interface.objects.filter(
-        machine__id=p.id).values_list('i_name', flat=True).distinct()
-
-    interfaces_latest = []
-    interfaces_added_ids = []
-    for i in distinct_interfaces:
-        i_latest = Interface.objects.filter(machine__id=p.id,
-                                            i_name=i).latest()
-        interfaces_latest.append(i_latest)
-
-        # *** add to dict_diff: Mark oldest of each interface as 'added'. ***
-        i_oldest = Interface.objects.filter(machine__id=p.id,
-            i_name=i).order_by('date_added').all()
-        if i_oldest.exists():
-            interfaces_added_ids.append(i_oldest[0].id)
-
-        v_previous = Version.objects.get_for_object(i_latest).order_by('-revision')
-
-        #i_previous = Interface.objects.filter(machine__id=p.id,
-        #    i_name=i, active=False).exclude(id=i_latest.id).order_by(
-        #    '-date_added').all()
-        if v_previous:
-            # If second most recent interface was inactive but the latest
-            # interface is now active, then mark it as "added."
-            #interfaces_added_ids.append(v_previous.object_id)
-            pass
-
-    interfaces_history = Interface.objects.filter(machine__id=p.id).order_by(
-        '-date_added').all()
-
-
-    #interfaces_versions = get_version_diff(interfaces_history[0])
-
-    # Get all unique interfaces.
-    interfaces_versions = []
-    for i in interfaces_latest:
-        i_v = get_version_diff(i)
-        interfaces_versions += i_v
-
-    #interfaces_newest = interfaces_versions[0]
-
-    interfaces_versions = sorted(interfaces_versions,
-                                 key=lambda k: k['timestamp'], reverse=True)
-
-    #for i in interfaces_versions:
-    #    i['fields']['date_added']
-
-    #interfaces_versions = [get_version_diff(i) for i in interfaces_latest]
-
-    #interfaces_versions = Version.objects.get_deleted(Interface)
-
-
-    sshconfig_latest = []
-    sshconfig_history = SSHConfig.objects.filter(machine__id=p.id).order_by(
-        '-date_added').all()
-
-    if sshconfig_history.exists():
-        sshconfig_latest = SSHConfig.objects.filter(machine__id=p.id).latest()
-
 
     template_context = {'query': query,
                         'machine': p,
                         'system': system_latest,
-                        'system_history': system_history,
                         'system_versions': system_versions,
                         'services': services_latest,
-                        'services_history': services_history,
                         'services_versions': services_versions,
                         'rpms': rpms_latest,
                         'rpms_history': rpms_history,
                         'interfaces': interfaces_latest,
-                        'interfaces_history': interfaces_history,
                         'interfaces_versions': interfaces_versions,
-                        'interfaces_added': interfaces_added_ids,
                         'sshconfig': sshconfig_latest,
-                        'sshconfig_history': sshconfig_history}
+                        'sshconfig_versions': sshconfig_versions}
     return render_to_response('machines/detail.html', template_context,
         context_instance=RequestContext(request))
 

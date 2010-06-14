@@ -26,27 +26,23 @@ import BaseHTTPServer
 import SimpleHTTPServer
 import SimpleXMLRPCServer
 import SocketServer
-
-from OpenSSL import SSL
 import os
 import socket
+
+from OpenSSL import SSL
+
 
 class SecureXMLRPCServer(BaseHTTPServer.HTTPServer,
                          SimpleXMLRPCServer.SimpleXMLRPCDispatcher):
     def __init__(self, server_address, HandlerClass, logRequests=True):
-        """
-        Secure XML-RPC server.
-
-        It it very similar to SimpleXMLRPCServer but it uses HTTPS for
-        transporting XML data.
-        """
+        """Secure XML-RPC server based on SimpleXMLRPCServer, using HTTPS."""
         self.logRequests = logRequests
 
         try:
             SimpleXMLRPCServer.SimpleXMLRPCDispatcher.__init__(self)
         except TypeError:
-            # An exception is raised in Python 2.5 as the prototype of the __init__
-            # method has changed and now has 3 arguments (self, allow_none, encoding)
+            # An exception is raised in Python 2.5, as the __init__ method
+            # instead accepts three arguments: self, allow_none, encoding.
             SimpleXMLRPCServer.SimpleXMLRPCDispatcher.__init__(self, False, None)
 
         SocketServer.BaseServer.__init__(self, server_address, HandlerClass)
@@ -59,16 +55,11 @@ class SecureXMLRPCServer(BaseHTTPServer.HTTPServer,
         self.server_activate()
 
 class SecureXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
-    """
-    Secure XML-RPC request handler class.
-
-    It it very similar to SimpleXMLRPCRequestHandler but it uses HTTPS for
-    transporting XML data.
-    """
+    """Secure XML-RPC request handler class."""
     def setup(self):
         self.connection = self.request
-        self.rfile = socket._fileobject(self.request, "rb", self.rbufsize)
-        self.wfile = socket._fileobject(self.request, "wb", self.wbufsize)
+        self.rfile = socket._fileobject(self.request, 'rb', self.rbufsize)
+        self.wfile = socket._fileobject(self.request, 'wb', self.wbufsize)
         
     def do_POST(self):
         """
@@ -80,7 +71,7 @@ class SecureXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
 
         try:
             # Get arguments.
-            data = self.rfile.read(int(self.headers["content-length"]))
+            data = self.rfile.read(int(self.headers['content-length']))
 
             # In previous versions of SimpleXMLRPCServer, _dispatch
             # could be overridden in this class, instead of in
@@ -97,8 +88,8 @@ class SecureXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
         else:
             # Received a valid XML-RPC response.
             self.send_response(200)
-            self.send_header("Content-type", "text/xml")
-            self.send_header("Content-length", str(len(response)))
+            self.send_header('Content-type', 'text/xml')
+            self.send_header('Content-length', str(len(response)))
             self.end_headers()
             self.wfile.write(response)
 
@@ -109,9 +100,7 @@ class SecureXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
 
 def process(HandlerClass=SecureXMLRPCRequestHandler,
             ServerClass=SecureXMLRPCServer):
-    """
-    Process XML-RPC commands over HTTPS server.
-    """
+    """Process XML-RPC commands over HTTPS server."""
 
     from functions import ServerFunctions
 

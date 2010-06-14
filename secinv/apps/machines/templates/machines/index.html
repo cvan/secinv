@@ -35,7 +35,7 @@
                 {{ machine.hostname }}
               </a>
             </td>
-            <td>{{ machine.ext_ip }}</td>
+            <td>{% if machine.ext_ip == 'None' %}{{ machine.ext_ip }}{% endif %}</td>
             <td title="{% if machine.httpd %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
                 class="{% if machine.httpd %}enabled{% else %}disabled{% endif %}">
               <mark>{% if machine.httpd %}&#10004;{% else %}&#10006;{% endif %}</mark>

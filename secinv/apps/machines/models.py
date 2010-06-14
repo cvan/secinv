@@ -101,7 +101,6 @@ def diff_dict2(a, b, delimiter=None):
                 a_pair_v = re.split(delimiter, a[key]) if key in a else []
                 b_pair_v = re.split(delimiter, value)
 
-
         if key_name and value_name:
             a_pair_dict = dict(zip(a_pair_k, a_pair_v))
             b_pair_dict = dict(zip(b_pair_k, b_pair_v))
@@ -252,7 +251,7 @@ class Interface(models.Model):
         return u'%s - %s - %s - %s' % (self.i_name, self.i_ip, self.i_mac,
                                        self.i_mask)
 
-    def diff(self):
+    def version_changes(self):
         """
         Create a dictionary of the differences between the current and previous
         interface of the same interface name.
@@ -294,7 +293,7 @@ class System(models.Model):
                                             self.nfs, self.ip_fwd,
                                             self.iptables)
 
-    def diff(self):
+    def version_changes(self):
         """
         Create a dictionary of the differences between the current and previous
         entry of the system info.
@@ -322,7 +321,6 @@ if not reversion.is_registered(System):
 
 class Services(models.Model):
     machine = models.ForeignKey('Machine')
-
     # TODO: Use TextFields.
     k_processes = models.CharField(_('processes'), max_length=255, blank=True,
                                    null=True)
@@ -331,7 +329,7 @@ class Services(models.Model):
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
-    def diff(self):
+    def version_changes(self):
         """
         Create a dictionary of the differences between the current and previous
         services entries.
@@ -357,6 +355,53 @@ class Services(models.Model):
 
 if not reversion.is_registered(Services):
     reversion.register(Services)
+
+
+class SSHConfig(models.Model):
+    machine = models.ForeignKey('Machine')
+    k_parameters = models.TextField(_('parameters'), blank=True, null=True)
+    v_values = models.TextField(_('values'), blank=True, null=True)
+    date_added = models.DateTimeField(_('date added'), editable=False,
+                                      default=datetime.datetime.now)
+
+    def version_changes(self):
+        """
+        Create a dictionary of the differences between the current and previous
+        SSH configuration entries.
+        """
+        s_diff = {}
+
+        try:
+            s_latest = SSHConfig.objects.get(machine__id=self.machine_id)
+            s_v = get_version_diff(s_latest, '\n')
+            if s_v:
+                s_diff = s_v[0]
+            else:
+                s_diff = {'empty': 'itis'}
+        except SSHConfig.DoesNotExist:
+            pass
+
+        return s_diff
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.k_parameters, self.v_values)
+
+    class Meta:
+        verbose_name = _('SSHConfig')
+        verbose_name_plural = _('SSHConfig')
+        get_latest_by = 'date_added'
+
+if not reversion.is_registered(SSHConfig):
+    reversion.register(SSHConfig)
+
+'''
+class ApacheConfig(models.Model):
+    machine = models.ForeignKey('Machine')
+    parameters = models.TextField(blank=True, null=True)
+    values = models.TextField(blank=True, null=True)
+    date_added = models.DateTimeField(_('date added'), editable=False,
+                                      default=datetime.datetime.now)
+'''
 
 
 class RPMs(models.Model):
@@ -388,84 +433,6 @@ class RPMs(models.Model):
 
 if not reversion.is_registered(RPMs):
     reversion.register(RPMs)
-
-
-class SSHConfig(models.Model):
-    machine = models.ForeignKey('Machine')
-    k_parameters = models.TextField(_('parameters'), blank=True, null=True)
-    v_values = models.TextField(_('values'), blank=True, null=True)
-    date_added = models.DateTimeField(_('date added'), editable=False,
-                                      default=datetime.datetime.now)
-
-    def differences(self):
-        """
-        Create a dictionary of the differences between the latest
-        and the previous SSH configuration files.
-        """
-        s_older = SSHConfig.objects.filter(
-            machine__id=self.machine_id).exclude(id=self.id).filter(
-            date_added__lt=self.date_added).order_by('-date_added').all()
-
-        s_previous = {}
-        if s_older.exists():
-            # TODO: remove carriage returns?
-            s_params = re.split('\n', s_older[0].k_parameters.replace('\r', ''))
-            s_values = re.split('\n', s_older[0].v_values.replace('\r', ''))
-            s_previous = dict(zip(s_params, s_values))
-
-        s_params = re.split('\n', self.k_parameters.replace('\r', ''))
-        s_values = re.split('\n', self.v_values.replace('\r', ''))
-        s_latest = dict(zip(s_params, s_values))
-
-        return diff_dict(s_previous, s_latest)
-
-    def parameters_split(self):
-        return re.split('\n', self.k_parameters.replace('\r', ''))
-
-    def values_split(self):
-        return re.split('\n', self.v_values.replace('\r', ''))
-
-    def parameters_dict(self):
-        """
-        Merge and return latest and previous dictionaries of parameters/values.
-        """
-        # TODO: merge_diff(s_older, self, fields=['parameters', 'values'], delimeter='')
-
-        s_older = SSHConfig.objects.filter(
-            machine__id=self.machine_id).exclude(id=self.id).filter(
-            date_added__lt=self.date_added).order_by('-date_added').all()
-
-        s_previous = {}
-        if s_older.exists():
-            s_params = re.split('\n', s_older[0].k_parameters.replace('\r', ''))
-            s_values = re.split('\n', s_older[0].v_values.replace('\r', ''))
-            s_previous = dict(zip(s_params, s_values))
-
-        s_params = re.split('\n', self.k_parameters.replace('\r', ''))
-        s_values = re.split('\n', self.v_values.replace('\r', ''))
-        s_latest = dict(zip(s_params, s_values))
-
-        return dict(s_latest, **s_previous)
-
-    def __unicode__(self):
-        return u'%s - %s' % (self.k_parameters, self.v_values)
-
-    class Meta:
-        verbose_name = _('SSHConfig')
-        verbose_name_plural = _('SSHConfig')
-        get_latest_by = 'date_added'
-
-#if not reversion.is_registered(SSHConfig):
-#    reversion.register(SSHConfig)
-
-'''
-class ApacheConfig(models.Model):
-    machine = models.ForeignKey('Machine')
-    parameters = models.TextField(blank=True, null=True)
-    values = models.TextField(blank=True, null=True)
-    date_added = models.DateTimeField(_('date added'), editable=False,
-                                      default=datetime.datetime.now)
-'''
 
 
 class IPTable(models.Model):
