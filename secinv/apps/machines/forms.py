@@ -7,8 +7,9 @@ class MachineSearchForm(BaseSearchForm):
         base_qs = Machine.objects
         search_fields = ['sys_ip', 'hostname', 'ext_ip',
                          'system__kernel_rel', 'system__rh_rel', 'system__nfs',
-                         'services__processes', 'services__ports',
-                         'rpms__rpms',
+                         'system__ip_fwd', 'system__iptables',
+                         'services__k_processes', 'services__v_ports',
+                         'rpms__v_rpms',
                          'interface__i_name', 'interface__i_ip',
                          'interface__i_mac', 'interface__i_mask']
 

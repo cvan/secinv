@@ -8,7 +8,7 @@
         <h2>{{ _('Machines') }}</h2>
       </hgroup>
 
-{% if machine_list %}
+{% if machines %}
 {# TODO: Pagination #}
       <table class="wide">
         <caption>{{ _('Machines') }}</caption>
@@ -24,11 +24,10 @@
             <th>{{ _('Added') }}</th>
             <!--<th>{{ _('Modified') }}</th>-->
             <th>{{ _('Scanned') }}</th>
-{# TODO: add httpd, mysqld, openvpn columns! #}
           </tr>
         </thead>
         <tbody>
-      {% for machine in machine_list %}
+      {% for machine in machines %}
           <tr>
             <td>{{ machine.sys_ip }}</td>
             <td>
@@ -77,9 +76,6 @@
               </time>
               {% endif %}
             </td>
-{# TODO: Add #}
-{# TODO: Edit #}
-{# TODO: Delete #}
           </tr>
       {% endfor %}
         </tbody>

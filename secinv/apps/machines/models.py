@@ -11,39 +11,42 @@ from reversion.models import Version
 # TODO: Move functions.
 
 
-def get_version_diff(obj_item):
+def get_version_diff(obj_item, delimiter=None):
     obj_version = Version.objects.get_for_object(obj_item).order_by('revision')
     versions = []
     for index, ver in enumerate(obj_version):
-        '''
-        try:
-            old_v = obj_version[index + 1].field_dict
-        #except AssertionError:
-        except IndexError:
-            old_v = {}
-        new_v = ver.field_dict
-        patch = diff_dict(old_v, new_v)
-        '''
+        old_v = {}
         try:
             old_v = obj_version[index - 1].field_dict
         except AssertionError:
-        #except IndexError:
             old_v = {}
+            #for k in ver.field_dict.keys():
+            #    old_v[k] = ''
         new_v = ver.field_dict
-        patch = diff_dict2(old_v, new_v)
+        patch = diff_dict2(old_v, new_v, delimiter)
 
-        '''
-        field_diffs = {}
-        for status, field in patch:
-            field_diffs[field] = status
-        '''
-        versions.append({'fields': ver.field_dict, 'diff': patch,
+        new_fields = ver.field_dict
+        # If there are old fields, merge the dictionaries.
+        if old_v:
+            new_fields = dict(old_v, **ver.field_dict)
+
+        versions.append({'fields': new_fields, 'diff': patch,
                          'timestamp': ver.field_dict['date_added']})
     versions.reverse()
     return versions
 
 
-def diff_dict2(a, b):
+def diff_list2(l_old, l_new):
+    """Creates a new dictionary representing a difference between two lists."""
+    set_old, set_new = set(l_old), set(l_new)
+    intersect = set_new.intersection(set_past)
+
+    added = list(set_new - intersect)
+    removed = list(set_old - intersect)
+
+    return {'added': added, 'removed': removed}
+
+def diff_dict2(a, b, delimiter=None):
     """Return differences from dictionaries a to b.
 
     Return a tuple of three dicts: (removed, added, changed).
@@ -57,7 +60,6 @@ def diff_dict2(a, b):
     added = dict()
     changed = dict()
     unchanged = dict()
-
 
     # If inactive object is now active, mark each field as 'added'.
     if 'active' in a and a['active'] == False and 'active' in b and b['active'] == True:
@@ -79,8 +81,42 @@ def diff_dict2(a, b):
             if key not in a:
                 added[key] = value
 
-    return {'removed': removed, 'added': added, 'changed': changed,
-            'unchanged': unchanged}
+    # To determine the differences of key/value pairs, the key and value fields
+    # are split, merged as dictionaries, and subsequently compared.
+
+    pair = {}
+    if delimiter:
+        key_name = None
+        value_name = None
+        for key, value in b.iteritems():
+            if key[:2] == 'k_' and delimiter in value:
+                key_name = key
+                a_pair_k = re.split(delimiter, a[key]) if key in a else []
+                b_pair_k = re.split(delimiter, value)
+            if key[:2] == 'v_' and delimiter in value:
+                value_name = value
+                a_pair_v = re.split(delimiter, a[key]) if key in a else []
+                b_pair_v = re.split(delimiter, value)
+
+        if key_name and value_name:
+            a_pair_dict = dict(zip(a_pair_k, a_pair_v))
+            b_pair_dict = dict(zip(b_pair_k, b_pair_v))
+            pair = diff_dict2(a_pair_dict, b_pair_dict)
+        elif value_name:
+            pair = diff_list2(a_pair_v, b_pair_v)
+
+    diffs = {'removed': removed, 'added': added, 'changed': changed,
+             'unchanged': unchanged}
+
+    if delimiter:
+        if b_pair_dict:
+            b = b_pair_dict
+        elif b_pair_v:
+            b = b_pair_v
+        diffs['pair'] = {'merged': b, 'diff': pair}
+
+    return diffs
+
 
 def diff_dict(d_old, d_new):
     """
@@ -121,9 +157,6 @@ class Machine(models.Model):
     sys_ip = models.IPAddressField(_('IP address'))
     hostname = models.CharField(max_length=255)
     ext_ip = models.IPAddressField(_('external IP address'), blank=True, null=True)
-
-    # TODO: get rid of 'diff' field.
-    diff = models.CharField(_('differences'), max_length=255, blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
     date_modified = models.DateTimeField(_('date modified'),
@@ -134,8 +167,8 @@ class Machine(models.Model):
     search_fields = ['sys_ip', 'hostname', 'ext_ip',
                      'system__kernel_rel', 'system__rh_rel', 'system__nfs',
                      'system__ip_fwd', 'system__iptables',
-                     'services__processes', 'services__ports',
-                     'rpms__rpms',
+                     'services__k_processes', 'services__v_ports',
+                     'rpms__v_rpms',
                      'interface__i_name', 'interface__i_ip',
                      'interface__i_mac', 'interface__i_mask']
 
@@ -228,7 +261,7 @@ class Interface(models.Model):
                 i_name=self.i_name).latest()
             i_v = get_version_diff(i_latest)
             if i_v:
-                i_diff = i_v[0]['diff']
+                i_diff = i_v[0]
         except Interface.DoesNotExist:
             pass
 
@@ -270,7 +303,7 @@ class System(models.Model):
                 machine__id=self.machine_id).latest()
             s_v = get_version_diff(s_latest)
             if s_v:
-                s_diff = s_v[0]['diff']
+                s_diff = s_v[0]
         except System.DoesNotExist:
             pass
 
@@ -286,62 +319,34 @@ if not reversion.is_registered(System):
 
 class Services(models.Model):
     machine = models.ForeignKey('Machine')
-    processes = models.CharField(max_length=255, blank=True, null=True)
-    ports = models.CommaSeparatedIntegerField(max_length=255, blank=True, null=True)
+
+    # TODO: Use TextFields.
+    k_processes = models.CharField(_('processes'), max_length=255, blank=True,
+                                   null=True)
+    v_ports = models.CommaSeparatedIntegerField(_('ports'), max_length=255,
+                                                blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
-    def differences(self):
+    def diff(self):
         """
-        Create a dictionary of the differences between the latest
-        and the previous system info.
+        Create a dictionary of the differences between the current and previous
+        services entries.
         """
-        s_older = Services.objects.filter(
-            machine__id=self.machine_id).exclude(id=self.id).filter(
-            date_added__lt=self.date_added).order_by('-date_added').all()
+        s_diff = {}
 
-        s_previous = {}
-        if s_older.exists():
-            s_procs = re.split(',', s_older[0].processes)
-            s_ports = re.split(',', s_older[0].ports)
-            s_previous = dict(zip(s_procs, s_ports))
+        try:
+            s_latest = Services.objects.get(machine__id=self.machine_id)
+            s_v = get_version_diff(s_latest, ',')
+            if s_v:
+                s_diff = s_v[0]
+        except Services.DoesNotExist:
+            pass
 
-        s_procs = re.split(',', self.processes)
-        s_ports = re.split(',', self.ports)
-        s_latest = dict(zip(s_procs, s_ports))
-
-        return diff_dict(s_previous, s_latest)
-
-    def processes_split(self):
-        return re.split(',', self.processes)
-
-    def ports_split(self):
-        return re.split(',', self.ports)
-
-    def processes_dict(self):
-        """
-        Merge and return latest and previous dictionaries of process/ports.
-        """
-        # TODO: merge_diff(s_older, self, fields=['processes', 'ports'], delimeter='')
-
-        s_older = Services.objects.filter(
-            machine__id=self.machine_id).exclude(id=self.id).filter(
-            date_added__lt=self.date_added).order_by('-date_added').all()
-
-        s_previous = {}
-        if s_older.exists():
-            s_procs = re.split(',', s_older[0].processes)
-            s_ports = re.split(',', s_older[0].ports)
-            s_previous = dict(zip(s_procs, s_ports))
-
-        s_procs = re.split(',', self.processes)
-        s_ports = re.split(',', self.ports)
-        s_latest = dict(zip(s_procs, s_ports))
-
-        return dict(s_latest, **s_previous)
+        return s_diff
 
     def __unicode__(self):
-        return u'%s - %s' % (self.processes, self.ports)
+        return u'%s - %s' % (self.k_processes, self.v_ports)
 
     class Meta:
         verbose_name_plural = _('Services')
@@ -353,7 +358,7 @@ if not reversion.is_registered(Services):
 
 class RPMs(models.Model):
     machine = models.ForeignKey('Machine')
-    rpms = models.TextField(_('RPMs'), blank=True, null=True)
+    v_rpms = models.TextField(_('RPMs'), blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
@@ -364,14 +369,14 @@ class RPMs(models.Model):
 
         r_previous = []
         if r_older:
-            r_previous = re.split('\n', r_older[0].rpms)
+            r_previous = re.split('\n', r_older[0].v_rpms)
 
-        r_latest = re.split('\n', self.rpms)
+        r_latest = re.split('\n', self.v_rpms)
 
         return diff_list(r_previous, r_latest)
 
     def __unicode__(self):
-        return u'%s' % (self.rpms[0:100])
+        return u'%s' % (self.v_rpms[0:100])
 
     class Meta:
         verbose_name = _('RPMs')
@@ -384,8 +389,8 @@ if not reversion.is_registered(RPMs):
 
 class SSHConfig(models.Model):
     machine = models.ForeignKey('Machine')
-    parameters = models.TextField(_('parameters'), blank=True, null=True)
-    values = models.TextField(_('values'), blank=True, null=True)
+    k_parameters = models.TextField(_('parameters'), blank=True, null=True)
+    v_values = models.TextField(_('values'), blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
@@ -401,21 +406,21 @@ class SSHConfig(models.Model):
         s_previous = {}
         if s_older.exists():
             # TODO: remove carriage returns?
-            s_params = re.split('\n', s_older[0].parameters.replace('\r', ''))
-            s_values = re.split('\n', s_older[0].values.replace('\r', ''))
+            s_params = re.split('\n', s_older[0].k_parameters.replace('\r', ''))
+            s_values = re.split('\n', s_older[0].v_values.replace('\r', ''))
             s_previous = dict(zip(s_params, s_values))
 
-        s_params = re.split('\n', self.parameters.replace('\r', ''))
-        s_values = re.split('\n', self.values.replace('\r', ''))
+        s_params = re.split('\n', self.k_parameters.replace('\r', ''))
+        s_values = re.split('\n', self.v_values.replace('\r', ''))
         s_latest = dict(zip(s_params, s_values))
 
         return diff_dict(s_previous, s_latest)
 
     def parameters_split(self):
-        return re.split('\n', self.parameters.replace('\r', ''))
+        return re.split('\n', self.k_parameters.replace('\r', ''))
 
     def values_split(self):
-        return re.split('\n', self.values.replace('\r', ''))
+        return re.split('\n', self.v_values.replace('\r', ''))
 
     def parameters_dict(self):
         """
@@ -429,18 +434,18 @@ class SSHConfig(models.Model):
 
         s_previous = {}
         if s_older.exists():
-            s_params = re.split('\n', s_older[0].parameters.replace('\r', ''))
-            s_values = re.split('\n', s_older[0].values.replace('\r', ''))
+            s_params = re.split('\n', s_older[0].k_parameters.replace('\r', ''))
+            s_values = re.split('\n', s_older[0].v_values.replace('\r', ''))
             s_previous = dict(zip(s_params, s_values))
 
-        s_params = re.split('\n', self.parameters.replace('\r', ''))
-        s_values = re.split('\n', self.values.replace('\r', ''))
+        s_params = re.split('\n', self.k_parameters.replace('\r', ''))
+        s_values = re.split('\n', self.v_values.replace('\r', ''))
         s_latest = dict(zip(s_params, s_values))
 
         return dict(s_latest, **s_previous)
 
     def __unicode__(self):
-        return u'%s - %s' % (self.parameters, self.values)
+        return u'%s - %s' % (self.k_parameters, self.v_values)
 
     class Meta:
         verbose_name = _('SSHConfig')

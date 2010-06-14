@@ -12,28 +12,17 @@ from reversion.models import Version
 
 import re
 
-'''
-def diff_dict(d_old, d_new):
-    """
-    Creates a new dict representing a diff between two dicts.
-    """
-    # Added and changed items.
-    diff = {}
-    for k, v in d_new.items():
-        old_v = d_old.get(k, None)
-        if v == old_v:
-            continue
-        diff.update({k: {'old': old_v, 'new': v}})
+def diff_list(l_old, l_new):
+    """Creates a new dictionary representing a difference between two lists."""
+    set_old, set_new = set(l_old), set(l_new)
+    intersect = set_new.intersection(set_past)
 
-    # Deleted items.
-    for k, v in d_old.items():
-        if k not in d_new.keys():
-            diff.update({k: {'deleted': v}})
+    added = list(set_new - intersect)
+    removed = list(set_old - intersect)
 
-    return diff
-'''
+    return {'added': added, 'removed': removed}
 
-def diff_dict(a, b):
+def diff_dict(a, b, delimiter=None):
     """Return differences from dictionaries a to b.
 
     Return a tuple of three dicts: (removed, added, changed).
@@ -47,7 +36,6 @@ def diff_dict(a, b):
     added = dict()
     changed = dict()
     unchanged = dict()
-
 
     # If inactive object is now active, mark each field as 'added'.
     if 'active' in a and a['active'] == False and 'active' in b and b['active'] == True:
@@ -69,10 +57,44 @@ def diff_dict(a, b):
             if key not in a:
                 added[key] = value
 
-    return {'removed': removed, 'added': added, 'changed': changed,
-            'unchanged': unchanged}
+    # To determine the differences of key/value pairs, the key and value fields
+    # are split, merged as dictionaries, and subsequently compared.
 
-def get_version_diff(obj_item):
+    pair = {}
+    if delimiter:
+        key_name = None
+        value_name = None
+        for key, value in b.iteritems():
+            if key[:2] == 'k_' and delimiter in value:
+                key_name = key
+                a_pair_k = re.split(delimiter, a[key]) if key in a else []
+                b_pair_k = re.split(delimiter, value)
+            if key[:2] == 'v_' and delimiter in value:
+                value_name = value
+                a_pair_v = re.split(delimiter, a[key]) if key in a else []
+                b_pair_v = re.split(delimiter, value)
+
+        if key_name and value_name:
+            a_pair_dict = dict(zip(a_pair_k, a_pair_v))
+            b_pair_dict = dict(zip(b_pair_k, b_pair_v))
+            pair = diff_dict(a_pair_dict, b_pair_dict)
+        elif value_name:
+            pair = diff_list(a_pair_v, b_pair_v)
+
+    diffs = {'removed': removed, 'added': added, 'changed': changed,
+             'unchanged': unchanged}
+
+    if delimiter:
+        if b_pair_dict:
+            b = b_pair_dict
+        elif b_pair_v:
+            b = b_pair_v
+        diffs['pair'] = {'merged': b, 'diff': pair}
+
+    return diffs
+
+
+def get_version_diff(obj_item, delimiter=None):
     obj_version = Version.objects.get_for_object(obj_item).order_by('revision')
     versions = []
     for index, ver in enumerate(obj_version):
@@ -91,24 +113,24 @@ def get_version_diff(obj_item):
         #except IndexError:
             old_v = {}
         new_v = ver.field_dict
-        patch = diff_dict(old_v, new_v)
+        patch = diff_dict(old_v, new_v, delimiter)
 
-        '''
-        field_diffs = {}
-        for status, field in patch:
-            field_diffs[field] = status
-        '''
-        versions.append({'fields': ver.field_dict, 'diff': patch,
+        new_fields = ver.field_dict
+        # If there are old fields, merge the dictionaries.
+        if old_v:
+            new_fields = dict(old_v, **ver.field_dict)
+
+        versions.append({'fields': new_fields, 'diff': patch,
                          'timestamp': ver.field_dict['date_added']})
     versions.reverse()
     return versions
 
 
 def index(request):
-    machine_list = Machine.objects.all()
+    machines = Machine.objects.all()
     query = request.GET.get('q', '')
     return render_to_response('machines/index.html',
-        {'machine_list': machine_list, 'query': query},
+        {'machines': machines, 'query': query},
         context_instance=RequestContext(request))
 
 
@@ -150,6 +172,9 @@ def detail(request, machine_slug):
     services_history = Services.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
 
+    # Get historical versions of Services objects.
+    services_versions = get_version_diff(services_history[0], ',')
+
     if services_history.exists():
         services_latest = Services.objects.filter(machine__id=p.id).latest()
 
@@ -162,7 +187,7 @@ def detail(request, machine_slug):
     if rpms_history.exists():
         rpms_obj = RPMs.objects.filter(machine__id=p.id).latest()
 
-        rpms_list = re.split('\n', rpms_obj.rpms)
+        rpms_list = re.split('\n', rpms_obj.v_rpms)
 
         rpms_date_added = rpms_obj.date_added
 
@@ -237,6 +262,7 @@ def detail(request, machine_slug):
                         'system_versions': system_versions,
                         'services': services_latest,
                         'services_history': services_history,
+                        'services_versions': services_versions,
                         'rpms': rpms_latest,
                         'rpms_history': rpms_history,
                         'interfaces': interfaces_latest,

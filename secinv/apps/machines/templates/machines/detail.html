@@ -93,6 +93,7 @@ function getTabs(section) {
         </dl>
       </details>
 
+{# TODO: diff for machine #}
       <table class="view sortable">
         <caption>{{ _('Machine details') }}</caption>
         <tbody>
@@ -173,19 +174,19 @@ function getTabs(section) {
             <tbody>
               <tr>
                 <td>
-                  {% differ system.diff 'kernel_rel' %}{{ system.kernel_rel }}{% enddiffer %}
+                  {% differ system.diff.diff 'kernel_rel' %}{{ system.kernel_rel }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.diff 'rh_rel' %}{{ system.rh_rel }}{% enddiffer %}
+                  {% differ system.diff.diff 'rh_rel' %}{{ system.rh_rel }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.diff 'nfs' %}{{ system.nfs|enum:'Yes,No' }}{% enddiffer %}
+                  {% differ system.diff.diff 'nfs' %}{{ system.nfs|enum:'Yes,No' }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.diff 'ip_fwd' %}{{ system.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
+                  {% differ system.diff.diff 'ip_fwd' %}{{ system.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.diff 'iptables' %}{{ system.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
+                  {% differ system.diff.diff 'iptables' %}{{ system.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td class="timestamp">
                   <time datetime="{{ system.date_added|date:'c' }}">
@@ -269,10 +270,10 @@ function getTabs(section) {
             <tbody>
           {% for interface in interfaces %}
               <tr>
-                <td>{% differ interface.diff 'i_name' %}{{ interface.i_name }}{% enddiffer %}</td>
-                <td>{% differ interface.diff 'i_ip' %}{{ interface.i_ip }}{% enddiffer %}</td>
-                <td>{% differ interface.diff 'i_mac' %}{{ interface.i_mac }}{% enddiffer %}</td>
-                <td>{% differ interface.diff 'i_mask' %}{{ interface.i_mask }}{% enddiffer %}</td>
+                <td>{% differ interface.diff.diff 'i_name' %}{{ interface.i_name }}{% enddiffer %}</td>
+                <td>{% differ interface.diff.diff 'i_ip' %}{{ interface.i_ip }}{% enddiffer %}</td>
+                <td>{% differ interface.diff.diff 'i_mac' %}{{ interface.i_mac }}{% enddiffer %}</td>
+                <td>{% differ interface.diff.diff 'i_mask' %}{{ interface.i_mask }}{% enddiffer %}</td>
                 <td class="timestamp">
                   <time datetime="{{ interface.date_added|date:'c' }}">
                     {{ interface.date_added }}
@@ -345,80 +346,33 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
-
-    {% if services %}
-        <tr>
-          <td colspan="2">
-            <table>
-            {% for process, port in services.processes_dict.items %}
+            {% if services %}
               <tr>
-                <td class="pair_name">
-                {% spaceless %}
-                  {% if process in services.differences %}
-
-                    {% with services.differences|dict_get:process as process_dict %}
-
-
-                      {% if process_dict.new and not process_dict.old %}
-                          <ins>{{ process }}</ins>
-                      {% else %}
-                        {% if process_dict.new and process_dict.old %}
-                          <mark>{{ process }}</mark>
-                        {% endif %}
-
-                        {% if process_dict.deleted %}
-                          <del>{{ process }}</del>
-                        {% endif %}
-                      {% endif %}
-
-
-                    {% endwith %}
-
-                  {% else %}
-                          {{ process }}
-                  {% endif %}
-                {% endspaceless %}
+                <td colspan="2">
+                  <table>
+                  {% for process, port in services.diff.diff.pair.merged.items %}
+                    <tr>
+                      <td class="pair_name">
+                        {% differ services.diff.diff.pair.diff process %}{{ process }}{% enddiffer %}
+                      </td>
+                      <td class="pair_port">
+                        {% differ services.diff.diff.pair.diff process %}{{ port }}{% enddiffer %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  </table>
                 </td>
-                <td class="pair_port">
-                {% spaceless %}
-                  {% if process in services.differences %}
-
-                    {% with services.differences|dict_get:process as process_dict %}
-                      {% if process_dict.new and not process_dict.old %}
-                          <ins>{{ port }}</ins>
-                      {% else %}
-                        {% if process_dict.new and process_dict.old %}
-                          <mark>{{ process_dict.new }}</mark>
-                        {% endif %}
-
-                        {% if process_dict.deleted %}
-                          <del>{{ port }}</del>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-
-                  {% else %}
-                          {{ port }}
-                  {% endif %}
-                {% endspaceless %}
+                <td class="timestamp">
+                  <time datetime="{{ services.date_added|date:'c' }}">
+                    {{ services.date_added }}
+                  </time>
                 </td>
               </tr>
-            {% endfor %}
-            </table>
-          </td>
-          <td class="timestamp">
-            <time datetime="{{ services.date_added|date:'c' }}">
-              {{ services.date_added }}
-            </time>
-          </td>
-        </tr>
-
-    {% else %}
+            {% else %}
               <tr>
                 <td></td>
               </tr>
-    {% endif %}
-
+            {% endif %}
             </tbody>
           </table>
 
@@ -435,76 +389,33 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
-    {% for services_h in services_history %}
-
-        <tr>
-          <td colspan="2">
-            <table>
-            {% for process, port in services_h.processes_dict.items %}
+            {% for services_h in services_versions %}
               <tr>
-                <td class="pair_name">
-                {% spaceless %}
-                  {% if process in services_h.differences %}
-
-                    {% with services_h.differences|dict_get:process as process_dict %}
-                      {% if process_dict.new and not process_dict.old %}
-                          <ins>{{ process }}</ins>
-                      {% else %}
-                        {% if process_dict.new and process_dict.old %}
-                          <mark>{{ process }}</mark>
-                        {% endif %}
-
-                        {% if process_dict.deleted %}
-                          <del>{{ process }}</del>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-
-                  {% else %}
-                          {{ process }}
-                  {% endif %}
-                {% endspaceless %}
+                <td colspan="2">
+                  <table>
+                  {% for process, port in services_h.diff.pair.merged.items %}
+                    <tr>
+                      <td class="pair_name">
+                        {% differ services_h.diff.pair.diff process %}{{ process }}{% enddiffer %}
+                      </td>
+                      <td class="pair_port">
+                        {% differ services_h.diff.pair.diff process %}{{ port }}{% enddiffer %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  </table>
                 </td>
-                <td class="pair_port">
-                {% spaceless %}
-                  {% if process in services_h.differences %}
-
-                    {% with services_h.differences|dict_get:process as process_dict %}
-                      {% if process_dict.new and not process_dict.old %}
-                          <ins>{{ port }}</ins>
-                      {% else %}
-                        {% if process_dict.new and process_dict.old %}
-                          <mark>{{ process_dict.new }}</mark>
-                        {% endif %}
-
-                        {% if process_dict.deleted %}
-                          <del>{{ port }}</del>
-                        {% endif %}
-                      {% endif %}
-                    {% endwith %}
-
-                  {% else %}
-                          {{ port }}
-                  {% endif %}
-                {% endspaceless %}
+                <td class="timestamp">
+                  <time datetime="{{ services_h.fields.date_added|date:'c' }}">
+                    {{ services_h.fields.date_added }}
+                  </time>
                 </td>
               </tr>
-            {% endfor %}
-            </table>
-          </td>
-          <td class="timestamp">
-            <time datetime="{{ services_h.date_added|date:'c' }}">
-              {{ services_h.date_added }}
-            </time>
-          </td>
-        </tr>
-
-    {% empty %}
+            {% empty %}
               <tr>
                 <td></td>
               </tr>
-    {% endfor %}
-
+            {% endfor %}
             </tbody>
           </table>
 

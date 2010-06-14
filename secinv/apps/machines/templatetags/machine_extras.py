@@ -36,7 +36,7 @@ def diff(value, arg, autoescape=None):
     # value = sytem
     if arg in value['diff']['added']:
         result = '<ins>%s</ins>' % value['fields'][arg]
-                
+
     if arg in value['diff']['changed']:
         result = '<mark>%s</mark>' % value['fields'][arg]
 
@@ -56,7 +56,7 @@ def diff(value, arg, autoescape=False):
     # value = sytem
     if arg in value['diff']['added']:
         result = '<ins>%s</ins>' % value['fields'][arg]
-                
+
     if arg in value['diff']['changed']:
         result = '<mark>%s</mark>' % value['fields'][arg]
 
@@ -130,19 +130,27 @@ class DifferNode(template.Node):
         self.nodelist = nodelist
         self.diff_dict = diff_dict
         self.field_name = field_name
-    
+
     def render(self, context):
+        # Remove quotation marks from string value.
+        field_name = self.field_name
+        if field_name[0] in ('"', "'") and field_name[0] == field_name[-1]:
+            field_name = field_name[1:-1]
+        else:
+            field_name = template.Variable(field_name).resolve(context)
+
+
         diff_dict = template.Variable(self.diff_dict).resolve(context)
 
         emphasis_tag = ''
 
-        if 'added' in diff_dict and self.field_name in diff_dict['added']:
+        if 'added' in diff_dict and field_name in diff_dict['added']:
             emphasis_tag = 'ins'
-                    
-        if 'changed' in diff_dict and self.field_name in diff_dict['changed']:
+
+        if 'changed' in diff_dict and field_name in diff_dict['changed']:
             emphasis_tag = 'mark'
-    
-        if 'removed' in diff_dict and self.field_name in diff_dict['removed']:
+
+        if 'removed' in diff_dict and field_name in diff_dict['removed']:
             emphasis_tag = 'del'
 
         emphasis_start = ('<%s>' % emphasis_tag) if len(emphasis_tag) else ''
@@ -157,7 +165,7 @@ def differ(parser, token):
     """
     This wraps the enclosed text with the appropriate element: ins, mark, del.
 
-    Requires two arguments, (1) a dictionary of the field differences,
+    Requires two arguments: (1) a dictionary of the field differences,
     and (2) a string of the field name.
 
     Example::
@@ -166,17 +174,14 @@ def differ(parser, token):
     """
 
     bits = token.split_contents()
-    
+
     if len(bits) != 3:
         raise template.TemplateSyntaxError('%r tag requires two arguments.' % bits[0])
-    
+
     diff_dict = bits[1]
     field_name = bits[2]
 
-    # Remove quotation marks from string value.
-    if field_name[0] in ('"', "'") and field_name[0] == field_name[-1]:
-        field_name = field_name[1:-1]
-    
+
     nodelist = parser.parse(('enddiffer',))
     parser.delete_first_token()
     return DifferNode(nodelist, diff_dict, field_name)
@@ -185,64 +190,59 @@ def differ(parser, token):
 
 
 
-
-'''
-
-
-class MyDifferNode(template.Node):
-    def __init__(self, nodelist, diff_dict, field_name):
-        self.nodelist = nodelist
-        #self.diff_dict = template.Variable(diff_dict)
-        self.diff_dict = diff_dict
-        self.field_name = field_name
+class SplitAsListNode(template.Node):
+    def __init__(self, source_list, destination_list, delimiter=','):
+        self.source_list = source_list
+        self.destination_list = destination_list
+        self.delimiter = delimiter
 
     def render(self, context):
-        #try:
-        #diff_dict = self.diff_dict.resolve(context)
-        #except template.VariableDoesNotExist:
-        #  return ''
-        #for key in self.dict_pairs:
-        #    self.diff_dict[key] = self.dict_pairs[key].resolve(context)
-        diff_dict = template.Variable(self.diff_dict).resolve(context)
+        source_list = template.Variable(self.source_list).resolve(context)
+        new_list = source_list.split(self.delimiter)
+        context[self.destination_list] = new_list
+        return ''
 
 
-        emphasis_tag = ''
+@register.tag
+def split_as_list(parser, token):
+    """
+    This wraps the enclosed text with the appropriate element: ins, mark, del.
 
-        if self.field_name in diff_dict['added']:
-            emphasis_tag = 'ins'
-                    
-        if self.field_name in diff_dict['changed']:
-            emphasis_tag = 'mark'
-    
-        if self.field_name in diff_dict['removed']:
-            emphasis_tag = 'del'
+    Requires two arguments: (1) a string delimited by some character,
+    and (2) a string of the destination list name.
 
-        emphasis_start = ('<%s>' % emphasis_tag) if len(emphasis_tag) else ''
-        emphasis_end = ('</%s>' % emphasis_tag) if len(emphasis_tag) else ''
+    Optional first argument: (1) delimiter.
 
-        output = self.nodelist.render(context)
-        return '%s%s%s' % (emphasis_start, output, emphasis_end)
+    Example::
 
-        
-        #output = self.nodelist.render(context)
-        #return '%s - %s ' % (emphasis_tag, output)
+        {% split_as_list services.processes as processes_list %}
 
-def mydiffer(parser, token):
+        or
+
+        {% split_as_list ',' services.processes as processes_list %}
+    """
+
     bits = token.split_contents()
+    num_bits = len(bits)
+
+    if num_bits != 4 and num_bits != 5:
+        raise template.TemplateSyntaxError('%r tag requires at least four arguments (at most five).' % bits[0])
+    elif (bits[2] != 'as' and num_bits == 4) or (bits[3] != 'as' and num_bits == 5):
+        raise template.TemplateSyntaxError("%r tag must contain an 'as' argument." % bits[0])
+
+    source_string = bits[1]
+    destination_list = bits[3]
+
+    # Remove quotation marks from string value.
+    delimiter = ','
+    if num_bits == 5:
+        delimiter = bits[1]
+        if delimiter[0] in ('"', "'") and delimiter[0] == delimiter[-1]:
+            delimiter = delimiter[1:-1]
     
-    if len(bits) != 3:
-        raise template.TemplateSyntaxError('%r tag requires 2 arguments.' % bits[0])
+        source_string = bits[2]
+        destination_list = bits[4]
     
-    diff_dict = bits[1]
-    field_name = bits[2]
-    #diff_dict, field_name = bits[1:]
+    return SplitAsListNode(source_string, destination_list, delimiter)
 
-    if field_name[0] in ('"', "'") and field_name[0] == field_name[-1]:
-        field_name = field_name[1:-1] # A string.
 
-    nodelist = parser.parse(('endmydiffer',))
-    parser.delete_first_token()
-    return MyDifferNode(nodelist, diff_dict, field_name)
-mydiffer = register.tag(mydiffer)
-
-'''
