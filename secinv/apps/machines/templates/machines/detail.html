@@ -389,25 +389,25 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
-            {% for services_h in services_versions %}
+            {% for services_ver in services_versions %}
               <tr>
                 <td colspan="2">
                   <table>
-                  {% for process, port in services_h.diff.pair.merged.items %}
+                  {% for process, port in services_ver.diff.pair.merged.items %}
                     <tr>
                       <td class="pair_name">
-                        {% differ services_h.diff.pair.diff process %}{{ process }}{% enddiffer %}
+                        {% differ services_ver.diff.pair.diff process %}{{ process }}{% enddiffer %}
                       </td>
                       <td class="pair_port">
-                        {% differ services_h.diff.pair.diff process %}{{ port }}{% enddiffer %}
+                        {% differ services_ver.diff.pair.diff process %}{{ port }}{% enddiffer %}
                       </td>
                     </tr>
                   {% endfor %}
                   </table>
                 </td>
                 <td class="timestamp">
-                  <time datetime="{{ services_h.fields.date_added|date:'c' }}">
-                    {{ services_h.fields.date_added }}
+                  <time datetime="{{ services_ver.fields.date_added|date:'c' }}">
+                    {{ services_ver.fields.date_added }}
                   </time>
                 </td>
               </tr>
@@ -485,25 +485,25 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
-            {% for sshconfig_h in sshconfig_versions %}
+            {% for sshconfig_ver in sshconfig_versions %}
               <tr>
                 <td colspan="2">
                   <table>
-                  {% for process, port in sshconfig_h.diff.pair.merged.items %}
+                  {% for process, port in sshconfig_ver.diff.pair.merged.items %}
                     <tr>
                       <td class="pair_name">
-                        {% differ sshconfig_h.diff.pair.diff process %}{{ process }}{% enddiffer %}
+                        {% differ sshconfig_ver.diff.pair.diff process %}{{ process }}{% enddiffer %}
                       </td>
                       <td class="pair_port">
-                        {% differ sshconfig_h.diff.pair.diff process %}{{ port }}{% enddiffer %}
+                        {% differ sshconfig_ver.diff.pair.diff process %}{{ port }}{% enddiffer %}
                       </td>
                     </tr>
                   {% endfor %}
                   </table>
                 </td>
                 <td class="timestamp">
-                  <time datetime="{{ sshconfig_h.fields.date_added|date:'c' }}">
-                    {{ sshconfig_h.fields.date_added }}
+                  <time datetime="{{ sshconfig_ver.fields.date_added|date:'c' }}">
+                    {{ sshconfig_ver.fields.date_added }}
                   </time>
                 </td>
               </tr>
@@ -559,41 +559,41 @@ function getTabs(section) {
               </tr>
             </thead>
             <tbody>
-    {% for rpms_h in rpms_history %}
+            {% for rpms_ver in rpms_versions %}
               <tr>
                 <td>
-                  {% if rpms_h.differences.added %}
+                {% if rpms_ver.diff.pair.diff.added %}
                   <ul>
-                    {% for rpm in rpms_h.differences.added %}
+                  {% for rpm in rpms_ver.diff.pair.diff.added %}
                     <li><ins>{{ rpm }}</ins></li>
-                    {% endfor %}
+                  {% endfor %}
                   </ul>
-                  {% endif %}
+                {% endif %}
                 </td>
                 <td>
-                  {% if rpms_h.differences.deleted %}
+                {% if rpms_ver.diff.pair.diff.removed %}
                   <ul>
-                    {% for rpm in rpms_h.differences.deleted %}
+                  {% for rpm in rpms_ver.diff.pair.diff.removed %}
                     <li><del class="visible">{{ rpm }}</del></li>
-                    {% endfor %}
+                  {% endfor %}
                   </ul>
-                  {% endif %}
+                {% endif %}
                 </td>
                 <td class="timestamp">
-                  <time datetime="{{ rpms_h.date_added|date:'c' }}">
-                    {{ rpms_h.date_added }}
+                  <time datetime="{{ rpms_ver.fields.date_added|date:'c' }}">
+                    {{ rpms_ver.fields.date_added }}
                   </time>
               </tr>
-    {% empty %}
+            {% empty %}
               <tr>
                 <td></td>
               </tr>
-    {% endfor %}
+            {% endfor %}
             </tbody>
           </table>
 
         </div><!-- #rpms-history -->
       </section>
 
-
 {% endblock %}
+

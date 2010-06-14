@@ -39,7 +39,7 @@ def get_version_diff(obj_item, delimiter=None):
 def diff_list2(l_old, l_new):
     """Creates a new dictionary representing a difference between two lists."""
     set_old, set_new = set(l_old), set(l_new)
-    intersect = set_new.intersection(set_past)
+    intersect = set_new.intersection(set_old)
 
     added = list(set_new - intersect)
     removed = list(set_old - intersect)
@@ -112,7 +112,7 @@ def diff_dict2(a, b, delimiter=None):
             pair = diff_list2(a_pair_v, b_pair_v)
 
             # Similarly, merge lists.
-            b = list(a_pair_v, **b_pair_v)
+            b = a_pair_v + b_pair_v
 
         if value_name:
             diffs['pair'] = {'merged': b, 'diff': pair}
@@ -410,18 +410,22 @@ class RPMs(models.Model):
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
 
-    def differences(self):
-        r_older = RPMs.objects.filter(
-            machine__id=self.machine_id).exclude(id=self.id).filter(
-            date_added__lt=self.date_added).order_by('-date_added').all()
+    def version_changes(self):
+        """
+        Create a dictionary of the differences between the current and previous
+        RPMs installed.
+        """
+        r_diff = {}
 
-        r_previous = []
-        if r_older:
-            r_previous = re.split('\n', r_older[0].v_rpms)
+        try:
+            r_latest = RPMs.objects.get(machine__id=self.machine_id)
+            r_v = get_version_diff(s_latest, '\n')
+            if r_v:
+                r_diff = r_v[0]
+        except RPMs.DoesNotExist:
+            pass
 
-        r_latest = re.split('\n', self.v_rpms)
-
-        return diff_list(r_previous, r_latest)
+        return r_diff
 
     def __unicode__(self):
         return u'%s' % (self.v_rpms[0:100])

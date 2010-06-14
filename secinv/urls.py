@@ -15,6 +15,6 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
 
     # TODO: temporary redirect
-    #(r'^', lambda request: HttpResponsePermanentRedirect('/secinv2/machines/')),
+    #(r'^', lambda request: HttpResponsePermanentRedirect('/secinv/machines/')),
 )
 

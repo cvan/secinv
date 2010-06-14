@@ -8,7 +8,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 path = lambda *a: os.path.join(ROOT, *a)
 
 # Base URL path.
-BASE_URL = '/secinv2/'
+BASE_URL = '/secinv/'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

@@ -15,7 +15,7 @@ import re
 def diff_list(l_old, l_new):
     """Creates a new dictionary representing a difference between two lists."""
     set_old, set_new = set(l_old), set(l_new)
-    intersect = set_new.intersection(set_past)
+    intersect = set_new.intersection(set_old)
 
     added = list(set_new - intersect)
     removed = list(set_old - intersect)
@@ -88,7 +88,7 @@ def diff_dict(a, b, delimiter=None):
             pair = diff_list(a_pair_v, b_pair_v)
 
             # Similarly, merge lists.
-            b = list(a_pair_v, **b_pair_v)
+            b = a_pair_v + b_pair_v
 
         if value_name:
             diffs['pair'] = {'merged': b, 'diff': pair}
@@ -189,16 +189,14 @@ def detail(request, machine_slug):
         machine__id=p.id).values_list('i_name', flat=True).distinct()
 
     interfaces_latest = []
-    interfaces_added_ids = []
+    interfaces_versions = []
     for i in distinct_interfaces:
         i_latest = Interface.objects.filter(machine__id=p.id,
                                             i_name=i).latest()
         interfaces_latest.append(i_latest)
 
-    # Get all unique interfaces.
-    interfaces_versions = []
-    for i in interfaces_latest:
-        i_v = get_version_diff(i)
+        # Append each unique interface's history.
+        i_v = get_version_diff(i_latest)
         interfaces_versions += i_v
 
     interfaces_versions = sorted(interfaces_versions,
@@ -223,15 +221,14 @@ def detail(request, machine_slug):
     rpms_history = RPMs.objects.filter(machine__id=p.id).order_by(
         '-date_added').all()
 
+    # Get historical versions of RPMs objects.
+    rpms_versions = get_version_diff(rpms_history[0], '\n')
+
     if rpms_history.exists():
-        rpms_obj = RPMs.objects.filter(machine__id=p.id).latest()
-
-        rpms_list = re.split('\n', rpms_obj.v_rpms)
-
-        rpms_date_added = rpms_obj.date_added
+        rpms_list = re.split('\n', rpms_history[0].v_rpms)
+        rpms_date_added = rpms_history[0].date_added
 
     rpms_latest = {'installed': rpms_list, 'date_added': rpms_date_added}
-
 
 
     template_context = {'query': query,
@@ -241,7 +238,7 @@ def detail(request, machine_slug):
                         'services': services_latest,
                         'services_versions': services_versions,
                         'rpms': rpms_latest,
-                        'rpms_history': rpms_history,
+                        'rpms_versions': rpms_versions,
                         'interfaces': interfaces_latest,
                         'interfaces_versions': interfaces_versions,
                         'sshconfig': sshconfig_latest,
