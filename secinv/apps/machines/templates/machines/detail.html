@@ -331,10 +331,10 @@ function getTabs(section) {
 
       <section class="tabs">
         <ul>
-          <li><a href="#serv-latest" class="latest">{{ _('Current') }}</a></li>
-          <li><a href="#serv-history" class="history">{{ _('History') }}</a></li>
+          <li><a href="#services-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#services-history" class="history">{{ _('History') }}</a></li>
         </ul>
-        <div id="serv-latest" class="latest">
+        <div id="services-latest" class="latest">
 
           <table>
             <caption>{{ _('Current') }}</caption>
@@ -377,7 +377,7 @@ function getTabs(section) {
           </table>
 
         </div><!-- #services-latest -->
-        <div id="serv-history" class="history">
+        <div id="services-history" class="history">
 
           <table class="nested">
             <caption>{{ _('History') }}</caption>
@@ -530,12 +530,12 @@ function getTabs(section) {
           <h4 class="group">{{ _('Installed RPMs') }}</h4>
 
           {% if rpms %}
-          <p class="date">
+          <details class="date">
             <strong>{{ _('Last Modified') }}</strong>
             <time datetime="{{ rpms.date_added|date:'c' }}">
               {{ rpms.date_added }}
             </time>
-          </p>
+          </details>
           <div class="clear"></div>
 
           <ul>
@@ -583,6 +583,7 @@ function getTabs(section) {
                   <time datetime="{{ rpms_ver.fields.date_added|date:'c' }}">
                     {{ rpms_ver.fields.date_added }}
                   </time>
+                </td>
               </tr>
             {% empty %}
               <tr>
@@ -594,6 +595,66 @@ function getTabs(section) {
 
         </div><!-- #rpms-history -->
       </section>
+
+
+      <h3>{{ _('iptables') }}</h3>
+      <section class="tabs">
+        <ul>
+          <li><a href="#iptables-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#iptables-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="iptables-latest" class="latest">
+          <h4 class="group">{{ _('iptables') }}</h4>
+
+          {% if iptables %}
+          <details class="date">
+            <strong>{{ _('Last Modified') }}</strong>
+            <time datetime="{{ iptables.date_added|date:'c' }}">
+              {{ iptables.date_added }}
+            </time>
+          </details>
+          <div class="clear"></div>
+
+          <pre><code>{{ iptables.body }}</code></pre>
+
+          <div class="clear"></div>
+          {% endif %}
+        </div><!-- #iptables-latest -->
+        <div id="iptables-history" class="history">
+
+          <table>
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th>{{ _('Differences') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for ipt_ver in iptables_versions %}
+              <tr>
+                <td>
+                {% if ipt_ver.diff %}
+                  {{ ipt_ver.diff|safe }}
+                {% endif %}
+                </td>
+                <td class="timestamp">
+                  <time datetime="{{ ipt_ver.fields.date_added|date:'c' }}">
+                    {{ ipt_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #iptables-history -->
+      </section>
+
 
 {% endblock %}
 

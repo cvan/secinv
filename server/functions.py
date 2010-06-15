@@ -68,6 +68,9 @@ class ServerFunctions:
         if self.auth_key != auth_key:
             return False
 
+        #try:
+        #    a = AuthKey.objects.filter(machine=self.machine)
+
         self.is_authenticated = True
         return True
 
@@ -199,7 +202,8 @@ class ServerFunctions:
             if sys_object.kernel_rel != system_dict['kernel_rel'] or \
                sys_object.rh_rel != system_dict['rh_rel'] or \
                sys_object.nfs != system_dict['nfs'] or \
-               sys_object.ip_fwd != system_dict['ip_fwd']:
+               sys_object.ip_fwd != system_dict['ip_fwd'] or \
+               sys_object.iptables != ipt_dict['status']:
 
                 sys_object.machine = self.machine_obj
                 sys_object.kernel_rel = system_dict['kernel_rel']
@@ -310,8 +314,32 @@ class ServerFunctions:
         ## iptables.
         #print 'Received iptables dictionary:\n'
         iptables_rules = ipt_dict['rules']
+        iptables_body = ipt_dict['rules']['body']
+        iptables_status = ipt_dict['status']
         #print iptables_rules
 
+        try:
+            i_object = IPTableInfo.objects.filter(
+                machine__id=self.machine_id).latest()
+
+            if i_object.body != iptables_body or \
+               i_object.active != iptables_status:
+                i_object.machine = self.machine_obj
+                i_object.body = iptables_body
+                i_object.active = iptables_status
+                i_object.date_added = datetime.datetime.now()
+                with reversion.revision:
+                    i_object.save()
+
+        except IPTableInfo.DoesNotExist:
+            i_object = IPTableInfo.objects.create(machine=self.machine_obj,
+                                                  body=iptables_body,
+                                                  active=iptables_status)
+            with reversion.revision:
+                i_object.save()
+
+
+        '''
         # TODO: If unique table names in DB are not in tables_rules --> set as inactive.
 
         for table_name, v in iptables_rules.iteritems():
@@ -364,7 +392,7 @@ class ServerFunctions:
                     i_dict = {'table': ipt_table,
                               'rule': rule}
                     IPTableRule.objects.create(**i_dict)
-
+        '''
 
         return True
 

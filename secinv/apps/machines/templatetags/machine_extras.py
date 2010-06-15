@@ -247,3 +247,24 @@ def split_as_list(parser, token):
     return SplitAsListNode(source_string, destination_list, delimiter)
 
 
+
+def autolinebreaks(value, autoescape=None):
+    """
+    Checks if the content is HTML or plain text. If plain text ,
+    line breaks are replaced with the appropriate HTML; a single
+    newline becomes an HTML line break (`<br />`) and a new line
+    followed by a blank line becomes a paragraph break (`</p>`).
+    """
+    import re
+    html_match = re.compile('<br>|<br />|<p>|<table>', re.IGNORECASE)
+    if not html_match.search(value):
+        from django.utils.html import linebreaks
+        autoescape = autoescape and not isinstance(value, SafeData)
+        return mark_safe(linebreaks(value, autoescape).replace('<br />', '<br>\n'))
+    else:
+        return value.replace('<br />', '<br>\n')
+autolinebreaks.is_safe = True
+autolinebreaks.needs_autoescape = True
+autolinebreaks = stringfilter(autolinebreaks)
+register.filter(autolinebreaks)
+

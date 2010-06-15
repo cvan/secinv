@@ -86,10 +86,10 @@ pre, code       {
     line-height: 1.5;
 }
 code {
-    background-color: #d5d2d8;
+/*    background-color: #dedede; */
     display: block;
-    padding: 0 2px 4px 26px;
-    background: #fff url(code.jpg) no-repeat left top;
+/*    padding: 0 2px 4px 26px;
+    background: #fff url(code.jpg) no-repeat left top; */
     line-height: 1.67em;
 }
 pre {

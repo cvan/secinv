@@ -1,158 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 #from ..fulltext.search import SearchManager
-import reversion
-
-import datetime
-import re
-
+from .utils import diff_list, diff_dict, get_version_diff
 from reversion.models import Version
 
-# TODO: Move functions.
-
-
-def get_version_diff(obj_item, delimiter=None):
-    obj_version = Version.objects.get_for_object(obj_item).order_by('revision')
-    versions = []
-    for index, ver in enumerate(obj_version):
-        old_v = {}
-        try:
-            old_v = obj_version[index - 1].field_dict
-        except AssertionError:
-            old_v = {}
-            #for k in ver.field_dict.keys():
-            #    old_v[k] = ''
-        new_v = ver.field_dict
-        patch = diff_dict2(old_v, new_v, delimiter)
-
-        new_fields = ver.field_dict
-        # If there are old fields, merge the dictionaries.
-        if old_v:
-            new_fields = dict(old_v, **ver.field_dict)
-
-        versions.append({'fields': new_fields, 'diff': patch,
-                         'timestamp': ver.field_dict['date_added']})
-    versions.reverse()
-    return versions
-
-
-def diff_list2(l_old, l_new):
-    """Creates a new dictionary representing a difference between two lists."""
-    set_old, set_new = set(l_old), set(l_new)
-    intersect = set_new.intersection(set_old)
-
-    added = list(set_new - intersect)
-    removed = list(set_old - intersect)
-
-    return {'added': added, 'removed': removed}
-
-def diff_dict2(a, b, delimiter=None):
-    """Return differences from dictionaries a to b.
-
-    Return a tuple of three dicts: (removed, added, changed).
-    'removed' has all keys and values removed from a. 'added' has
-    all keys and values that were added to b. 'changed' has all
-    keys and their values in b that are different from the corresponding
-    key in a.
-    """
-
-    removed = dict()
-    added = dict()
-    changed = dict()
-    unchanged = dict()
-
-    # If inactive object is now active, mark each field as 'added'.
-    if 'active' in a and a['active'] == False and 'active' in b and b['active'] == True:
-        for key, value in b.iteritems():
-            added[key] = value
-    # If object is inactive, mark each field as 'removed'.
-    elif 'active' in b and b['active'] == False:
-        for key, value in b.iteritems():
-            removed[key] = value
-    else:
-        for key, value in a.iteritems():
-            if key not in b:
-                removed[key] = value
-            elif b[key] != value:
-                changed[key] = b[key]
-            elif b[key] == value:
-                unchanged[key] = b[key]
-        for key, value in b.iteritems():
-            if key not in a:
-                added[key] = value
-
-    diffs = {'removed': removed, 'added': added, 'changed': changed,
-             'unchanged': unchanged}
-
-    # To determine the differences of key/value pairs, the key and value fields
-    # are split, merged as dictionaries, and subsequently compared.
-
-    pair = {}
-    if delimiter:
-        key_name = None
-        value_name = None
-        for key, value in b.iteritems():
-            if key[:2] == 'k_' and delimiter in value:
-                key_name = key
-                a_pair_k = re.split(delimiter, a[key]) if key in a else []
-                b_pair_k = re.split(delimiter, value)
-            if key[:2] == 'v_' and delimiter in value:
-                value_name = value
-                a_pair_v = re.split(delimiter, a[key]) if key in a else []
-                b_pair_v = re.split(delimiter, value)
-
-        if key_name and value_name:
-            a_pair_dict = dict(zip(a_pair_k, a_pair_v))
-            b_pair_dict = dict(zip(b_pair_k, b_pair_v))
-            pair = diff_dict2(a_pair_dict, b_pair_dict)
-
-            # Merge previous and current dictionaries.
-            b = dict(a_pair_dict, **b_pair_dict)
-        elif value_name:
-            pair = diff_list2(a_pair_v, b_pair_v)
-
-            # Similarly, merge lists.
-            b = a_pair_v + b_pair_v
-
-        if value_name:
-            diffs['pair'] = {'merged': b, 'diff': pair}
-
-    return diffs
-
-
-def diff_dict(d_old, d_new):
-    """
-    Creates a new dict representing a diff between two dicts.
-    """
-    # Added and changed items.
-    diff = {}
-    for k, v in d_new.items():
-        old_v = d_old.get(k, None)
-        if v == old_v:
-            continue
-        diff.update({k: {'old': old_v, 'new': v}})
-
-    # Deleted items.
-    for k, v in d_old.items():
-        if k not in d_new.keys():
-            diff.update({k: {'deleted': v}})
-
-    return diff
-
-def diff_list(l_old, l_new):
-    """
-    Creates a new dict representing a diff between two lists.
-    """
-    set_new, set_past = set(l_new), set(l_old)
-    intersect = set_new.intersection(set_past)
-
-    added = list(set_new - intersect)
-    deleted = list(set_past - intersect)
-
-    # Added and deleted items.
-    diff = {'added': added, 'deleted': deleted}
-
-    return diff
+import datetime
+import reversion
 
 
 class Machine(models.Model):
@@ -290,8 +143,7 @@ class System(models.Model):
 
     def __unicode__(self):
         return u'%s - %s - %s - %s - %s' % (self.kernel_rel, self.rh_rel,
-                                            self.nfs, self.ip_fwd,
-                                            self.iptables)
+                                            self.nfs, self.ip_fwd, self.iptables)
 
     def version_changes(self):
         """
@@ -326,7 +178,7 @@ class Services(models.Model):
                                    null=True)
     v_ports = models.CommaSeparatedIntegerField(_('ports'), max_length=255,
                                                 blank=True, null=True)
-    date_added = models.DateTimeField(_('date added'), editable=False,
+    date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
     def version_changes(self):
@@ -361,7 +213,7 @@ class SSHConfig(models.Model):
     machine = models.ForeignKey('Machine')
     k_parameters = models.TextField(_('parameters'), blank=True, null=True)
     v_values = models.TextField(_('values'), blank=True, null=True)
-    date_added = models.DateTimeField(_('date added'), editable=False,
+    date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
     def version_changes(self):
@@ -397,17 +249,30 @@ if not reversion.is_registered(SSHConfig):
 '''
 class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
-    parameters = models.TextField(blank=True, null=True)
-    values = models.TextField(blank=True, null=True)
-    date_added = models.DateTimeField(_('date added'), editable=False,
+
+    # TODO: Store as compressed Text Field.
+    contents = models.TextField(_('contents'), blank=True, null=True)
+
+    filename = models.CharField(_('filename'), max_length=255, blank=True,
+                                null=True)
+
+    # TODO: Store as dictionary (json or python serialized).
+    directives = models.TextField(blank=True, null=True)
+    date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u'%s' contents[0:100]
+
+    class Meta:
+        pass
 '''
 
 
 class RPMs(models.Model):
     machine = models.ForeignKey('Machine')
     v_rpms = models.TextField(_('RPMs'), blank=True, null=True)
-    date_added = models.DateTimeField(_('date added'), editable=False,
+    date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
     def version_changes(self):
@@ -428,7 +293,7 @@ class RPMs(models.Model):
         return r_diff
 
     def __unicode__(self):
-        return u'%s' % (self.v_rpms[0:100])
+        return u'%s' % self.v_rpms[0:100]
 
     class Meta:
         verbose_name = _('RPMs')
@@ -439,11 +304,35 @@ if not reversion.is_registered(RPMs):
     reversion.register(RPMs)
 
 
+class IPTableInfo(models.Model):
+    machine = models.ForeignKey('Machine')
+    body = models.TextField(_('iptables policies and rules'), blank=True,
+                            null=True)
+    active = models.BooleanField(_('iptables status'), default=0)
+    date_added = models.DateTimeField(_('date added'),
+                                      default=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u'%s' % self.body[0:100]
+
+    class Meta:
+        verbose_name = _('IPTableInfo')
+        verbose_name_plural = _('IPTableInfo')
+        get_latest_by = 'date_added'
+
+if not reversion.is_registered(IPTableInfo):
+    reversion.register(IPTableInfo)
+
+
 class IPTable(models.Model):
     machine = models.ForeignKey('Machine')
-    name = models.TextField(_('name'), max_length=255)
+    name = models.CharField(_('name'), max_length=255)
+#    table_name
+#    chain_name    ','
+#    chain_policy  ','
+#    chain_rules   '\n'
     #active = models.BooleanField(_('active'), default=1)
-    date_added = models.DateTimeField(_('date added'), editable=False,
+    date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
     def __unicode__(self):
@@ -461,10 +350,10 @@ class IPTable(models.Model):
 class IPTableChain(models.Model):
     table = models.ForeignKey('IPTable')
     name = models.CharField(_('chain name'), max_length=255)
-    policy = models.TextField(_('chain policy'), max_length=255, blank=True, null=True)
+    policy = models.TextField(_('chain policy'), blank=True, null=True)
     packets = models.BigIntegerField(_('packets counter'))
     bytes = models.BigIntegerField(_('bytes counter'))
-    date_added = models.DateTimeField(_('date added'), editable=False,
+    date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
     class Meta:
@@ -479,7 +368,7 @@ class IPTableChain(models.Model):
 class IPTableRule(models.Model):
     table = models.ForeignKey('IPTable')
     rule = models.CharField(_('rule'), max_length=255)
-    date_added = models.DateTimeField(_('date added'), editable=False,
+    date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
     class Meta:
@@ -489,4 +378,16 @@ class IPTableRule(models.Model):
 
 #if not reversion.is_registered(IPTableRule):
 #    reversion.register(IPTableRule)
+
+
+class AuthKey(models.Model):
+    machine = models.ForeignKey('Machine')
+    key = models.CharField(_('authorization key'), max_length=255)
+    date_added = models.DateTimeField(_('date added'),
+                                      default=datetime.datetime.now)
+
+    class Meta:
+        verbose_name = _('AuthKey')
+        verbose_name_plural = _('AuthKeys')
+        get_latest_by = 'date_added'
 

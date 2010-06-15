@@ -22,11 +22,16 @@
 
     <link rel="stylesheet" type="text/css"
           href="{{ MEDIA_URL }}css/smoothness/jquery-ui-1.8.1.custom.css">
+	<link rel="stylesheet" type="text/css"
+	      href="{{ MEDIA_URL }}css/jquery.tablescroll.css">
+
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/jquery-1.4.2.min.js"></script>
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/jquery-ui-1.8.1.custom.min.js"></script>
 
+    <script type="text/javascript"
+            src="{{ MEDIA_URL }}js/jquery.tablescroll.js"></script>
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/main.js"></script>
   </head>
@@ -61,11 +66,11 @@
       </header>
 
       <div id="row" class="content-wrap">
-        <section id="content" class="content col_11 col">
+        <section id="content" class="content col_13 col"> <!-- col_11 -->
 {% block content %}{% endblock %}
         </section><!-- #content -->
 
-        <aside id="sidebar" class="col_5 col">
+        <aside id="sidebar" class="col_7 col"> <!-- col_5 -->
         	<h2>{{ _('Machines') }}</h2>
           <form action="" method="post">
           	<fieldset><legend>{{ _('Filter Machines') }}</legend>
@@ -226,10 +231,10 @@
     </div><!-- #wrap -->
 
     <footer class="row">
-      <section class="col_8 col align_left">
+      <section class="col_10 col align_left"> <!-- col_8 -->
         &nbsp;&copy; Copyright 2010, Mozilla Corporation. All rights reserved.
       </section>
-      <section class="col_8 col align_right">
+      <section class="col_10 col align_right"> <!-- col_8 -->
         <a href="">Licensed under MPL 1.1 / GPL 2.0 / LGPL 2.1</a>
       </section>
     </footer>
