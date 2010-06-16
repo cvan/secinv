@@ -680,6 +680,18 @@ hgroup#masthead h3 {
 hgroup#masthead h3.sub {
     font-size: 2.5em;
 }
+hgroup#masthead h3 a {
+    color: #000;
+    text-decoration: none;
+}
+hgroup#masthead h3 a:hover {
+    color: #333;
+}
+hgroup#masthead h3 a:hover em {
+    color: #999;
+}
+
+
 hgroup#masthead h4 {
     font-size: 3em;
 }

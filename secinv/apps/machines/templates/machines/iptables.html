@@ -7,7 +7,9 @@
 {% block content %}
       <hgroup id="masthead">
         <h2 class="sub">{{ _('Machines') }}</h2>
-        <h3 class="sub">{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></h3>
+        <h3 class="sub">
+          <a href="{% url apps.machines.views.detail machine_slug=machine.hostname %}">{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></a>
+        </h3>
         <h4>{{ _('iptables') }}</h4>
       </hgroup>
       <div class="clear"></div>
