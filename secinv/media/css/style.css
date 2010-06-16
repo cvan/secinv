@@ -329,7 +329,8 @@ tbody tbody {
 table.wide {
     border-bottom-color: #ddd;
     margin: -10px -10px 0 -10px;
-    width: 660px; /* .col_11 width + 10px margins */
+/*    width: 660px; *//* .col_11 width + 10px margins */
+    width: 780px; /* .col_13 width + 10px margins */
 }
 
 /* TODO: temporary */
@@ -655,12 +656,17 @@ hgroup#masthead {
     padding: 20px 10px 20px 10px;
     position: relative;
 }
-hgroup#masthead h2 {
+hgroup#masthead h2,
+hgroup#masthead h4 {
     color: #fff;
     font-size: 2em;
 	font-weight: bold;
     text-shadow: #000 0 1px 1px;
     margin: 0;
+}
+hgroup#masthead h2.sub {
+    position: absolute;
+    left: -9999px;
 }
 hgroup#masthead h3 {
     color: #000;
@@ -671,6 +677,13 @@ hgroup#masthead h3 {
     line-height: 1;
     margin: 0;
 }
+hgroup#masthead h3.sub {
+    font-size: 2.5em;
+}
+hgroup#masthead h4 {
+    font-size: 3em;
+}
+
 
 #wrap {
     background-color: #fff;

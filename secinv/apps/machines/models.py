@@ -5,6 +5,7 @@ from .utils import diff_list, diff_dict, get_version_diff
 from reversion.models import Version
 
 import datetime
+import re
 import reversion
 
 

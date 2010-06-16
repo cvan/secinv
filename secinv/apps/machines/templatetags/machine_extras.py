@@ -5,6 +5,9 @@ from django.utils.safestring import mark_safe, SafeData
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 
+from .. import utils
+
+
 register = template.Library()
 
 @register.filter
@@ -252,7 +255,7 @@ def autolinebreaks(value, autoescape=None):
     """
     Checks if the content is HTML or plain text. If plain text ,
     line breaks are replaced with the appropriate HTML; a single
-    newline becomes an HTML line break (`<br />`) and a new line
+    newline becomes an HTML line break (`<br>`) and a new line
     followed by a blank line becomes a paragraph break (`</p>`).
     """
     import re
@@ -267,4 +270,14 @@ autolinebreaks.is_safe = True
 autolinebreaks.needs_autoescape = True
 autolinebreaks = stringfilter(autolinebreaks)
 register.filter(autolinebreaks)
+
+
+def engine(f):
+    def apply(text_a, text_b):
+        # Don't need to consider autoescape because difflib does the escaping.
+        return mark_safe(f(text_a, text_b))
+    return apply
+
+register.filter('diff_html', engine(utils.diff_html))
+register.filter('diff_table', engine(utils.diff_table))
 

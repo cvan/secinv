@@ -1,0 +1,31 @@
+{% extends "machines/base.html" %}
+{% load i18n %}
+{% load machine_extras %}
+
+{% block head_title %}{{ _('iptables') }} | {{ machine.hostname }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+      <hgroup id="masthead">
+        <h2 class="sub">{{ _('Machines') }}</h2>
+        <h3 class="sub">{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></h3>
+        <h4>{{ _('iptables') }}</h4>
+      </hgroup>
+      <div class="clear"></div>
+
+      <section class="col_6 col align_left"> <!-- col_8 -->
+
+        <h4>Previous</h4>
+        <code>{{ iptables_previous|autolinebreaks }}</code>
+
+      </section>
+      <section class="col_6 col align_left"> <!-- col_8 -->
+
+        <h4>Current</h4>
+        <code>{{ iptables_current|autolinebreaks }}</code>
+
+      </section>
+
+
+{% endblock %}
+
+

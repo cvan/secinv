@@ -174,12 +174,29 @@ def search(request):
         context_instance=RequestContext(request))
 
 
-def section_history(request):
-    p = get_object_or_404(Machine, hostname=machine_slug)
+def history_iptables(request, machine_slug):
+    m = get_object_or_404(Machine, hostname=machine_slug)
     query = request.GET.get('q', '')
 
+    iptables_current = ''
+    iptables_previous = ''
 
-    template_context = {'query': query}
-    return render_to_response('machines/search.html', template_context,
+    iptables_history = IPTableInfo.objects.filter(machine__id=m.id).order_by(
+        '-date_added').all()
+
+    if iptables_history.exists():
+        iptables_current = iptables_history[0].body
+
+        obj_versions = Version.objects.get_for_object(
+            iptables_history[0]).order_by('-revision')
+        if obj_versions:
+            iptables_previous = obj_versions[0].field_dict['body']
+
+
+    template_context = {'machine': m,
+                        'query': query,
+                        'iptables_current': iptables_current,
+                        'iptables_previous': iptables_previous}
+    return render_to_response('machines/iptables.html', template_context,
         context_instance=RequestContext(request))
 

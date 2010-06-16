@@ -9,7 +9,7 @@ urlpatterns = patterns('secinv.apps.machines.views',
     (r'^$', 'index'),
     (r'^search/', 'search'),
     (r'^%s/$' % machine_slug, 'detail'),
-    (r'^%s/history/%s/$' % (machine_slug, section_slug), 'section_history'),
+    (r'^%s/history/iptables/$' % machine_slug, 'history_iptables'),
     (r'^%s/history/$' % machine_slug, 'history'),
     (r'^%s/results/$' % machine_slug, 'results'),
 )
