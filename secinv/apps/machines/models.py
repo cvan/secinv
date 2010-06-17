@@ -247,7 +247,7 @@ class SSHConfig(models.Model):
 if not reversion.is_registered(SSHConfig):
     reversion.register(SSHConfig)
 
-'''
+
 class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
 
@@ -257,17 +257,26 @@ class ApacheConfig(models.Model):
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
 
+    directives = models.TextField(_('directives'), blank=True, null=True)
+    domains = models.TextField(_('domains'), blank=True, null=True)
+    included = models.TextField(_('included configuration files'), blank=True,
+                                null=True)
+
     # TODO: Store as dictionary (json or python serialized).
-    directives = models.TextField(blank=True, null=True)
+
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
     def __unicode__(self):
-        return u'%s' contents[0:100]
+        return u'%s' % body[0:100]
 
     class Meta:
-        pass
-'''
+        verbose_name = _('ApacheConfig')
+        verbose_name_plural = _('ApacheConfig')
+        get_latest_by = 'date_added'
+
+if not reversion.is_registered(ApacheConfig):
+    reversion.register(ApacheConfig)
 
 
 class RPMs(models.Model):

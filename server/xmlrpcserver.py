@@ -54,8 +54,13 @@ class SecureXMLRPCServer(BaseHTTPServer.HTTPServer,
         self.server_bind()
         self.server_activate()
 
-class SecureXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
+class RequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
     """Secure XML-RPC request handler class."""
+    def __init__(self, request, client_address, server):
+        self.client_ip = client_address
+        SimpleXMLRPCServer.SimpleXMLRPCRequestHandler.__init__(self, request,
+            client_address, server)
+
     def setup(self):
         self.connection = self.request
         self.rfile = socket._fileobject(self.request, 'rb', self.rbufsize)
@@ -68,7 +73,6 @@ class SecureXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
         It was copied out from SimpleXMLRPCServer.py and modified to shutdown
         the socket cleanly.
         """
-
         try:
             # Get arguments.
             data = self.rfile.read(int(self.headers['content-length']))
@@ -78,9 +82,8 @@ class SecureXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
             # SimpleXMLRPCDispatcher. To maintain backwards compatibility,
             # check to see if a subclass implements _dispatch and dispatch
             # using that method if present.
-            response = self.server._marshaled_dispatch(
-                    data, getattr(self, '_dispatch', None)
-                )
+            response = self.server._marshaled_dispatch(data,
+                getattr(self, '_dispatch', None))
         except:
             # Internal error -- report as HTTP server error.
             self.send_response(500)
@@ -98,8 +101,7 @@ class SecureXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
             self.connection.shutdown()
 
 
-def process(HandlerClass=SecureXMLRPCRequestHandler,
-            ServerClass=SecureXMLRPCServer):
+def process(HandlerClass=RequestHandler, ServerClass=SecureXMLRPCServer):
     """Process XML-RPC commands over HTTPS server."""
 
     from functions import ServerFunctions

@@ -372,6 +372,18 @@ table.wide time {
     font-size: 0.9em;
 }
 
+table td a {
+    color: #000;
+}
+table td a:hover {
+    color: #333;
+}
+
+td.cmp {
+    width: 20%;
+}
+
+
 /* @end */
 
 
@@ -759,9 +771,6 @@ height: 200px;
     text-indent: 1em;
 }
 
-#iptables-latest, #iptables-history {
-    font-size: 0.9em;
-}
 
 /* Last Modified */
 h4.group {
@@ -864,6 +873,10 @@ details.differences dd {
     width: 500px;   
 }
 
+.tabs .highlight {
+    width: 100%;
+}
+
 .highlight .hll { background-color: #ffffcc; }
 .highlight  { background: #f8f8f8;; }
 .highlight .c { color: #408080; font-style: italic; } /* Comment */
@@ -929,6 +942,85 @@ details.differences dd {
 
 
 /* @end */
+
+
+/*** Wiki diff page. ***/
+table.diff {
+    font-family: Courier;
+}
+
+table.diff tfoot {
+    border-top: #666 1px solid;
+    border-bottom: #666 3px solid;
+}
+
+table.diff tfoot th {
+    padding-top: 2em;
+}
+
+/* The links' and line number's columns should be thin. */
+.diff_next, .diff_header {
+    width: 1%;
+}
+.diff_header {
+    background-color: #e0e0e0;
+    text-align: right;
+}
+.diff_next {
+    background-color: #c0c0c0;
+}
+
+/* Keep line numbers and line changes aligned to the top of the cells. */
+table.diff td {
+    vertical-align: top;
+}
+
+/* Divide the columns equally. */
+.diff_text, table.diff_legends .diff_links {
+    width: 50%;
+}
+
+/* Add some spacing between the Colors and Links columns. */
+table.diff_legends td, table.diff_legends .diff_links {
+    padding-left: 14px;
+}
+
+/* Added, Changed, and Deleted legends. */
+table.diff_legends td.diff_add,
+table.diff_legends td.diff_chg,
+table.diff_legends td.diff_sub {
+    font-weight: normal;
+    line-height: 2.0em;
+    padding: 0 0.5em;
+}
+
+/* Colors for Added, Changed, and Deleted (lines and legends). */
+/*
+table .diff_add { background-color: #afa; }
+table .diff_chg { background-color: #adf;   dad, cac - purple, ff7 - yellow }
+table .diff_sub { background-color: #faa; }
+*/
+table .diff_add { background-color: #afa; }
+table .diff_chg { background-color: #adf; }
+table .diff_sub { background-color: #faa; }
+
+table .diff_add {
+    background-color: #dfd; /* #080 + 20 */
+}
+table .diff_chg {
+    background-color: #fec; /* #c50 + 15 */
+}
+table .diff_sub {
+    background-color: #fdd; /* #800 + 20 */
+}
+
+/* Legends caption, Colors and Links headers. */
+table.diff caption, table.diff thead th {
+    background-color: #fff;
+}
+table.diff caption {
+    font-weight: normal;
+}
 
 
 /* @end */

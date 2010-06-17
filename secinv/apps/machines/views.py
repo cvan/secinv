@@ -4,7 +4,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 
-from .models import Machine, Services, System, RPMs, Interface, SSHConfig, IPTableInfo
+from .models import Machine, Services, System, RPMs, Interface, SSHConfig, \
+                    IPTableInfo, ApacheConfig
 from .forms import MachineSearchForm
 from .utils import diff_list, diff_dict, get_version_diff, get_version_diff_field
 
@@ -129,6 +130,30 @@ def detail(request, machine_slug):
         iptables_latest = iptables_history[0]
 
 
+    ## Apache configuration files.
+    apacheconfig_latest = []
+    apacheconfig_history = ApacheConfig.objects.filter(machine__id=p.id).order_by(
+        '-date_added').all()
+
+    # Get historical versions of ApacheConfig objects.
+    apacheconfig_versions = get_version_diff_field(apacheconfig_history[0], 'contents')
+
+    if apacheconfig_history.exists():
+        # TODO: get main `httpd.conf` file.
+        apacheconfig_latest = apacheconfig_history[0]
+
+        from pygments import highlight
+        from pygments.lexers import PythonLexer
+        from pygments.formatters import HtmlFormatter
+        from pygments.lexers import ApacheConfLexer
+        #from pygments.filters import VisibleWhitespaceFilter
+    
+        code = apacheconfig_latest.contents
+        l = ApacheConfLexer()
+        #l.add_filter(VisibleWhitespaceFilter(newlines=True))
+        #diff_highlighted = highlight(code, PythonLexer(), HtmlFormatter())
+        apacheconfig_latest_body = highlight(apacheconfig_latest.contents, l, HtmlFormatter())
+
     template_context = {'query': query,
                         'machine': p,
                         'system': system_latest,
@@ -142,7 +167,10 @@ def detail(request, machine_slug):
                         'sshconfig': sshconfig_latest,
                         'sshconfig_versions': sshconfig_versions,
                         'iptables': iptables_latest,
-                        'iptables_versions': iptables_versions}
+                        'iptables_versions': iptables_versions,
+                        'apacheconfig': apacheconfig_latest,
+                        'apacheconfig_versions': apacheconfig_versions,
+                        'apacheconfig_latest_body': apacheconfig_latest_body}
     return render_to_response('machines/detail.html', template_context,
         context_instance=RequestContext(request))
 
@@ -174,9 +202,10 @@ def search(request):
         context_instance=RequestContext(request))
 
 
-def history_iptables(request, machine_slug):
+def history_iptables(request, machine_slug, version_number, compare_with='previous'):
     m = get_object_or_404(Machine, hostname=machine_slug)
     query = request.GET.get('q', '')
+    v_num = int(version_number)
 
     iptables_current = ''
     iptables_previous = ''
@@ -185,18 +214,53 @@ def history_iptables(request, machine_slug):
         '-date_added').all()
 
     if iptables_history.exists():
-        iptables_current = iptables_history[0].body
+        if compare_with == 'current':
+            iptables_current = iptables_history[0].body
 
         obj_versions = Version.objects.get_for_object(
-            iptables_history[0]).order_by('-revision')
+            iptables_history[0]).order_by('revision')
         if obj_versions:
-            iptables_previous = obj_versions[0].field_dict['body']
+            try:
+                if compare_with == 'current':
+                    iptables_previous = obj_versions[v_num - 1].field_dict['body']
+                elif compare_with == 'previous':
+                    iptables_current = obj_versions[v_num - 1].field_dict['body']
+                    iptables_previous = obj_versions[v_num - 2].field_dict['body']
+            except (IndexError, AssertionError):
+                pass
 
+            older_version = ''
+            newer_version = ''
+
+            if compare_with == 'current':
+                if (v_num - 2) < len(obj_versions):
+                    older_version = v_num - 1 # index + 1
+                if v_num < len(obj_versions):
+                    newer_version = v_num + 1
+            elif compare_with == 'previous':
+                if (v_num - 3) < len(obj_versions):
+                    older_version = v_num - 2
+                if v_num < len(obj_versions):
+                    newer_version = v_num + 1
+
+            if older_version < 0:
+                older_version = ''
+            if newer_version < 0:
+                newer_version = ''
+
+    v_num_previous = 0
+    if v_num > 0:
+        v_num_previous = v_num - 1
 
     template_context = {'machine': m,
                         'query': query,
                         'iptables_current': iptables_current,
-                        'iptables_previous': iptables_previous}
+                        'iptables_previous': iptables_previous,
+                        'version_current': str(v_num),
+                        'version_previous': str(v_num_previous),
+                        'older_version': str(older_version),
+                        'newer_version': str(newer_version),
+                        'compare_with': compare_with,}
     return render_to_response('machines/iptables.html', template_context,
         context_instance=RequestContext(request))
 

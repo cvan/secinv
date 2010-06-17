@@ -6,21 +6,16 @@ import datetime
 import os
 import sys
 
-def diff_list(l_old, l_new):
-    """
-    Creates a new dict representing a diff between two lists.
-    """
 
-    set_new, set_past = set(l_new), set(l_old)
-    intersect = set_new.intersection(set_past)
+def diff_list(l_old, l_new):
+    """Creates a new dictionary representing a difference between two lists."""
+    set_old, set_new = set(l_old), set(l_new)
+    intersect = set_new.intersection(set_old)
 
     added = list(set_new - intersect)
-    deleted = list(set_past - intersect)
+    removed = list(set_old - intersect)
 
-    # Added and deleted items.
-    diff = {'added': added, 'deleted': deleted}
-
-    return diff
+    return {'added': added, 'removed': removed}
 
 
 # BASE_PATH is the absolute path of '..' relative to this script location.
@@ -48,7 +43,8 @@ import reversion
 
 from apps.machines.models import *
 #from apps.machines.models import Interface, System, Services, RPMs, \
-#                                 SSHConfig, IPTable, IPTableChain, IPTableRules
+#                                 SSHConfig, IPTable, IPTableChain, IPTableRules,
+#                                 IPTableInfo, ApacheConfig
 
 
 class ServerFunctions:
@@ -75,7 +71,7 @@ class ServerFunctions:
         return True
 
     def machine(self, ip_dict, system_dict, services_dict, rpms_dict,
-                sshconfig_dict, ipt_dict):
+                sshconfig_dict, ipt_dict, acl_list):
         if not self.is_authenticated:
             return False
 
@@ -182,7 +178,7 @@ class ServerFunctions:
         i_diff = diff_list(distinct_interfaces, ip_dict.keys())
 
         # Update each deactivated interface as inactive.
-        for i in i_diff['deleted']:
+        for i in i_diff['removed']:
             try:
                 i_latest = Interface.objects.filter(machine__id=self.machine_id,
                                                     i_name=i, active=True).latest()
@@ -281,6 +277,40 @@ class ServerFunctions:
                                            v_rpms=rpms_dict['list'])
             with reversion.revision:
                 r_object.save()
+
+
+        ## Apache configuration files.
+
+        #
+        # TODO: Mark deleted .conf files as `inactive`.
+        # Add `active` field, a la Interfaces.
+        #
+
+        for ac in acl_list:
+            try:
+                a_object = ApacheConfig.objects.get(
+                    machine__id=self.machine_id, filename=ac['filename'])
+
+                if a_object.contents != ac['body_w'] or \
+                   a_object.directives != ac['directives'] or \
+                   a_object.domains != ac['domains'] or \
+                   a_object.included != ac['included']:
+
+                    a_object.contents = ac['body_w']
+                    a_object.directives = ac['directives']
+                    a_object.domains = ac['domains']
+                    a_object.included = ac['included']
+                    a_object.date_added = datetime.datetime.now()
+                    with reversion.revision:
+                        a_object.save()
+
+            except ApacheConfig.DoesNotExist:
+                a_object = ApacheConfig.objects.create(machine=self.machine_obj,
+                    contents=ac['body_w'], filename=ac['filename'],
+                    directives=ac['directives'], domains=ac['domains'],
+                    included=ac['included'])
+                #with reversion.revision:
+                a_object.save()
 
 
         ## SSH configuration file.

@@ -122,7 +122,8 @@ def get_version_diff(obj_item, delimiter=None):
             new_fields = dict(old_v, **ver.field_dict)
 
         versions.append({'fields': new_fields, 'diff': patch,
-                         'timestamp': ver.field_dict['date_added']})
+                         'timestamp': ver.field_dict['date_added'],
+                         'version': index + 1})
     versions.reverse()
     return versions
 
@@ -176,7 +177,8 @@ def get_version_diff_field(obj_item, field_name):
 
 
         versions.append({'fields': ver.field_dict, 'diff': diff_highlighted,
-                         'timestamp': ver.field_dict['date_added']})
+                         'timestamp': ver.field_dict['date_added'],
+                         'version': index + 1})
     versions.reverse()
     return versions
 

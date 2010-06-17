@@ -27,7 +27,7 @@ function getTabs(section) {
 
     if (section == 'sys-history') {
 
-        $.getJSON('{% url secinv.apps.machines.views.history machine_slug=machine.hostname %}', function(data) {
+        $.getJSON('{% url apps.machines.views.history machine_slug=machine.hostname %}', function(data) {
 
             newHTML += "<table>\n<caption>{{ _('History') }}</caption>\n";
             newHTML += "<thead>\n<tr>\n";
@@ -626,17 +626,19 @@ function getTabs(section) {
             <caption>{{ _('History') }}</caption>
             <thead>
               <tr>
-                <th>{{ _('Differences') }}</th>
+                <th class="cmp">{{ _('Compare against') }}</th>
+                <th>{{ _('Revisions') }}</th>
                 <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
             <tbody>
             {% for ipt_ver in iptables_versions %}
               <tr>
+                <td class="cmp">
+                  <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=ipt_ver.version, compare_with='current' %}">(cur)</a> <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=ipt_ver.version, compare_with='previous' %}">(prev)</a>
+                </td>
                 <td>
-                {% if ipt_ver.diff %}
-                  {{ ipt_ver.diff|safe }}
-                {% endif %}
+                  {{ _('Version') }} #{{ ipt_ver.version }}
                 </td>
                 <td class="timestamp">
                   <time datetime="{{ ipt_ver.fields.date_added|date:'c' }}">
@@ -653,6 +655,37 @@ function getTabs(section) {
           </table>
 
         </div><!-- #iptables-history -->
+      </section>
+
+
+      <h3>{{ _('Apache configuration files') }}</h3>
+      <section class="tabs">
+        <ul>
+          <li><a href="#apacheconfig-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#apacheconfig-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="apacheconfig-latest" class="latest">
+          {% if apacheconfig %}
+<!--          <h4 class="group">{{ apacheconfig.filename }}</h4> -->
+          <h4 class="group">/etc/httpd/conf/httpd.conf</h4>
+
+          <details class="date">
+            <strong>{{ _('Last Modified') }}</strong>
+            <time datetime="{{ apacheconfig.date_added|date:'c' }}">
+              {{ apacheconfig.date_added }}
+            </time>
+          </details>
+          <div class="clear"></div>
+
+<!--          <pre><code>{{ apacheconfig.contents }}</code></pre> -->
+          {{ apacheconfig_latest_body|safe }}
+
+          <div class="clear"></div>
+          {% endif %}
+        </div><!-- #apacheconfig-latest -->
+        <div id="apacheconfig-history" class="history">
+
+        </div><!-- #apacheconfig-history -->
       </section>
 
 
