@@ -8,7 +8,7 @@
       <hgroup id="masthead">
         <h2 class="sub">{{ _('Machines') }}</h2>
         <h3 class="sub">
-          <a href="{% url apps.machines.views.detail machine_slug=machine.hostname %}">{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></a>
+          <a href="{% url machines-detail machine_slug=machine.hostname %}">{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></a>
         </h3>
         <h4>{{ _('iptables') }}</h4>
       </hgroup>
@@ -46,7 +46,7 @@
 
               {% if older_version %}
                 <br>
-                <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=version_previous, compare_with='current' %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
+                <a href="{% url history-iptables machine_slug=machine.hostname, version_number=version_previous, compare_with='current' %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
               {% endif %}
 
             {% else %}
@@ -54,7 +54,7 @@
 
               {% if older_version %}
                 <br>
-                <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=version_previous, compare_with=compare_with %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
+                <a href="{% url history-iptables machine_slug=machine.hostname, version_number=version_previous, compare_with=compare_with %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
               {% endif %}
 
             {% endif %}
@@ -67,7 +67,7 @@
 
               {% if newer_version %}
                 <br>
-                <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=newer_version, compare_with=compare_with %}">&rarr; {{ _('Newer version') }}<!-- (#{{ newer_version }})--></a>
+                <a href="{% url history-iptables machine_slug=machine.hostname, version_number=newer_version, compare_with=compare_with %}">&rarr; {{ _('Newer version') }}<!-- (#{{ newer_version }})--></a>
               {% endif %}
 
             {% endif %}

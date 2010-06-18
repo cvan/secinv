@@ -1,0 +1,75 @@
+{% extends "machines/base.html" %}
+{% load i18n %}
+{% load machine_extras %}
+
+{% block head_title %}{{ _('Apache configuration file') }}: {{ ac.filename }} | {{ machine.hostname }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+      <hgroup id="masthead">
+        <h2 class="sub">{{ _('Machines') }}</h2>
+        <h3 class="sub">
+          <a href="{% url machines-detail machine_slug=machine.hostname %}">{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></a>
+        </h3>
+        <h4>{{ _('Apache configuration file') }} <em>{{ ac.filename }}</em></h4>
+      </hgroup>
+      <div class="clear"></div>
+
+      <details class="date">
+        <strong>{{ _('Last Modified') }}</strong>
+        <time datetime="{{ ac.date_added|date:'c' }}">
+          {{ ac.date_added }}
+        </time>
+      </details>
+      <div class="clear"></div>
+
+      {{ ac_body|safe }}
+
+      {{ apacheconfig_latest_body|safe }}
+
+
+      <h5>{{ _('Domains') }}</h5>
+      <h6>{{ _('In this file') }}</h6>
+
+      {# TODO: have client send as list, not dictionary. #}
+
+      {% if ac.domains %}
+      <ul>
+        {% for domain, ports in ac.domains.items %}
+        <li>{{ domain }} ({{ ports|join:', ' }})</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <h6>{{ _('In included .conf files') }}</h6>
+      {% if ac.get_domains %}
+      <ul>
+        {% for domain, ports in ac.get_domains %}
+        <li>{{ domain }} ({{ ports|join:', ' }})</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+
+      <h5>{{ _('Includes') }}</h5>
+      {% if apacheconfig_includes %}
+      <ul>
+        {% for fn, id, ac, body in apacheconfig_includes %}
+        <li>
+          <strong><a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=id %}">{{ fn }}</a></strong>
+          <!--{{ body|safe }}-->
+          {% if ac.domains %}
+          <ul>
+            {% for domain, ports in ac.domains.items %}
+            <li>{{ domain }} ({{ ports|join:', ' }})</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+{# TODO: link to historical versions #}
+
+{% endblock %}
+

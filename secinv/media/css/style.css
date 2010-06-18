@@ -229,12 +229,19 @@ h3 {
     margin-top: 1.556em /* 28px */;
     margin-bottom: 0.778em /* 14px */;
 }
+h3 {
+    font-size: 1.8em;
+}
 h4 {
     color: #223355;
-    font-size: 1em /* 13px */;
+/*    font-size: 1em *//* 13px *//*;*/
+    font-size: 1.5em;
 }
 h5, h6 {
     font-size: 1em /* 13px */;
+}
+h5 {
+    font-size: 1.385em;
 }
 
 h3 em {
@@ -244,6 +251,12 @@ h3 em {
     font-size: 0.6em;
     font-style: normal;
     text-shadow: none;
+}
+h4 em {
+    color: #999;
+    font-style: normal;
+    font-size: 0.6em;
+    display: block;
 }
 
 /* @end */
@@ -380,7 +393,7 @@ table td a:hover {
 }
 
 td.cmp {
-    width: 20%;
+    width: 25%;
 }
 
 
@@ -418,6 +431,7 @@ header nav form label {
 }
 
 fieldset {
+    margin-bottom: 1em;
     padding: 1em;
 }
 
@@ -870,11 +884,10 @@ details.differences dd {
 .highlight {
     overflow: auto;
     max-height: 400px;
-    width: 500px;   
 }
 
-.tabs .highlight {
-    width: 100%;
+.history .highlight {
+    width: 500px;
 }
 
 .highlight .hll { background-color: #ffffcc; }

@@ -31,7 +31,7 @@
           <tr>
             <td>{{ machine.sys_ip }}</td>
             <td>
-              <a href="{% url apps.machines.views.detail machine_slug=machine.hostname %}">
+              <a href="{% url machines-detail machine_slug=machine.hostname %}">
                 {{ machine.hostname }}
               </a>
             </td>

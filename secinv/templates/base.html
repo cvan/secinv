@@ -44,19 +44,19 @@
         <nav role="navigation">
           <ul>
             <li class="machines">
-              <a href="{% url apps.machines.views.index %}" class="button black pill">{{ _('Machines') }}</a>
+              <a href="{% url machines-index %}" class="button black pill">{{ _('Machines') }}</a>
             </li>
             <li class="devices">
-              <a href="{% url apps.devices.views.index %}" class="button black pill">{{ _('Devices') }}</a>
+              <a href="{% url machines-index %}" class="button black pill">{{ _('Devices') }}</a>
             </li>
             <li class="profiles">
-              <a href="{% url apps.machines.views.index %}" class="button black pill">{{ _('Profiles') }}</a>
+              <a href="{% url machines-index %}" class="button black pill">{{ _('Profiles') }}</a>
             </li>
             <li class="config">
-              <a href="{% url apps.machines.views.index %}" class="button black pill">{{ _('Configuration Files') }}</a>
+              <a href="{% url machines-index %}" class="button black pill">{{ _('Configuration Files') }}</a>
             </li>
           </ul>
-          <form action="{% url apps.machines.views.search %}" method="get">
+          <form action="{% url machines-search %}" method="get">
             <label for="q">{{ _('Search') }}</label>
             <input type="search" name="q" id="q" value="{{ query|escape }}">
             <input type="submit" class="button pill lightblue" value="Search">
@@ -71,158 +71,7 @@
         </section><!-- #content -->
 
         <aside id="sidebar" class="col_7 col"> <!-- col_5 -->
-        	<h2>{{ _('Machines') }}</h2>
-          <form action="" method="post">
-          	<fieldset><legend>{{ _('Filter Machines') }}</legend>
-
-          	  <label for="machine_hostname">{{ _('Select by machine') }}</label>
-              <select name="machine_hostname" id="machine_hostname"
-                      onchange="this.form.submit();">
-                <option>*</option>
-                <option>pm-app-bugs01</option>
-                <option>pm-app-bugs02</option>
-                <option>pm-app-bugs03</option>
-                <option>pm-app-bugs04</option>
-                <option>pm-app-bugs05</option>
-                <option>tm-bugs01-master01</option>
-                <option>tm-bugs01-slave01</option>
-                <option>tm-bugs01-slave02</option>
-                <option>tm-bugs01-slave03</option>
-                <option>pm-app-amo01</option>
-                <option>pm-app-amo02</option>
-                <option>pm-app-amo03</option>
-                <option>pm-app-amo04</option>
-                <option>pm-app-amo05</option>
-                <option>pm-app-amo06</option>
-                <option>pm-app-amo07</option>
-                <option>pm-app-amo08</option>
-                <option>pm-app-amo09</option>
-                <option>pm-app-amo10</option>
-                <option>pm-app-amo11</option>
-                <option>pm-app-amo12</option>
-                <option>pm-app-amo13</option>
-                <option>pm-app-amo14</option>
-                <option>pm-app-amo15</option>
-                <option>pm-app-amo16</option>
-                <option>pm-app-amo17</option>
-                <option>pm-app-amo18</option>
-                <option>pm-app-amo19</option>
-                <option>pm-app-amo21</option>
-                <option>pm-app-amo22</option>
-                <option>pm-app-amo23</option>
-                <option>pm-app-amo24</option>
-                <option>dm-svn01</option>
-                <option>dm-svn02</option>
-                <option>pm-app-personas01</option>
-                <option>pm-app-personas02</option>
-                <option>pm-app-personas03</option>
-                <option>pm-app-dist01</option>
-                <option>pm-app-dist02</option>
-                <option>pm-app-dist03</option>
-                <option>pm-app-dist04</option>
-                <option>pm-app-dist05</option>
-                <option>pm-app-dist06</option>
-                <option>pm-app-dist07</option>
-                <option>pm-app-dist08</option>
-                <option>pm-app-dist09</option>
-                <option>dm-download02</option>
-                <option>dm-download03</option>
-                <option>dm-download04</option>
-                <option>pm-app-generic01</option>
-                <option>pm-app-generic02</option>
-                <option>pm-app-generic03</option>
-                <option>pm-app-generic04</option>
-                <option>pm-app-generic05</option>
-                <option>pm-app-generic06</option>
-                <option>pm-ns01</option>
-                <option>pm-ns02</option>
-                <option>tm-bouncer01-master01</option>
-                <option>tm-bouncer01-slave01</option>
-                <option>tm-bouncer01-slave02</option>
-                <option>tm-bouncer01-slave03</option>
-                <option>pm-web01</option>
-                <option>pm-web02</option>
-                <option>pm-web03</option>
-                <option>pm-web04</option>
-                <option>dm-mozcrm-stage01</option>
-                <option>mradm01</option>
-                <option>mradm02</option>
-                <option>tm-sumo01-master01</option>
-                <option>tm-sumo01-slave01</option>
-                <option>tm-sumo01-slave02</option>
-                <option>dm-hg01</option>
-                <option>dm-hg02</option>
-                <option>dm-surf</option>
-                <option>sm-personas01</option>
-                <option>pm-weave01</option>
-                <option>pm-weave02</option>
-                <option>pm-weave03</option>
-                <option>pm-weave04</option>
-                <option>pm-weave06</option>
-                <option>pm-weavefs01</option>
-                <option>pm-weaveadmin01</option>
-              </select>
-
-              <label for="domain">{{ _('Select by domain') }}</label>
-              <select name="domain" id="domain" onchange="this.form.submit();">
-                <option>addons.mozilla.org</option>
-                <option>air.mozilla.com</option>
-                <option>archive-sfx.spreadfirefox.com</option>
-                <option>aus2-staging.mozilla.org</option>
-                <option>aus2.mozilla.org</option>
-                <option>blog.getfirebug.com</option>
-                <option>blog.lizardwrangler.com</option>
-                <option>blog.mozilla.com</option>
-                <option>communitystore.mozilla.org</option>
-                <option>crash-reports-php.mozilla.com</option>
-                <option>crash-reports.mozilla.com</option>
-                <option>creative.mozilla.org</option>
-                <option>developer.mozilla.org</option>
-                <option>download-stats.mozilla.com</option>
-                <option>download.mozilla.org</option>
-                <option>downloadstats.mozilla.com</option>
-                <option>fastestfirefox.mozilla.com</option>
-                <option>feeds.mozilla.com</option>
-                <option>forums.addons.mozilla.org</option>
-                <option>getfirebug.com</option>
-                <option>getpersonas.com </option>
-                <option>guides.mozilla.org</option>
-                <option>hacks.mozilla.org</option>
-                <option>impactmozilla.com</option>
-                <option>jetpackgallery.mozillalabs.com</option>
-                <option>labs.mozilla.com</option>
-                <option>metrics-collector.mozilla.com</option>
-                <option>mobile.support.mozilla.com</option>
-                <option>mozilla-europe.org</option>
-                <option>mozillamessaging.com</option>
-                <option>mozillaparty-archive.mozilla.com</option>
-                <option>mozillaservice.org</option>
-                <option>mpl.mozilla.org</option>
-                <option>opentochoice.org</option>
-                <option>operationfirefox.com</option>
-                <option>outgoing.mozilla.org</option>
-                <option>pastebin.mozilla.org</option>
-                <option>pfs2.mozilla.org</option>
-                <option>plugins.mozilla.org</option>
-                <option>preview.addons.mozilla.org</option>
-                <option>reporter.mozilla.org</option>
-                <option>rockyourfirefox.com</option>
-                <option>securityquiz.facebook.mozilla.com</option>
-                <option>support.mozilla.com</option>
-                <option>survey.mozilla.com</option>
-                <option>surveys.mozilla-europe.org</option>
-                <option>tiki-trunk.mozilla.com</option>
-                <option>tools.mozilla.com</option>
-                <option>userpanel.mozilla.com</option>
-                <option>wiki.mozilla.org</option>
-                <option>www.firefoxflicks.com</option>
-                <option>www.getpersonas.com</option>
-                <option>www.priorartshare.org</option>
-                <option>www.spreadfirefox.com</option>
-                <option>www.worldfirefoxday.com</option>
-              </select>
-            </fieldset>
-          </form>
+{% block sidebar %}{% endblock %}
         </aside>
 
         <div class="clear"></div>

@@ -275,6 +275,12 @@ class ApacheConfig(models.Model):
     def __unicode__(self):
         return u'%s' % self.body[0:100]
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('httpd-conf', (), {'machine_slug': self.machine.hostname,
+                                   'ac_id': str(self.id)})
+
+    '''
     def get_domains(self):
         domains = {}
         for fn in self.included:
@@ -283,6 +289,21 @@ class ApacheConfig(models.Model):
                                              filename=fn)
                 if a.domains:
                     domains = dict(domains, **a.domains)
+            except ApacheConfig.DoesNotExist:
+                pass
+        return domains
+    '''
+
+    def get_domains(self):
+        domains = []
+        for fn in self.included:
+            try:
+                a = ApacheConfig.objects.get(machine__id=self.machine_id,
+                                             filename=fn)
+                if a.domains:
+                    #domains.append( a.domains )
+                    for k, v in a.domains.iteritems():
+                        domains.append([k, v, a])
             except ApacheConfig.DoesNotExist:
                 pass
         return domains

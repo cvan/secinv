@@ -9,9 +9,65 @@ from .models import Machine, Services, System, RPMs, Interface, SSHConfig, \
 from .forms import MachineSearchForm
 from .utils import diff_list, diff_dict, get_version_diff, get_version_diff_field
 
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import ApacheConfLexer
+
 from reversion.models import Version
 
 import re
+
+
+def get_all_domains():
+    all_domains = []
+
+    m_all = Machine.objects.all()
+    for m in m_all:
+        a_m = ApacheConfig.objects.filter(machine__id=m.id).all()
+        for a in a_m:
+            for fn in a.included:
+                try:
+                    i_a = ApacheConfig.objects.get(machine__id=m.id,
+                                                   filename=fn)
+                    if i_a.domains:
+                        # TODO: Want port number (value)?
+                        for k in i_a.domains.keys():
+                            if not [m.hostname, k, i_a.id] in all_domains:
+                                all_domains.append([m.hostname, k, i_a.id])
+                except ApacheConfig.DoesNotExist:
+                    pass
+
+    all_domains.sort()
+    return all_domains
+
+def get_all_directives():
+    all_directives_dict = {}
+
+    m_all = Machine.objects.all()
+    for m in m_all:
+        a_m = ApacheConfig.objects.filter(machine__id=m.id).all()
+        for a in a_m:
+            for fn in a.included:
+                try:
+                    i_a = ApacheConfig.objects.get(machine__id=m.id,
+                                                   filename=fn)
+                    if i_a.directives:
+                        for k, v in i_a.directives.iteritems():
+                            if k in all_directives_dict:
+                                all_directives_dict[k] += v
+                            else:
+                                all_directives_dict[k] = v
+                except ApacheConfig.DoesNotExist:
+                    pass
+
+    all_directives = []
+
+    for key, values in all_directives_dict.iteritems():
+        all_directives.append([key, list(set(values))])
+
+    all_directives.sort()
+    return all_directives
 
 
 def index(request):
@@ -29,10 +85,10 @@ def history(request, machine_slug):
     #if not request.is_ajax():
     #    return HttpResponse(status=400)
 
-    p = get_object_or_404(Machine, hostname=machine_slug)
+    m = get_object_or_404(Machine, hostname=machine_slug)
 
     # Retrieve all the system history.
-    system_history = System.objects.filter(machine__id=p.id).order_by(
+    system_history = System.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
     # Serialize the result of the database retrieval to JSON and send an
@@ -42,12 +98,12 @@ def history(request, machine_slug):
 
 
 def detail(request, machine_slug):
-    p = get_object_or_404(Machine, hostname=machine_slug)
+    m = get_object_or_404(Machine, hostname=machine_slug)
     query = request.GET.get('q', '')
 
     ## System.
     system_latest = []
-    system_history = System.objects.filter(machine__id=p.id).order_by(
+    system_history = System.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
     # Get historical versions of System objects.
@@ -59,7 +115,7 @@ def detail(request, machine_slug):
 
     ## Services.
     services_latest = []
-    services_history = Services.objects.filter(machine__id=p.id).order_by(
+    services_history = Services.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
     # Get historical versions of Services objects.
@@ -73,12 +129,12 @@ def detail(request, machine_slug):
 
     # Get latest interfaces (select by distinct interface name).
     distinct_interfaces = Interface.objects.filter(
-        machine__id=p.id).values_list('i_name', flat=True).distinct()
+        machine__id=m.id).values_list('i_name', flat=True).distinct()
 
     interfaces_latest = []
     interfaces_versions = []
     for i in distinct_interfaces:
-        i_latest = Interface.objects.filter(machine__id=p.id,
+        i_latest = Interface.objects.filter(machine__id=m.id,
                                             i_name=i).latest()
         interfaces_latest.append(i_latest)
 
@@ -92,7 +148,7 @@ def detail(request, machine_slug):
 
     ## SSHConfig.
     sshconfig_latest = []
-    sshconfig_history = SSHConfig.objects.filter(machine__id=p.id).order_by(
+    sshconfig_history = SSHConfig.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
     # Get historical versions of SSHConfig objects.
@@ -105,7 +161,7 @@ def detail(request, machine_slug):
     # RPMs.
     rpms_list = []
     rpms_date_added = None
-    rpms_history = RPMs.objects.filter(machine__id=p.id).order_by(
+    rpms_history = RPMs.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
     # Get historical versions of RPMs objects.
@@ -120,7 +176,7 @@ def detail(request, machine_slug):
 
     ## iptables.
     iptables_latest = []
-    iptables_history = IPTableInfo.objects.filter(machine__id=p.id).order_by(
+    iptables_history = IPTableInfo.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
     # Get historical versions of IPTableInfo objects.
@@ -132,7 +188,8 @@ def detail(request, machine_slug):
 
     ## Apache configuration files.
     apacheconfig_latest = []
-    apacheconfig_history = ApacheConfig.objects.filter(machine__id=p.id).order_by(
+    apacheconfig_includes = []
+    apacheconfig_history = ApacheConfig.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
     # Get historical versions of ApacheConfig objects.
@@ -142,17 +199,87 @@ def detail(request, machine_slug):
         # TODO: get main `httpd.conf` file.
         apacheconfig_latest = apacheconfig_history[0]
 
-        from pygments import highlight
-        from pygments.lexers import PythonLexer
-        from pygments.formatters import HtmlFormatter
-        from pygments.lexers import ApacheConfLexer
-        #from pygments.filters import VisibleWhitespaceFilter
-    
         code = apacheconfig_latest.body
+
         l = ApacheConfLexer()
         #l.add_filter(VisibleWhitespaceFilter(newlines=True))
         #diff_highlighted = highlight(code, PythonLexer(), HtmlFormatter())
         apacheconfig_latest_body = highlight(code, l, HtmlFormatter())
+
+
+        body = ''
+        lines = re.split('\n', apacheconfig_latest_body)
+        for line in lines:
+            ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
+            if len(ls) == 2 and ls[0].lower() == 'include':
+                # TODO: in Apache Config Parser, handle ``quoted`` Include filenames.
+
+                try:
+                    a = ApacheConfig.objects.get(machine__id=m.id,
+                                                 filename__endswith=ls[1])
+                    i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
+                except (ApacheConfig.DoesNotExist, ApacheConfig.MultipleObjectsReturned):
+                    i_fn = '%s' % ls[1]
+
+                line = '<span class="nb">%s</span> %s' % (ls[0], i_fn)
+            body += '%s\n' % line
+        apacheconfig_latest_body = body
+
+
+        for fn in apacheconfig_latest.included:
+            try:
+                i = ApacheConfig.objects.get(machine__id=m.id, filename=fn)
+                
+                code = i.body
+                highlighted_code = highlight(code, l, HtmlFormatter())
+        
+                body = ''
+                lines = re.split('\n', highlighted_code)
+                for line in lines:
+                    ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
+                    if len(ls) == 2 and ls[0].lower() == 'include':
+                        # TODO: in Apache Config Parser, handle ``quoted`` Include filenames.
+        
+                        try:
+                            a = ApacheConfig.objects.get(machine__id=m.id,
+                                                         filename__endswith=ls[1])
+                            i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
+                        except (ApacheConfig.DoesNotExist, ApacheConfig.MultipleObjectsReturned):
+                            i_fn = '%s' % ls[1]
+        
+                        line = '<span class="nb">%s</span> %s' % (ls[0], i_fn)
+                    body += '%s\n' % line
+                
+                apacheconfig_includes.append([fn, i.id, i, body])
+            except ApacheConfig.DoesNotExist:
+                pass
+
+
+    '''
+    all_domains = []
+
+    m_all = Machine.objects.all()
+    for m in m_all:
+        a_m = ApacheConfig.objects.filter(machine__id=m.id).all()
+        for a in a_m:
+            for fn in a.included:
+                try:
+                    i_a = ApacheConfig.objects.get(machine__id=m.id,
+                                                   filename=fn)
+                    if i_a.domains:
+                        # TODO: Want port number (value)?
+                        for k in i_a.domains.keys():
+                            if not [m.hostname, k, i_a.id] in all_domains:
+                                all_domains.append([m.hostname, k, i_a.id])
+                except ApacheConfig.DoesNotExist:
+                    pass
+
+    all_domains.sort()
+    '''
+
+    all_domains = get_all_domains()
+    all_directives = get_all_directives()
+
 
     template_context = {'query': query,
                         'machine': p,
@@ -170,14 +297,11 @@ def detail(request, machine_slug):
                         'iptables_versions': iptables_versions,
                         'apacheconfig': apacheconfig_latest,
                         'apacheconfig_versions': apacheconfig_versions,
-                        'apacheconfig_latest_body': apacheconfig_latest_body}
+                        'apacheconfig_latest_body': apacheconfig_latest_body,
+                        'apacheconfig_includes': apacheconfig_includes,
+                        'all_domains': all_domains,
+                        'all_directives': all_directives}
     return render_to_response('machines/detail.html', template_context,
-        context_instance=RequestContext(request))
-
-
-def results(request, machine_slug):
-    p = get_object_or_404(Machine, hostname=machine_slug)
-    return render_to_response('machines/results.html', {'machine': p},
         context_instance=RequestContext(request))
 
 
@@ -199,6 +323,39 @@ def search(request):
                         'query': query,
                         'terms': terms}
     return render_to_response('machines/search.html', template_context,
+        context_instance=RequestContext(request))
+
+
+def httpd_conf(request, machine_slug, ac_id):
+    m = get_object_or_404(Machine, hostname=machine_slug)
+    ac = get_object_or_404(ApacheConfig, id=ac_id)
+
+    code = ac.body
+    highlighted_code = highlight(code, ApacheConfLexer(), HtmlFormatter())
+
+    body = ''
+    lines = re.split('\n', highlighted_code)
+    for line in lines:
+        ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
+        if len(ls) == 2 and ls[0].lower() == 'include':
+            # TODO: in Apache Config Parser, handle ``quoted`` Include filenames.
+
+            try:
+                a = ApacheConfig.objects.get(machine__id=m.id,
+                                             filename__endswith=ls[1])
+                i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
+            except (ApacheConfig.DoesNotExist, ApacheConfig.MultipleObjectsReturned):
+                i_fn = '%s' % ls[1]
+
+            line = '<span class="nb">%s</span> %s' % (ls[0], i_fn)
+        body += '%s\n' % line
+
+    query = request.GET.get('q', '')
+    template_context = {'machine': m,
+                        'query': query,
+                        'ac': ac,
+                        'ac_body': body}
+    return render_to_response('machines/httpd_conf.html', template_context,
         context_instance=RequestContext(request))
 
 
@@ -263,4 +420,22 @@ def history_iptables(request, machine_slug, version_number, compare_with='previo
                         'compare_with': compare_with,}
     return render_to_response('machines/iptables.html', template_context,
         context_instance=RequestContext(request))
+
+
+# View that that returns the JSON result.
+def apache(request, machine_slug):
+    # TODO: prevent calls
+    #if not request.is_ajax():
+    #    return HttpResponse(status=400)
+
+    m = get_object_or_404(Machine, hostname=machine_slug)
+
+    # Retrieve all the system history.
+    system_history = System.objects.filter(machine__id=m.id).order_by(
+        '-date_added').all()
+
+    # Serialize the result of the database retrieval to JSON and send an
+    # application/json response.
+    return HttpResponse(serializers.serialize('json', system_history),
+                        mimetype='application/json')
 

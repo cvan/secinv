@@ -27,7 +27,7 @@ function getTabs(section) {
 
     if (section == 'sys-history') {
 
-        $.getJSON('{% url apps.machines.views.history machine_slug=machine.hostname %}', function(data) {
+        $.getJSON('{% url history machine_slug=machine.hostname %}', function(data) {
 
             newHTML += "<table>\n<caption>{{ _('History') }}</caption>\n";
             newHTML += "<thead>\n<tr>\n";
@@ -635,7 +635,11 @@ function getTabs(section) {
             {% for ipt_ver in iptables_versions %}
               <tr>
                 <td class="cmp">
-                  <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=ipt_ver.version, compare_with='current' %}">(cur)</a> <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=ipt_ver.version, compare_with='previous' %}">(prev)</a>
+                  {% if forloop.first %}{{ _('(current)') }}{% else %}
+                  <a href="{% url history-iptables machine_slug=machine.hostname, version_number=ipt_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
+                  {% endif %}
+
+                  <a href="{% url history-iptables machine_slug=machine.hostname, version_number=ipt_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
                 </td>
                 <td>
                   {{ _('Version') }} #{{ ipt_ver.version }}
@@ -680,25 +684,37 @@ function getTabs(section) {
 <!--          <pre><code>{{ apacheconfig.body }}</code></pre> -->
           {{ apacheconfig_latest_body|safe }}
 
-          <h5>{{ _('Directives') }}</h5>
-          {{ apacheconfig.directives }}
 
-          <h5>{{ _('Domains') }}</h5>
-
-        {% if apacheconfig.get_domains %}
+          <h5>{{ _('Domains in this file') }}</h5>
+          {% if apacheconfig.domains %}
           <ul>
-          {% for domain, ports in apacheconfig.get_domains.items %}
+            {% for domain, ports in apacheconfig.domains.items %}
             <li>{{ domain }} ({{ ports|join:', ' }})</li>
-          {% endfor %}
+            {% endfor %}
           </ul>
-        {% endif %}
+          {% else %}
+          <p>None</p>
+          {% endif %}
+    
 
           <h5>{{ _('Includes') }}</h5>
-          {% if apacheconfig.included %}
+          {% if apacheconfig_includes %}
           <ul>
-          {% for fn in apacheconfig.included %}
-            <li>{{ fn }}</li>
-          {% endfor %}
+            {% for fn, id, ac, body in apacheconfig_includes %}
+            <li>
+              <strong><a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=id %}">{{ fn }}</a></strong>
+              <!--
+              {{ body|safe }}
+              -->
+              {% if ac.domains %}
+              <ul>
+                {% for domain, ports in ac.domains.items %}
+                <li>{{ domain }} ({{ ports|join:', ' }})</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </li>
+            {% endfor %}
           </ul>
           {% endif %}
 
