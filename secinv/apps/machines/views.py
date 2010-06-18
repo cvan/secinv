@@ -136,7 +136,7 @@ def detail(request, machine_slug):
         '-date_added').all()
 
     # Get historical versions of ApacheConfig objects.
-    apacheconfig_versions = get_version_diff_field(apacheconfig_history[0], 'contents')
+    apacheconfig_versions = get_version_diff_field(apacheconfig_history[0], 'body')
 
     if apacheconfig_history.exists():
         # TODO: get main `httpd.conf` file.
@@ -148,11 +148,11 @@ def detail(request, machine_slug):
         from pygments.lexers import ApacheConfLexer
         #from pygments.filters import VisibleWhitespaceFilter
     
-        code = apacheconfig_latest.contents
+        code = apacheconfig_latest.body
         l = ApacheConfLexer()
         #l.add_filter(VisibleWhitespaceFilter(newlines=True))
         #diff_highlighted = highlight(code, PythonLexer(), HtmlFormatter())
-        apacheconfig_latest_body = highlight(apacheconfig_latest.contents, l, HtmlFormatter())
+        apacheconfig_latest_body = highlight(code, l, HtmlFormatter())
 
     template_context = {'query': query,
                         'machine': p,

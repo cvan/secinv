@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 #from ..fulltext.search import SearchManager
+from ..fields import *
 from .utils import diff_list, diff_dict, get_version_diff
 from reversion.models import Version
 
@@ -252,15 +253,19 @@ class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
 
     # TODO: Store as compressed Text Field.
-    contents = models.TextField(_('contents'), blank=True, null=True)
+    body = CompressedTextField(_('contents'), blank=True, null=True)
 
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
 
-    directives = models.TextField(_('directives'), blank=True, null=True)
-    domains = models.TextField(_('domains'), blank=True, null=True)
-    included = models.TextField(_('included configuration files'), blank=True,
-                                null=True)
+    directives = SerializedDataField()
+    domains = SerializedDataField()
+    included = SerializedDataField()
+
+    #directives = models.TextField(_('directives'), blank=True, null=True)
+    #domains = models.TextField(_('domains'), blank=True, null=True)
+    #included = models.TextField(_('included configuration files'), blank=True,
+    #                            null=True)
 
     # TODO: Store as dictionary (json or python serialized).
 
@@ -268,7 +273,19 @@ class ApacheConfig(models.Model):
                                       default=datetime.datetime.now)
 
     def __unicode__(self):
-        return u'%s' % body[0:100]
+        return u'%s' % self.body[0:100]
+
+    def get_domains(self):
+        domains = {}
+        for fn in self.included:
+            try:
+                a = ApacheConfig.objects.get(machine__id=self.machine_id,
+                                             filename=fn)
+                if a.domains:
+                    domains = dict(domains, **a.domains)
+            except ApacheConfig.DoesNotExist:
+                pass
+        return domains
 
     class Meta:
         verbose_name = _('ApacheConfig')
@@ -337,11 +354,10 @@ if not reversion.is_registered(IPTableInfo):
 class IPTable(models.Model):
     machine = models.ForeignKey('Machine')
     name = models.CharField(_('name'), max_length=255)
-#    table_name
-#    chain_name    ','
-#    chain_policy  ','
-#    chain_rules   '\n'
+
+    # TODO: `active` field.
     #active = models.BooleanField(_('active'), default=1)
+
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
@@ -355,39 +371,6 @@ class IPTable(models.Model):
 
 #if not reversion.is_registered(IPTable):
 #    reversion.register(IPTable)
-
-
-class IPTableChain(models.Model):
-    table = models.ForeignKey('IPTable')
-    name = models.CharField(_('chain name'), max_length=255)
-    policy = models.TextField(_('chain policy'), blank=True, null=True)
-    packets = models.BigIntegerField(_('packets counter'))
-    bytes = models.BigIntegerField(_('bytes counter'))
-    date_added = models.DateTimeField(_('date added'),
-                                      default=datetime.datetime.now)
-
-    class Meta:
-        verbose_name = _('IPTableChain')
-        verbose_name_plural = _('IPTableChains')
-        get_latest_by = 'date_added'
-
-#if not reversion.is_registered(IPTableChain):
-#    reversion.register(IPTableChain)
-
-
-class IPTableRule(models.Model):
-    table = models.ForeignKey('IPTable')
-    rule = models.CharField(_('rule'), max_length=255)
-    date_added = models.DateTimeField(_('date added'),
-                                      default=datetime.datetime.now)
-
-    class Meta:
-        verbose_name = _('IPTableRules')
-        verbose_name_plural = _('IPTableRules')
-        get_latest_by = 'date_added'
-
-#if not reversion.is_registered(IPTableRule):
-#    reversion.register(IPTableRule)
 
 
 class AuthKey(models.Model):

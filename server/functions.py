@@ -291,12 +291,12 @@ class ServerFunctions:
                 a_object = ApacheConfig.objects.get(
                     machine__id=self.machine_id, filename=ac['filename'])
 
-                if a_object.contents != ac['body_w'] or \
+                if a_object.body != ac['body'] or \
                    a_object.directives != ac['directives'] or \
                    a_object.domains != ac['domains'] or \
                    a_object.included != ac['included']:
 
-                    a_object.contents = ac['body_w']
+                    a_object.body = ac['body']
                     a_object.directives = ac['directives']
                     a_object.domains = ac['domains']
                     a_object.included = ac['included']
@@ -306,11 +306,11 @@ class ServerFunctions:
 
             except ApacheConfig.DoesNotExist:
                 a_object = ApacheConfig.objects.create(machine=self.machine_obj,
-                    contents=ac['body_w'], filename=ac['filename'],
+                    body=ac['body'], filename=ac['filename'],
                     directives=ac['directives'], domains=ac['domains'],
                     included=ac['included'])
-                #with reversion.revision:
-                a_object.save()
+                with reversion.revision:
+                    a_object.save()
 
 
         ## SSH configuration file.

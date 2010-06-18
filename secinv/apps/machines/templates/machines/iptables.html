@@ -43,20 +43,20 @@
             <th>
             {% if compare_with == 'current' %}
               {{ _('Version') }} #{{ version_current }}
-    
+
               {% if older_version %}
                 <br>
                 <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=version_previous, compare_with='current' %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
               {% endif %}
-    
+
             {% else %}
               {{ _('Version') }} #{{ version_previous }}
-    
+
               {% if older_version %}
                 <br>
                 <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=version_previous, compare_with=compare_with %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
               {% endif %}
-    
+
             {% endif %}
             </th>
             <th class="diff_links">
@@ -64,20 +64,19 @@
               {{ _('Current') }}
             {% else %}
               {{ _('Version') }} #{{ version_current }}
-    
+
               {% if newer_version %}
                 <br>
                 <a href="{% url apps.machines.views.history_iptables machine_slug=machine.hostname, version_number=newer_version, compare_with=compare_with %}">&rarr; {{ _('Newer version') }}<!-- (#{{ newer_version }})--></a>
               {% endif %}
-    
+
             {% endif %}
             </th>
           </tr>
         </tfoot>
       </table>
-    
-    {{ iptables_previous|diff_table:iptables_current }}
 
+    {{ iptables_previous|diff_table:iptables_current }}
 
 
 {% endblock %}

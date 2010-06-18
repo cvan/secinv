@@ -666,8 +666,8 @@ function getTabs(section) {
         </ul>
         <div id="apacheconfig-latest" class="latest">
           {% if apacheconfig %}
-<!--          <h4 class="group">{{ apacheconfig.filename }}</h4> -->
-          <h4 class="group">/etc/httpd/conf/httpd.conf</h4>
+          <h4 class="group">{{ apacheconfig.filename }}</h4>
+<!--          <h4 class="group">/etc/httpd/conf/httpd.conf</h4> -->
 
           <details class="date">
             <strong>{{ _('Last Modified') }}</strong>
@@ -677,8 +677,30 @@ function getTabs(section) {
           </details>
           <div class="clear"></div>
 
-<!--          <pre><code>{{ apacheconfig.contents }}</code></pre> -->
+<!--          <pre><code>{{ apacheconfig.body }}</code></pre> -->
           {{ apacheconfig_latest_body|safe }}
+
+          <h5>{{ _('Directives') }}</h5>
+          {{ apacheconfig.directives }}
+
+          <h5>{{ _('Domains') }}</h5>
+
+        {% if apacheconfig.get_domains %}
+          <ul>
+          {% for domain, ports in apacheconfig.get_domains.items %}
+            <li>{{ domain }} ({{ ports|join:', ' }})</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+
+          <h5>{{ _('Includes') }}</h5>
+          {% if apacheconfig.included %}
+          <ul>
+          {% for fn in apacheconfig.included %}
+            <li>{{ fn }}</li>
+          {% endfor %}
+          </ul>
+          {% endif %}
 
           <div class="clear"></div>
           {% endif %}
