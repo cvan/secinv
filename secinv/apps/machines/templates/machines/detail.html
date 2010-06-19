@@ -34,7 +34,7 @@ function getTabs(section) {
             newHTML += "<th>{{ _('Kernel release') }}</th>\n";
             newHTML += "<th>{{ _('RedHat release') }}</th>\n";
             newHTML += "<th>{{ _('NFS') }}</th>\n";
-            newHTML += "<th class="timestamp">{{ _('Modified') }}</th>\n";
+            newHTML += '<th class="timestamp">{{ _('Modified') }}</th>\n';
             newHTML += "</tr>\n</thead>\n<tbody>\n";
 
             $.each(data, function(key, value) {

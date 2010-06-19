@@ -166,18 +166,96 @@
             </fieldset>
 
 
-          	<fieldset><legend>{{ _('Filter Apache configuration files') }}</legend>
+          	<fieldset>
+          	 <legend>{{ _('Filter Apache configuration files') }}</legend>
 
-{% if all_directives %}
-<ul>
-{% for directive, values in all_directives %}
-  <li>
-    <h3>{{ directive }}</h3>
-    {{ values|join:'<br>' }}
-  </li>
-{% endfor %}
-</ul>
-{% endif %}
+<script type="text/javascript">
+
+$(function() {
+
+    $('select#ac-filter-directives').focus(function(){
+        //alert('focused!');
+        //doPopulate();
+        //var options = $('select#ac-filter-directives').children('option').html();
+
+        var selected = $('select#ac-filter-directives').val();
+
+        var numChildren = $('select#ac-filter-directives').find('option').length;
+        //alert(numChildren);
+
+        if (selected == '' && numChildren == 1)
+            doPopulate();
+    }).change(function(){
+        //alert('changed!');
+        doChange();
+    }).keypress(function(){
+        //alert('keydown!');
+        doChange();
+    });
+
+});
+
+
+function doPopulate()
+{
+    $.getJSON('{% url ac-filter-directives-all %}', function(data) {
+        var newHTML = "";
+
+        $.each(data, function(key, value) {
+
+            $('select#ac-filter-directives').append("<option>" + data[key] + "</option>\n");
+
+            //newHTML += "key: " + data[key] + "<br>\n";
+
+            /*
+            $.each(data[key][1], function(k, v) {
+                newHTML += "&nbsp;&nbsp; - " + v + "<br>\n";
+            });
+            */
+            //newHTML += key + " - " + value;
+
+        });
+    });
+}
+
+function doChange()
+{
+    var dirVal = $('select#ac-filter-directives').val();
+
+    if (dirVal == '')
+        $('select#ac-filter-directives-values').html('<option value="">*</option>\n');
+    else
+    {
+        $.post('{% url ac-filter-directives %}', { directive: dirVal }, function(data) {
+            var newOptions = '<option value="">*</option>\n';
+    
+            $.each(data, function(key, value) {
+                newOptions += "<option>" + value + "</option>\n";
+            });
+    
+            $('select#ac-filter-directives-values').html(newOptions);
+        });
+    }
+}
+
+</script>
+
+            <div id="ac-filter-directives-text">
+            </div>
+
+            <select name="ac_filter_directives" id="ac-filter-directives">
+              <option value="">{{ _('Select directive') }}</option>
+            </select>
+
+            <br><br>
+
+            <select name="ac_filter_directives_values" id="ac-filter-directives-values">
+              <option value="">*</option>
+            </select>
+
+            <div class="align_right">
+            <button>{{ _('Go') }}</button>
+            </div>
 
             </fieldset>
           </form>

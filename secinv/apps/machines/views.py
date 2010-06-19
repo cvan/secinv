@@ -3,6 +3,7 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from django.utils import simplejson
 
 from .models import Machine, Services, System, RPMs, Interface, SSHConfig, \
                     IPTableInfo, ApacheConfig
@@ -17,7 +18,7 @@ from pygments.lexers import ApacheConfLexer
 from reversion.models import Version
 
 import re
-
+import json
 
 def get_all_domains():
     all_domains = []
@@ -41,6 +42,15 @@ def get_all_domains():
     all_domains.sort()
     return all_domains
 
+#
+# TODO: Save in a table.
+#
+# TODO: Update after each scan.
+#
+
+#
+# TODO: Apache Parser -- Force directives to be uppercased.
+#
 def get_all_directives():
     all_directives_dict = {}
 
@@ -48,6 +58,13 @@ def get_all_directives():
     for m in m_all:
         a_m = ApacheConfig.objects.filter(machine__id=m.id).all()
         for a in a_m:
+            if a.directives:
+                for k, v in a.directives.iteritems():
+                    if k in all_directives_dict:
+                        all_directives_dict[k] += v
+                    else:
+                        all_directives_dict[k] = v
+
             for fn in a.included:
                 try:
                     i_a = ApacheConfig.objects.get(machine__id=m.id,
@@ -282,7 +299,7 @@ def detail(request, machine_slug):
 
 
     template_context = {'query': query,
-                        'machine': p,
+                        'machine': m,
                         'system': system_latest,
                         'system_versions': system_versions,
                         'services': services_latest,
@@ -423,19 +440,62 @@ def history_iptables(request, machine_slug, version_number, compare_with='previo
 
 
 # View that that returns the JSON result.
-def apache(request, machine_slug):
+'''
+def ac_filter_directives(request, directive_slug=None):
     # TODO: prevent calls
     #if not request.is_ajax():
     #    return HttpResponse(status=400)
 
-    m = get_object_or_404(Machine, hostname=machine_slug)
-
-    # Retrieve all the system history.
-    system_history = System.objects.filter(machine__id=m.id).order_by(
-        '-date_added').all()
+    all_directives = get_all_directives()
+    if directive_slug:
+        for v in all_directives:
+            if v[0] == directive_slug:
+                result = v[1]
+                break
+    else:
+        result = [f[0] for f in all_directives]
+        #result = []
+        #for f in all_directives:
+        #    result.append(f[0])
 
     # Serialize the result of the database retrieval to JSON and send an
     # application/json response.
-    return HttpResponse(serializers.serialize('json', system_history),
+#    return HttpResponse(serializers.serialize('json', get_all_domains()),
+    return HttpResponse(simplejson.dumps(result),
+                        mimetype='application/json')
+'''
+
+def ac_filter_directives_keys(request):
+    # TODO: prevent calls
+    #if not request.is_ajax():
+    #    return HttpResponse(status=400)
+
+    all_directives = get_all_directives()
+    result = [f[0] for f in all_directives]
+
+    # Serialize the result of the database retrieval to JSON and send an
+    # application/json response.
+    return HttpResponse(simplejson.dumps(result),
+                        mimetype='application/json')
+
+def ac_filter_directives(request):
+    # TODO: prevent calls
+    # if not request.is_ajax():
+    #    return HttpResponse(status=400)
+
+    if request.method == 'POST': # and request.is_ajax():
+        #result = 'Raw Data: "%s"' % request.raw_post_data
+        directive = request.POST.get('directive', '')
+
+        all_directives = get_all_directives()
+        if directive:
+            for v in all_directives:
+                if v[0] == directive:
+                    result = v[1]
+                    break
+
+    # Serialize the result of the database retrieval to JSON and send an
+    # application/json response.
+    return HttpResponse(simplejson.dumps(result),
                         mimetype='application/json')
 

@@ -34,17 +34,17 @@ class Machine(models.Model):
 
     def httpd(self):
         s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        processes = re.split(',', s.processes)
+        processes = re.split(',', s.k_processes)
         return 'httpd' in processes
 
     def mysqld(self):
         s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        processes = re.split(',', s.processes)
+        processes = re.split(',', s.k_processes)
         return 'mysqld' in processes
 
     def openvpn(self):
         s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        processes = re.split(',', s.processes)
+        processes = re.split(',', s.k_processes)
         return 'openvpn' in processes
 
     def nfs(self):
