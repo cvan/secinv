@@ -5,257 +5,79 @@
 
 {% block sidebar %}
 
-        	<h2>{{ _('Machines') }}</h2>
-          <form action="" method="post">
+          <h2>{{ _('Machines') }}</h2>
+          <form action="{% url ac-filter-results %}" method="get">
           	<fieldset><legend>{{ _('Filter Machines') }}</legend>
 
-          {% if all_domains %}
-          <ul>
-            {% for hostname, domain, ac_id in all_domains %}
-            <li>{{ machine.hostname }} {{ domain }} (ac file {{ ac_id }})</li>
-            {% endfor %}
-          </ul>
-          {% endif %}
+              <!--
+              {% if all_domains %}
+              <ul>
+                {% for hostname, domain, ac_id in all_domains %}
+                <li>{{ hostname }} {{ domain }} (ac file {{ ac_id }})</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+              -->
 
-          	  <label for="machine_hostname">{{ _('Select by machine') }}</label>
-              <select name="machine_hostname" id="machine_hostname"
+              <script type="text/javascript">
+
+              </script>
+
+          	  <label for="machine-hostname">{{ _('Select by hostname') }}</label>
+              <select name="machine_hostname" id="machine-hostname"
                       onchange="this.form.submit();">
-                <option>*</option>
-                <option>pm-app-bugs01</option>
-                <option>pm-app-bugs02</option>
-                <option>pm-app-bugs03</option>
-                <option>pm-app-bugs04</option>
-                <option>pm-app-bugs05</option>
-                <option>tm-bugs01-master01</option>
-                <option>tm-bugs01-slave01</option>
-                <option>tm-bugs01-slave02</option>
-                <option>tm-bugs01-slave03</option>
-                <option>pm-app-amo01</option>
-                <option>pm-app-amo02</option>
-                <option>pm-app-amo03</option>
-                <option>pm-app-amo04</option>
-                <option>pm-app-amo05</option>
-                <option>pm-app-amo06</option>
-                <option>pm-app-amo07</option>
-                <option>pm-app-amo08</option>
-                <option>pm-app-amo09</option>
-                <option>pm-app-amo10</option>
-                <option>pm-app-amo11</option>
-                <option>pm-app-amo12</option>
-                <option>pm-app-amo13</option>
-                <option>pm-app-amo14</option>
-                <option>pm-app-amo15</option>
-                <option>pm-app-amo16</option>
-                <option>pm-app-amo17</option>
-                <option>pm-app-amo18</option>
-                <option>pm-app-amo19</option>
-                <option>pm-app-amo21</option>
-                <option>pm-app-amo22</option>
-                <option>pm-app-amo23</option>
-                <option>pm-app-amo24</option>
-                <option>dm-svn01</option>
-                <option>dm-svn02</option>
-                <option>pm-app-personas01</option>
-                <option>pm-app-personas02</option>
-                <option>pm-app-personas03</option>
-                <option>pm-app-dist01</option>
-                <option>pm-app-dist02</option>
-                <option>pm-app-dist03</option>
-                <option>pm-app-dist04</option>
-                <option>pm-app-dist05</option>
-                <option>pm-app-dist06</option>
-                <option>pm-app-dist07</option>
-                <option>pm-app-dist08</option>
-                <option>pm-app-dist09</option>
-                <option>dm-download02</option>
-                <option>dm-download03</option>
-                <option>dm-download04</option>
-                <option>pm-app-generic01</option>
-                <option>pm-app-generic02</option>
-                <option>pm-app-generic03</option>
-                <option>pm-app-generic04</option>
-                <option>pm-app-generic05</option>
-                <option>pm-app-generic06</option>
-                <option>pm-ns01</option>
-                <option>pm-ns02</option>
-                <option>tm-bouncer01-master01</option>
-                <option>tm-bouncer01-slave01</option>
-                <option>tm-bouncer01-slave02</option>
-                <option>tm-bouncer01-slave03</option>
-                <option>pm-web01</option>
-                <option>pm-web02</option>
-                <option>pm-web03</option>
-                <option>pm-web04</option>
-                <option>dm-mozcrm-stage01</option>
-                <option>mradm01</option>
-                <option>mradm02</option>
-                <option>tm-sumo01-master01</option>
-                <option>tm-sumo01-slave01</option>
-                <option>tm-sumo01-slave02</option>
-                <option>dm-hg01</option>
-                <option>dm-hg02</option>
-                <option>dm-surf</option>
-                <option>sm-personas01</option>
-                <option>pm-weave01</option>
-                <option>pm-weave02</option>
-                <option>pm-weave03</option>
-                <option>pm-weave04</option>
-                <option>pm-weave06</option>
-                <option>pm-weavefs01</option>
-                <option>pm-weaveadmin01</option>
+              {% for m in all_machines_hn %}
+                <option value="{% url machines-detail machine_slug=m.hostname %}">{{ m.hostname }} ({{ m.sys_ip }})</option>
+              {% endfor %}
               </select>
 
-              <label for="domain">{{ _('Select by domain') }}</label>
-              <select name="domain" id="domain" onchange="this.form.submit();">
-                <option>addons.mozilla.org</option>
-                <option>air.mozilla.com</option>
-                <option>archive-sfx.spreadfirefox.com</option>
-                <option>aus2-staging.mozilla.org</option>
-                <option>aus2.mozilla.org</option>
-                <option>blog.getfirebug.com</option>
-                <option>blog.lizardwrangler.com</option>
-                <option>blog.mozilla.com</option>
-                <option>communitystore.mozilla.org</option>
-                <option>crash-reports-php.mozilla.com</option>
-                <option>crash-reports.mozilla.com</option>
-                <option>creative.mozilla.org</option>
-                <option>developer.mozilla.org</option>
-                <option>download-stats.mozilla.com</option>
-                <option>download.mozilla.org</option>
-                <option>downloadstats.mozilla.com</option>
-                <option>fastestfirefox.mozilla.com</option>
-                <option>feeds.mozilla.com</option>
-                <option>forums.addons.mozilla.org</option>
-                <option>getfirebug.com</option>
-                <option>getpersonas.com </option>
-                <option>guides.mozilla.org</option>
-                <option>hacks.mozilla.org</option>
-                <option>impactmozilla.com</option>
-                <option>jetpackgallery.mozillalabs.com</option>
-                <option>labs.mozilla.com</option>
-                <option>metrics-collector.mozilla.com</option>
-                <option>mobile.support.mozilla.com</option>
-                <option>mozilla-europe.org</option>
-                <option>mozillamessaging.com</option>
-                <option>mozillaparty-archive.mozilla.com</option>
-                <option>mozillaservice.org</option>
-                <option>mpl.mozilla.org</option>
-                <option>opentochoice.org</option>
-                <option>operationfirefox.com</option>
-                <option>outgoing.mozilla.org</option>
-                <option>pastebin.mozilla.org</option>
-                <option>pfs2.mozilla.org</option>
-                <option>plugins.mozilla.org</option>
-                <option>preview.addons.mozilla.org</option>
-                <option>reporter.mozilla.org</option>
-                <option>rockyourfirefox.com</option>
-                <option>securityquiz.facebook.mozilla.com</option>
-                <option>support.mozilla.com</option>
-                <option>survey.mozilla.com</option>
-                <option>surveys.mozilla-europe.org</option>
-                <option>tiki-trunk.mozilla.com</option>
-                <option>tools.mozilla.com</option>
-                <option>userpanel.mozilla.com</option>
-                <option>wiki.mozilla.org</option>
-                <option>www.firefoxflicks.com</option>
-                <option>www.getpersonas.com</option>
-                <option>www.priorartshare.org</option>
-                <option>www.spreadfirefox.com</option>
-                <option>www.worldfirefoxday.com</option>
+          	  <label for="machine-ip">{{ _('Select by IP address') }}</label>
+              <select name="machine_ip" id="machine-ip"
+                      onchange="this.form.submit();">
+              {% for m in all_machines_ip %}
+                <option value="{% url machines-detail machine_slug=m.hostname %}">{{ m.sys_ip }} ({{ m.hostname }})</option>
+              {% endfor %}
               </select>
+
+              <label for="machine-domain">{{ _('Select by domain') }}</label>
+              <select name="machine_domain" id="machine-domain" onchange="this.form.submit();">
+              {% for hostname, domain, ac_id in all_domains %}
+                <option value="{% url machines-detail machine_slug=hostname %}">{{ domain }}<!-- ({{ ac_id }})--></option>
+              {% endfor %}
+              </select>
+
             </fieldset>
 
 
           	<fieldset>
-          	 <legend>{{ _('Filter Apache configuration files') }}</legend>
+          	  <legend>{{ _('Filter Apache configuration files') }}</legend>
 
-<script type="text/javascript">
+              <script type="text/javascript">
+                var urlAllDirs = '{% url ac-filter-directives-all %}';
+                var urlDirs = '{% url ac-filter-directives %}';
+              </script>
 
-$(function() {
+              <label for="ac-filter-directives">{{ _('Filter by parameter') }}</label>
+              <select name="ac_parameter" id="ac-filter-directives">
+                <option value="">{{ _('Select parameter') }}</option>
+              </select>
 
-    $('select#ac-filter-directives').focus(function(){
-        //alert('focused!');
-        //doPopulate();
-        //var options = $('select#ac-filter-directives').children('option').html();
+              <label for="ac-filter-directives-values">{{ _('Filter by values') }}</label>
+              <select name="ac_value" id="ac-filter-directives-values">
+                <option value="">*</option>
+              </select>
 
-        var selected = $('select#ac-filter-directives').val();
+              <button>{{ _('Go') }}</button>
 
-        var numChildren = $('select#ac-filter-directives').find('option').length;
-        //alert(numChildren);
-
-        if (selected == '' && numChildren == 1)
-            doPopulate();
-    }).change(function(){
-        //alert('changed!');
-        doChange();
-    }).keypress(function(){
-        //alert('keydown!');
-        doChange();
-    });
-
-});
-
-
-function doPopulate()
-{
-    $.getJSON('{% url ac-filter-directives-all %}', function(data) {
-        var newHTML = "";
-
-        $.each(data, function(key, value) {
-
-            $('select#ac-filter-directives').append("<option>" + data[key] + "</option>\n");
-
-            //newHTML += "key: " + data[key] + "<br>\n";
-
-            /*
-            $.each(data[key][1], function(k, v) {
-                newHTML += "&nbsp;&nbsp; - " + v + "<br>\n";
-            });
-            */
-            //newHTML += key + " - " + value;
-
-        });
-    });
-}
-
-function doChange()
-{
-    var dirVal = $('select#ac-filter-directives').val();
-
-    if (dirVal == '')
-        $('select#ac-filter-directives-values').html('<option value="">*</option>\n');
-    else
-    {
-        $.post('{% url ac-filter-directives %}', { directive: dirVal }, function(data) {
-            var newOptions = '<option value="">*</option>\n';
-    
-            $.each(data, function(key, value) {
-                newOptions += "<option>" + value + "</option>\n";
-            });
-    
-            $('select#ac-filter-directives-values').html(newOptions);
-        });
-    }
-}
-
-</script>
-
-            <div id="ac-filter-directives-text">
-            </div>
-
-            <select name="ac_filter_directives" id="ac-filter-directives">
-              <option value="">{{ _('Select directive') }}</option>
+            <!--
+            {% if all_domains %}
+            <select name="ac_filter_domains" id="ac_filter_domains">
+              {% for hostname, domain, ac_id in all_domains %}
+                <option value="{{ machine.hostname }}/{{ ac_id }}">{{ domain }}</option>
+              {% endfor %}
             </select>
-
-            <br><br>
-
-            <select name="ac_filter_directives_values" id="ac-filter-directives-values">
-              <option value="">*</option>
-            </select>
-
-            <div class="align_right">
-            <button>{{ _('Go') }}</button>
-            </div>
+            {% endif %}
+            -->
 
             </fieldset>
           </form>

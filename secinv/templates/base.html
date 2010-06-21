@@ -24,6 +24,8 @@
           href="{{ MEDIA_URL }}css/smoothness/jquery-ui-1.8.1.custom.css">
 	<link rel="stylesheet" type="text/css"
 	      href="{{ MEDIA_URL }}css/jquery.tablescroll.css">
+	<link rel="stylesheet" type="text/css"
+	      href="{{ MEDIA_URL }}css/ui.selectmenu.css">
 
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/jquery-1.4.2.min.js"></script>
@@ -33,7 +35,10 @@
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/jquery.tablescroll.js"></script>
     <script type="text/javascript"
+            src="{{ MEDIA_URL }}js/ui.selectmenu.js"></script>
+    <script type="text/javascript"
             src="{{ MEDIA_URL }}js/main.js"></script>
+
   </head>
   <body class="{% block body_class %}{% endblock %}">
     <div id="wrap" class="row">
@@ -87,6 +92,7 @@
         <a href="">Licensed under MPL 1.1 / GPL 2.0 / LGPL 2.1</a>
       </section>
     </footer>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/actions.js"></script>
 
   </body>
 </html>

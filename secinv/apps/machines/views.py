@@ -20,6 +20,7 @@ from reversion.models import Version
 import re
 import json
 
+
 def get_all_domains():
     all_domains = []
 
@@ -42,6 +43,9 @@ def get_all_domains():
     all_domains.sort()
     return all_domains
 
+def get_all_machines(order_by='id'):
+    return Machine.objects.all().order_by(order_by)
+
 #
 # TODO: Save in a table.
 #
@@ -51,6 +55,28 @@ def get_all_domains():
 #
 # TODO: Apache Parser -- Force directives to be uppercased.
 #
+def get_all_directives():
+    all_directives_dict = {}
+
+    a_all = ApacheConfig.objects.all()
+    for a in a_all:
+        if a.directives:
+            for k, v in a.directives.iteritems():
+                if k in all_directives_dict:
+                    all_directives_dict[k] += v
+                else:
+                    all_directives_dict[k] = v
+
+    all_directives = []
+
+    for key, values in all_directives_dict.iteritems():
+        all_directives.append([key, list(set(values))])
+
+    all_directives.sort()
+    return all_directives
+
+
+'''
 def get_all_directives():
     all_directives_dict = {}
 
@@ -85,15 +111,21 @@ def get_all_directives():
 
     all_directives.sort()
     return all_directives
-
+'''
 
 def index(request):
     """Machines index page."""
     machines = Machine.objects.all()
     query = request.GET.get('q', '')
-    return render_to_response('machines/index.html',
-        {'machines': machines, 'query': query},
-        context_instance=RequestContext(request))
+
+    template_context = {'machines': machines,
+                        'query': query,
+                        'all_machines_hn': get_all_machines('-hostname'),
+                        'all_machines_ip': get_all_machines('-sys_ip'),
+                        'all_domains': get_all_domains(),
+                        'all_directives': get_all_directives()}
+    return render_to_response('machines/index.html', template_context,
+                              context_instance=RequestContext(request))
 
 
 # View that that returns the JSON result.
@@ -294,10 +326,6 @@ def detail(request, machine_slug):
     all_domains.sort()
     '''
 
-    all_domains = get_all_domains()
-    all_directives = get_all_directives()
-
-
     template_context = {'query': query,
                         'machine': m,
                         'system': system_latest,
@@ -316,10 +344,12 @@ def detail(request, machine_slug):
                         'apacheconfig_versions': apacheconfig_versions,
                         'apacheconfig_latest_body': apacheconfig_latest_body,
                         'apacheconfig_includes': apacheconfig_includes,
-                        'all_domains': all_domains,
-                        'all_directives': all_directives}
+                        'all_machines_hn': get_all_machines('-hostname'),
+                        'all_machines_ip': get_all_machines('-sys_ip'),
+                        'all_domains': get_all_domains(),
+                        'all_directives': get_all_directives()}
     return render_to_response('machines/detail.html', template_context,
-        context_instance=RequestContext(request))
+                              context_instance=RequestContext(request))
 
 
 def search(request):
@@ -371,7 +401,11 @@ def httpd_conf(request, machine_slug, ac_id):
     template_context = {'machine': m,
                         'query': query,
                         'ac': ac,
-                        'ac_body': body}
+                        'ac_body': body,
+                        'all_machines_hn': get_all_machines('-hostname'),
+                        'all_machines_ip': get_all_machines('-sys_ip'),
+                        'all_domains': get_all_domains(),
+                        'all_directives': get_all_directives()}
     return render_to_response('machines/httpd_conf.html', template_context,
         context_instance=RequestContext(request))
 
@@ -434,7 +468,11 @@ def history_iptables(request, machine_slug, version_number, compare_with='previo
                         'version_previous': str(v_num_previous),
                         'older_version': str(older_version),
                         'newer_version': str(newer_version),
-                        'compare_with': compare_with,}
+                        'compare_with': compare_with,
+                        'all_machines_hn': get_all_machines('-hostname'),
+                        'all_machines_ip': get_all_machines('-sys_ip'),
+                        'all_domains': get_all_domains(),
+                        'all_directives': get_all_directives()}
     return render_to_response('machines/iptables.html', template_context,
         context_instance=RequestContext(request))
 
@@ -493,9 +531,52 @@ def ac_filter_directives(request):
                 if v[0] == directive:
                     result = v[1]
                     break
+    else:
+        return HttpResponse(status=400)
 
     # Serialize the result of the database retrieval to JSON and send an
     # application/json response.
     return HttpResponse(simplejson.dumps(result),
                         mimetype='application/json')
 
+'''
+def machine_filter(request, criterion, criterion_slug):
+    """Find machine by hostname, IP, or domain and redirect."""
+    if request
+
+    m = Machine.objects.all()
+'''
+
+def ac_filter_results(request):
+    """Filter ApacheConfig objects by parameters and values."""
+    query = request.GET.get('q', '')
+    ac_parameter = request.GET.get('ac_parameter', '')
+    ac_value = request.GET.get('ac_value', '')
+
+    if request.method != 'GET':
+        return HttpResponse(status=400)
+
+    results = []
+
+    # Store matching ApacheConfig objects in results list.
+    a_all = ApacheConfig.objects.all()
+    for a in a_all:
+        if a.directives:
+            for param, values in a.directives.iteritems():
+                if param == ac_parameter or ac_parameter == '':
+                    for v in values:
+                        if v == ac_value or ac_value == '':
+                            results.append([param, v, a])
+
+    results.sort()
+
+    template_context = {'query': query,
+                        'ac_parameter': ac_parameter,
+                        'ac_value': ac_value,
+                        'results': results,
+                        'all_machines_hn': get_all_machines('-hostname'),
+                        'all_machines_ip': get_all_machines('-sys_ip'),
+                        'all_domains': get_all_domains(),
+                        'all_directives': get_all_directives()}
+    return render_to_response('machines/httpd_results.html', template_context,
+                              context_instance=RequestContext(request))

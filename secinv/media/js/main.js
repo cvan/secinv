@@ -2,8 +2,7 @@ $(function(){
 
     $('.tabs').tabs();
 
-//	$('#interfaces-history>table').tableScroll({height:90});
-
-//	$('#services-history>table').tableScroll({height:90, width: 300});
+    $('select#machine-hostname, select#machine-ip, select#machine-domain').selectmenu({style:'dropdown', maxHeight: 200});
+    //$('select#ac-filter-directives, select#ac-filter-directives-values').selectmenu({style:'dropdown'});
 
 });

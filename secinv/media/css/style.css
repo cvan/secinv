@@ -147,7 +147,7 @@ body.config header nav ul li.config a:hover {
 /* @group Sidebar */
 aside#sidebar {
     padding-top: 10px;
-    min-height: 325px;
+    min-height: 425px;
 }
 aside#sidebar h2 {
     position: absolute;
@@ -354,9 +354,16 @@ table.wide thead tr th {
 
 table.wide thead tr th,
 table.wide tbody td {
-    text-align: center;
+/*    text-align: center; */
     padding: 4px 8px;
 }
+
+/*
+table.wide thead tr th,
+table.wide tbody td {
+    text-align: left;
+}
+*/
 
 table.wide thead th {
     border-bottom-width: 1px;
@@ -368,7 +375,7 @@ table.wide tbody {
 
 table.wide thead tr th,
 table.wide tbody tr td {
-    border-top-width: 0;
+/*    border-top-width: 0; */
     border-right: #ddd 1px solid;
 }
 
@@ -431,7 +438,7 @@ header nav form label {
 }
 
 fieldset {
-    margin-bottom: 1em;
+    margin: 1em 0;
     padding: 1em;
 }
 
@@ -496,6 +503,13 @@ header form button strong {
 /*    background: url(../img/search.png) 50% 50% no-repeat; */
     display: block;
 }
+
+aside#sidebar select {
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+
 
 
 /* @group Buttons */
@@ -721,7 +735,15 @@ hgroup#masthead h3 a:hover em {
 hgroup#masthead h4 {
     font-size: 3em;
 }
-
+h4 mark {
+    background-color: transparent;
+    color: #fff;
+/*    font-style: italic; */
+}
+h4 mark,
+h4 em span {
+    font-weight: normal;
+}
 
 #wrap {
     background-color: #fff;
@@ -739,7 +761,7 @@ hgroup#masthead h4 {
     padding: 0 10px 10px 10px;
     margin-left: 0;
     margin-right: -2px;
-    min-height: 325px;
+    min-height: 425px;
     overflow: visible;
 }
 

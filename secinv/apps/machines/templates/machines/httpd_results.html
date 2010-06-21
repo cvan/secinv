@@ -1,0 +1,56 @@
+{% extends "machines/base.html" %}
+{% load i18n %}
+{% load machine_extras %}
+
+{% block head_title %}{{ _('Filtered Apache configuration files') }} | {{ _('Machines') }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+      <hgroup id="masthead">
+        <h2 class="sub">{{ _('Machines') }}</h2>
+        <h3 class="sub">{{ _('Apache configuration files') }}</h3>
+        <h4>
+          <mark>{{ _('Parameter:') }}</mark> {% if ac_parameter %}{{ ac_parameter }}{% else %}{{ _('(All)') }}{% endif %}
+          <em><span>{{ _('Value:') }}</span> {% if ac_value %}{{ ac_value }}{% else %}*{% endif %}</em>
+        </h4>
+      </hgroup>
+      <div class="clear"></div>
+
+<!--{{ results }}-->
+
+      <table class="wide results">
+        <caption>{{ _('Filtered results') }}</caption>
+        <thead>
+          <tr>
+<!--
+            <th>{{ _('IP') }}</th>
+            <th>{{ _('Hostname') }}</th>
+-->
+            <th colspan="2">{{ _('Machine') }}</th>
+            <th>{{ _('Filename') }}</th>
+            <th>{{ _('Parameter') }}</th>
+            <th>{{ _('Value') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+<!--{% if ac_parameter %}-->
+<!--{% endif %}-->
+
+      {% for param, value, ac in results %}
+          <tr>
+            <td>{{ ac.machine.sys_ip }}</td>
+            <td>
+              <a href="{% url machines-detail machine_slug=ac.machine.hostname %}">
+                {{ ac.machine.hostname }}
+              </a>
+            </td>
+            <td><a href="{% url httpd-conf machine_slug=ac.machine.hostname, ac_id=ac.id %}">{{ ac.filename }}</a></td>
+            <td>{{ param }}</td>
+            <td>{{ value }}</td>
+          </tr>
+      {% endfor %}
+        </tbody>
+      </table>
+
+
+{% endblock %}
+

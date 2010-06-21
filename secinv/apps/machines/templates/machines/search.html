@@ -7,8 +7,14 @@
 {% endblock %}
 
 {% block content %}
-    <h2>Search</h2>
+      <hgroup id="masthead">
+        <h2 class="sub">{{ _('Machines') }}</h2>
+        <h3 class="sub">{{ _('Search results') }}</h3>
+        <h4>{{ query|escape }} ({{ results|length }})</h4>
+      </hgroup>
+      <div class="clear"></div>
 
+    <!--
     <form action="." method="get">
       <table>
         {{ form.as_table }}
@@ -20,9 +26,12 @@
         </tr>
       </table>
     </form>
+    -->
 
 {% if query %}
+    <!--
     <h3>{{ _('Search results:') }} <strong>{{ query|escape }}</strong> ({{ results|length }})</h3>
+    -->
     <ul>
   {% for result in results %}
       <li>
