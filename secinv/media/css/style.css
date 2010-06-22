@@ -242,6 +242,7 @@ h5, h6 {
 }
 h5 {
     font-size: 1.385em;
+    margin-top: 1.556em;
 }
 
 h3 em {
@@ -551,7 +552,6 @@ http://somadesign.ca/demos/buttons-redux.html
 	font-weight: bold;
 	text-align: center;
 	background-color: #aaa;
-	background-image: url(gradient.png); /* TODO: Remove */
 	background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
 	background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
 	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
@@ -805,6 +805,17 @@ height: 200px;
 }
 .tabs table td {
     vertical-align: top;
+}
+
+.tabs dl dt {
+    font-weight: bold;
+}
+.tabs dl dd {
+    margin-bottom: 0.5em;
+    padding-left: 1.5em;
+}
+.tabs dl dd:last-child {
+    margin-bottom: 0;
 }
 
 #rpms-latest ul {

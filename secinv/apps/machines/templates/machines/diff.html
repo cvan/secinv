@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load machine_extras %}
 
-{% block head_title %}{{ _('iptables') }} | {{ machine.hostname }} | {{ block.super }}{% endblock %}
+{% block head_title %}{% if section == 'iptables' %}{{ _('iptables') }}{% endif %}{% if section == 'httpd-conf' %}{{ _('Apache configuration file') }}: {{ obj_current.filename }}{% endif %} | {{ machine.hostname }} | {{ block.super }}{% endblock %}
 
 {% block content %}
       <hgroup id="masthead">

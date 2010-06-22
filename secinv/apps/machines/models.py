@@ -252,8 +252,10 @@ if not reversion.is_registered(SSHConfig):
 class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
 
-    # TODO: Store as compressed Text Field.
     body = CompressedTextField(_('contents'), blank=True, null=True)
+
+    # TODO: Store as serialized data field.
+#    body = SerializedDataField(_('contents'), blank=True, null=True)
 
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)

@@ -27,14 +27,14 @@
 
 
       <h5>{{ _('Domains') }}</h5>
-      <h6>{{ _('In this file') }}</h6>
 
       {# TODO: have client send as list, not dictionary. #}
 
+      <h6>{{ _('Domains in this file') }}</h6>
       {% if ac.domains %}
       <ul>
         {% for domain, ports in ac.domains.items %}
-        <li>{{ domain }} ({{ ports|join:', ' }})</li>
+        <li>{{ domain }}<!-- ({{ ports|join:', ' }})--></li>
         {% endfor %}
       </ul>
       {% endif %}
@@ -42,20 +42,19 @@
       <h6>{{ _('In included .conf files') }}</h6>
       {% if ac.get_domains %}
       <ul>
-        {% for domain, ports in ac.get_domains %}
-        <li>{{ domain }} ({{ ports|join:', ' }})</li>
+        {% for domain, ports, i_ac in ac.get_domains %}
+        <li><a href="{% url httpd-conf machine_slug=ac.machine.hostname, ac_id=i_ac.id %}">{{ domain }}</a><!--({{ ports|join:', ' }})--></li>
         {% endfor %}
       </ul>
       {% endif %}
 
-
+<!--
       <h5>{{ _('Includes') }}</h5>
       {% if apacheconfig_includes %}
       <ul>
         {% for fn, id, ac, body in apacheconfig_includes %}
         <li>
           <strong><a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=id %}">{{ fn }}</a></strong>
-          <!--{{ body|safe }}-->
           {% if ac.domains %}
           <ul>
             {% for domain, ports in ac.domains.items %}
@@ -67,6 +66,7 @@
         {% endfor %}
       </ul>
       {% endif %}
+-->
 
 {# TODO: link to historical versions #}
 

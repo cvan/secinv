@@ -145,8 +145,12 @@ def get_version_diff_field(obj_item, field_name):
 
     obj_version = Version.objects.get_for_object(obj_item).order_by('revision')
     versions = []
+    is_newest = False
     for index, ver in enumerate(obj_version):
         try:
+            if index == (len(obj_version) - 1):
+                is_newest = True
+
             old_v = obj_version[index - 1]
 
             code = generate_patch(old_v, ver, field_name)
@@ -178,7 +182,7 @@ def get_version_diff_field(obj_item, field_name):
 
         versions.append({'fields': ver.field_dict, 'diff': diff_highlighted,
                          'timestamp': ver.field_dict['date_added'],
-                         'version': index + 1})
+                         'version': index + 1, 'is_newest': is_newest})
     versions.reverse()
     return versions
 
