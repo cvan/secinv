@@ -6,8 +6,9 @@
 {% block sidebar %}
 
           <h2>{{ _('Machines') }}</h2>
-          <form action="{% url ac-filter-results %}" method="get">
-          	<fieldset><legend>{{ _('Filter Machines') }}</legend>
+          <form action="." method="get">
+          	<fieldset>
+          	  <legend>{{ _('Filter Machines') }}</legend>
 
               <!--
               {% if all_domains %}
@@ -19,21 +20,38 @@
               {% endif %}
               -->
 
-              <script type="text/javascript">
-
-              </script>
-
+<!--
           	  <label for="machine-hostname">{{ _('Select by hostname') }}</label>
-              <select name="machine_hostname" id="machine-hostname"
-                      onchange="this.form.submit();">
+              <select name="machine_hostname" id="machine-hostname">
               {% for m in all_machines_hn %}
                 <option value="{% url machines-detail machine_slug=m.hostname %}">{{ m.hostname }} ({{ m.sys_ip }})</option>
               {% endfor %}
               </select>
 
           	  <label for="machine-ip">{{ _('Select by IP address') }}</label>
-              <select name="machine_ip" id="machine-ip"
-                      onchange="this.form.submit();">
+              <select name="machine_ip" id="machine-ip">
+              {% for m in all_machines_ip %}
+                <option value="{% url machines-detail machine_slug=m.hostname %}">{{ m.sys_ip }} ({{ m.hostname }})</option>
+              {% endfor %}
+              </select>
+
+              <label for="machine-domain">{{ _('Select by domain') }}</label>
+              <select name="machine_domain" id="machine-domain">
+              {% for hostname, domain, ac_id in all_domains %}
+                <option value="{% url machines-detail machine_slug=hostname %}">{{ domain }}</option>
+              {% endfor %}
+              </select>
+-->
+
+          	  <label for="machine-hostname">{{ _('Select by hostname') }}</label>
+              <select name="machine_hostname" id="machine-hostname" onchange="this.form.submit();">
+              {% for m in all_machines_hn %}
+                <option value="{% url machines-detail machine_slug=m.hostname %}">{{ m.hostname }} ({{ m.sys_ip }})</option>
+              {% endfor %}
+              </select>
+
+          	  <label for="machine-ip">{{ _('Select by IP address') }}</label>
+              <select name="machine_ip" id="machine-ip" onchange="this.form.submit();">
               {% for m in all_machines_ip %}
                 <option value="{% url machines-detail machine_slug=m.hostname %}">{{ m.sys_ip }} ({{ m.hostname }})</option>
               {% endfor %}
@@ -42,13 +60,14 @@
               <label for="machine-domain">{{ _('Select by domain') }}</label>
               <select name="machine_domain" id="machine-domain" onchange="this.form.submit();">
               {% for hostname, domain, ac_id in all_domains %}
-                <option value="{% url machines-detail machine_slug=hostname %}">{{ domain }}<!-- ({{ ac_id }})--></option>
+                <option value="{% url machines-detail machine_slug=hostname %}">{{ domain }}</option>
               {% endfor %}
               </select>
 
             </fieldset>
+          </form>
 
-
+          <form action="{% url ac-filter-results %}" method="get">
           	<fieldset>
           	  <legend>{{ _('Filter Apache configuration files') }}</legend>
 
@@ -62,7 +81,7 @@
                 <option value="">{{ _('Select parameter') }}</option>
               </select>
 
-              <label for="ac-filter-directives-values">{{ _('Filter by values') }}</label>
+              <label for="ac-filter-directives-values">{{ _('Filter by value') }}</label>
               <select name="ac_value" id="ac-filter-directives-values">
                 <option value="">*</option>
               </select>

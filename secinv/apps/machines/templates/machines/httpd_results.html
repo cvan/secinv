@@ -5,19 +5,17 @@
 {% block head_title %}{{ _('Filtered Apache configuration files') }} | {{ _('Machines') }} | {{ block.super }}{% endblock %}
 
 {% block content %}
+
       <hgroup id="masthead">
         <h2 class="sub">{{ _('Machines') }}</h2>
         <h3 class="sub">{{ _('Apache configuration files') }}</h3>
         <h4>
-          <mark>{{ _('Parameter:') }}</mark> {% if ac_parameter %}{{ ac_parameter }}{% else %}{{ _('(All)') }}{% endif %}
+          <span>{{ _('Parameter:') }}</span> {% if ac_parameter %}{{ ac_parameter }}{% else %}{{ _('(All)') }}{% endif %}
           <em><span>{{ _('Value:') }}</span> {% if ac_value %}{{ ac_value }}{% else %}*{% endif %}</em>
         </h4>
       </hgroup>
-      <div class="clear"></div>
 
-<!--{{ results }}-->
-
-      <table class="wide results">
+      <table class="wide">
         <caption>{{ _('Filtered results') }}</caption>
         <thead>
           <tr>
@@ -32,9 +30,6 @@
           </tr>
         </thead>
         <tbody>
-<!--{% if ac_parameter %}-->
-<!--{% endif %}-->
-
       {% for param, value, ac in results %}
           <tr>
             <td>{{ ac.machine.sys_ip }}</td>
@@ -48,9 +43,8 @@
             <td>{{ value }}</td>
           </tr>
       {% endfor %}
-        </tbody>
+        </tbody>
       </table>
-
 
 {% endblock %}
 

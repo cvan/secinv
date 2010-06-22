@@ -264,7 +264,7 @@ h4 em {
 /* @group Tables */
 
 table {
-    border-bottom: #665 1px solid;
+    border-bottom: #666 1px solid;
     width: 100%;
 }
 
@@ -331,7 +331,7 @@ tbody tbody tr:first-child td {
 tbody td[colspan] {
     padding: 0;
 }
-table table {
+table table {/**/
     border-bottom-width: 0;
 }
 tbody tbody {
@@ -341,10 +341,18 @@ tbody tbody {
 
 table.wide {
     border-bottom-color: #ddd;
-    margin: -10px -10px 0 -10px;
+    margin: 0 -10px 0 -10px;
 /*    width: 660px; *//* .col_11 width + 10px margins */
     width: 780px; /* .col_13 width + 10px margins */
 }
+
+hgroup#masthead+table.wide {
+    margin-top: -10px;
+}
+#content>table.wide:last-child {
+    margin-bottom: -10px;
+}
+
 
 /* TODO: temporary */
 table.wide thead tr th {
@@ -735,13 +743,7 @@ hgroup#masthead h3 a:hover em {
 hgroup#masthead h4 {
     font-size: 3em;
 }
-h4 mark {
-    background-color: transparent;
-    color: #fff;
-/*    font-style: italic; */
-}
-h4 mark,
-h4 em span {
+h4 span {
     font-weight: normal;
 }
 
@@ -754,7 +756,7 @@ h4 em span {
     float: left;
 }
 
-#content.col {
+#content {
     background-color: #fff;
     border: #999 1px solid;
     border-width: 0 1px;
@@ -1060,3 +1062,10 @@ table.diff caption {
 
 /* @end */
 
+
+/** {     margin: 0 !important; padding: 0 !important; border-collapse: collapse !important; display: inline-table; } */
+
+/*tbody { display: inline-table; margin: 0 !important; padding: 0 !important; }*/
+
+
+tbody {  display: table-row-group !important; }

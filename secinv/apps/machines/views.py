@@ -368,7 +368,11 @@ def search(request):
     template_context = {'form': form,
                         'results': results,
                         'query': query,
-                        'terms': terms}
+                        'terms': terms,
+                        'all_machines_hn': get_all_machines('-hostname'),
+                        'all_machines_ip': get_all_machines('-sys_ip'),
+                        'all_domains': get_all_domains(),
+                        'all_directives': get_all_directives()}
     return render_to_response('machines/search.html', template_context,
         context_instance=RequestContext(request))
 
