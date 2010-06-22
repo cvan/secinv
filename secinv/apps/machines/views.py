@@ -385,6 +385,7 @@ def httpd_conf(request, machine_slug, ac_id):
     code = ac.body
     highlighted_code = highlight(code, ApacheConfLexer(), HtmlFormatter())
 
+    # TODO: ADD AS FILTER.
     body = ''
     lines = re.split('\n', highlighted_code)
     for line in lines:
@@ -415,7 +416,7 @@ def httpd_conf(request, machine_slug, ac_id):
         context_instance=RequestContext(request))
 
 
-def history_iptables(request, machine_slug, version_number, compare_with='previous'):
+def diff_iptables(request, machine_slug, version_number, compare_with='previous'):
     m = get_object_or_404(Machine, hostname=machine_slug)
     query = request.GET.get('q', '')
     v_num = int(version_number)
@@ -467,8 +468,9 @@ def history_iptables(request, machine_slug, version_number, compare_with='previo
 
     template_context = {'machine': m,
                         'query': query,
-                        'iptables_current': iptables_current,
-                        'iptables_previous': iptables_previous,
+                        'section': 'iptables',
+                        'body_current': iptables_current,
+                        'body_previous': iptables_previous,
                         'version_current': str(v_num),
                         'version_previous': str(v_num_previous),
                         'older_version': str(older_version),
@@ -478,8 +480,85 @@ def history_iptables(request, machine_slug, version_number, compare_with='previo
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
                         'all_directives': get_all_directives()}
-    return render_to_response('machines/iptables.html', template_context,
-        context_instance=RequestContext(request))
+    return render_to_response('machines/diff.html', template_context,
+                              context_instance=RequestContext(request))
+
+
+def diff_httpd_conf(request, machine_slug, version_number, compare_with='previous'):
+    m = get_object_or_404(Machine, hostname=machine_slug)
+    query = request.GET.get('q', '')
+    v_num = int(version_number)
+
+    iptables_current = ''
+    iptables_previous = ''
+
+    iptables_history = IPTableInfo.objects.filter(machine__id=m.id).order_by(
+        '-date_added').all()
+
+    if iptables_history.exists():
+        if compare_with == 'current':
+            iptables_current = iptables_history[0].body
+
+        obj_versions = Version.objects.get_for_object(
+            iptables_history[0]).order_by('revision')
+        if obj_versions:
+            try:
+                if compare_with == 'current':
+                    iptables_previous = obj_versions[v_num - 1].field_dict['body']
+                elif compare_with == 'previous':
+                    iptables_current = obj_versions[v_num - 1].field_dict['body']
+                    iptables_previous = obj_versions[v_num - 2].field_dict['body']
+            except (IndexError, AssertionError):
+                pass
+
+            older_version = ''
+            newer_version = ''
+
+            if compare_with == 'current':
+                if (v_num - 2) < len(obj_versions):
+                    older_version = v_num - 1 # index + 1
+                if v_num < len(obj_versions):
+                    newer_version = v_num + 1
+            elif compare_with == 'previous':
+                if (v_num - 3) < len(obj_versions):
+                    older_version = v_num - 2
+                if v_num < len(obj_versions):
+                    newer_version = v_num + 1
+
+            if older_version < 0:
+                older_version = ''
+            if newer_version < 0:
+                newer_version = ''
+
+    v_num_previous = 0
+    if v_num > 0:
+        v_num_previous = v_num - 1
+
+    template_context = {'machine': m,
+                        'query': query,
+                        'section': 'httpd-conf',
+                        'body_current': iptables_current,
+                        'body_previous': iptables_previous,
+                        'version_current': str(v_num),
+                        'version_previous': str(v_num_previous),
+                        'older_version': str(older_version),
+                        'newer_version': str(newer_version),
+                        'compare_with': compare_with,
+                        'all_machines_hn': get_all_machines('-hostname'),
+                        'all_machines_ip': get_all_machines('-sys_ip'),
+                        'all_domains': get_all_domains(),
+                        'all_directives': get_all_directives()}
+    return render_to_response('machines/diff.html', template_context,
+                              context_instance=RequestContext(request))
+
+
+
+def diff(request, machine_slug, section_slug, version_number, compare_with='previous'):
+    return HttpResponse('sup?')
+    #if section_slug == 'iptables':
+    #    return diff_iptables(request, machine_slug, version_number, compare_with)
+    #elif section_slug == 'httpd-conf':
+    #    return diff_httpd_conf(request, machine_slug, version_number, compare_with)
 
 
 # View that that returns the JSON result.
@@ -555,15 +634,20 @@ def machine_filter(request):
         return HttpResponse(status=400)
 
     if hostname:
-        destination = hostname
+        m_hn = hostname
     elif ip:
-        destination = ip
+        m_hn = ip
     elif domain:
-        destination = domain
-    else:
+        m_hn = domain
+
+    if not m_hn:
         destination = reverse('machines-index')
 
+    m = get_object_or_404(Machine, hostname=m_hn)
+    destination = reverse('machines-detail', args=[m.hostname])
+
     return HttpResponseRedirect(destination)
+    #return HttpResponse(destination)
 
 
 def ac_filter_results(request):

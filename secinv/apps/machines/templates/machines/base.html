@@ -24,7 +24,7 @@
               <select name="machine_hostname" id="machine-hostname">
                 <option selected value="">*</option>
               {% for m in all_machines_hn %}
-                <option value="{% url machines-detail machine_slug=m.hostname %}">{{ m.hostname }} ({{ m.sys_ip }})</option>
+                <option value="{{ m.hostname }}">{{ m.hostname }} ({{ m.sys_ip }})</option>
               {% endfor %}
               </select>
 
@@ -32,7 +32,7 @@
               <select name="machine_ip" id="machine-ip">
                 <option selected value="">*</option>
               {% for m in all_machines_ip %}
-                <option value="{% url machines-detail machine_slug=m.hostname %}">{{ m.sys_ip }} ({{ m.hostname }})</option>
+                <option value="{{ m.hostname }}">{{ m.sys_ip }} ({{ m.hostname }})</option>
               {% endfor %}
               </select>
 
@@ -40,7 +40,7 @@
               <select name="machine_domain" id="machine-domain">
                 <option selected value="">*</option>
               {% for hostname, domain, ac_id in all_domains %}
-                <option value="{% url machines-detail machine_slug=hostname %}">{{ domain }}</option>
+                <option value="{{ hostname }}">{{ domain }}</option>
               {% endfor %}
               </select>
 

@@ -25,7 +25,12 @@ urlpatterns = patterns('secinv.apps.machines.views',
 #    url(r'^%s/history/iptables/%s/(%s/)?$' % (machine_slug, version_number, compare_with), 'history_iptables', {'compare_with': 'previous'}, name='history-iptables'),
 
     url(r'^%s/httpd-conf/%s/$' % (machine_slug, ac_id), 'httpd_conf', name='httpd-conf'),
-    url(r'^%s/history/iptables/%s/%s/$' % (machine_slug, version_number, compare_with), 'history_iptables', name='history-iptables'),
+
+#    url(r'^%s/diff/iptables/%s/%s/$' % (machine_slug, version_number, compare_with), 'diff_iptables', name='diff-iptables'),
+#    url(r'^%s/diff/httpd-conf/%s/%s/$' % (machine_slug, version_number, compare_with), 'diff_httpd_conf', name='diff-httpd-conf'),
+
+    url(r'^%s/diff/%s/%s/%s/$' % (machine_slug, section_slug, version_number, compare_with), 'diff', name='diff'),
+
     url(r'^%s/history/$' % machine_slug, 'history', name='history'),
 )
 

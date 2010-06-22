@@ -1,0 +1,83 @@
+{% extends "machines/base.html" %}
+{% load i18n %}
+{% load machine_extras %}
+
+{% block head_title %}{{ _('iptables') }} | {{ machine.hostname }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+      <hgroup id="masthead">
+        <h2 class="sub">{{ _('Machines') }}</h2>
+        <h3 class="sub">
+          <a href="{% url machines-detail machine_slug=machine.hostname %}">{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></a>
+        </h3>
+        <h4>{{ _('iptables') }}</h4>
+      </hgroup>
+      <div class="clear"></div>
+
+      <h5>{{ _('Differences between revisions') }}</h5>
+
+      <table class="diff diff_legends" summary="Legends">
+        <caption>Legends</caption>
+        <thead>
+          <tr>
+            <th>Colors</th>
+            <th class="diff_links">Links</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="diff_add">Added</td>
+            <td>(f)irst change</td>
+          </tr>
+          <tr>
+            <td class="diff_chg">Changed</td>
+            <td>(n)ext change</td>
+          </tr>
+          <tr>
+            <td class="diff_sub">Deleted</td>
+            <td>(t)op</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th>
+            {% if compare_with == 'current' %}
+              {{ _('Version') }} #{{ version_current }}
+
+              {% if older_version %}
+                <br>
+                <a href="{% url diff machine_slug=machine.hostname, section_slug=section, version_number=version_previous, compare_with='current' %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
+              {% endif %}
+
+            {% else %}
+              {{ _('Version') }} #{{ version_previous }}
+
+              {% if older_version %}
+                <br>
+                <a href="{% url diff machine_slug=machine.hostname, section_slug=section, version_number=version_previous, compare_with=compare_with %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
+              {% endif %}
+
+            {% endif %}
+            </th>
+            <th class="diff_links">
+            {% if compare_with == 'current' %}
+              {{ _('Current') }}
+            {% else %}
+              {{ _('Version') }} #{{ version_current }}
+
+              {% if newer_version %}
+                <br>
+                <a href="{% url diff machine_slug=machine.hostname, section_slug=section, version_number=newer_version, compare_with=compare_with %}">&rarr; {{ _('Newer version') }}<!-- (#{{ newer_version }})--></a>
+              {% endif %}
+
+            {% endif %}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+
+    {{ body_previous|diff_table:body_current }}
+
+
+{% endblock %}
+

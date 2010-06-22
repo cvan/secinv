@@ -11,7 +11,7 @@
         <h3 class="sub">{{ _('Apache configuration files') }}</h3>
         <h4>
           <span>{{ _('Parameter:') }}</span> {% if ac_parameter %}{{ ac_parameter }}{% else %}{{ _('(All)') }}{% endif %}
-          <em><span>{{ _('Value:') }}</span> {% if ac_value %}{{ ac_value }}{% else %}*{% endif %}</em>
+          <em><span>{{ _('Value:') }}</span> {% if ac_value %}{{ ac_value }}{% else %}{{ _('(All)') }}{% endif %}</em>
         </h4>
       </hgroup>
 
@@ -24,6 +24,7 @@
             <th>{{ _('Hostname') }}</th>
 -->
             <th colspan="2">{{ _('Machine') }}</th>
+            <th>{{ _('Domains') }}</th>
             <th>{{ _('Filename') }}</th>
             <th>{{ _('Parameter') }}</th>
             <th>{{ _('Value') }}</th>
@@ -37,6 +38,15 @@
               <a href="{% url machines-detail machine_slug=ac.machine.hostname %}">
                 {{ ac.machine.hostname }}
               </a>
+            </td>
+            <td>
+              {% if ac.get_domains %}
+              <ul>
+                {% for domain, ports, i_ac in ac.get_domains %}
+                <li><a href="{% url httpd-conf machine_slug=ac.machine.hostname, ac_id=i_ac.id %}">{{ domain }}</a><!--({{ ports|join:', ' }})--></li>
+                {% endfor %}
+              </ul>
+              {% endif %}        
             </td>
             <td><a href="{% url httpd-conf machine_slug=ac.machine.hostname, ac_id=ac.id %}">{{ ac.filename }}</a></td>
             <td>{{ param }}</td>
