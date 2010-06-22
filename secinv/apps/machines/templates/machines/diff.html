@@ -10,7 +10,12 @@
         <h3 class="sub">
           <a href="{% url machines-detail machine_slug=machine.hostname %}">{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></a>
         </h3>
+        {% if section == 'iptables' %}
         <h4>{{ _('iptables') }}</h4>
+        {% endif %}
+        {% if section == 'httpd-conf' %}
+        <h4>{{ _('Apache configuration file') }} <em>{{ obj_current.filename }}</em></h4>
+        {% endif %}
       </hgroup>
       <div class="clear"></div>
 
