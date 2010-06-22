@@ -445,9 +445,15 @@ header nav form label {
     padding-right: 0.5em;
 }
 
-fieldset {
-    margin: 1em 0;
-    padding: 1em;
+form fieldset {
+    margin: 10px 0 20px 0;
+    padding: 0 10px 10px 10px;
+}
+form fieldset legend {
+    color: #008cc2;
+}
+form fieldset label {
+    color: #333;
 }
 
 nav form {
@@ -485,7 +491,7 @@ input#q:focus {
     color: #000;
 }
 
-
+/* TODO: remove */
 header form button {
 	color: #000;
 	cursor: pointer;
@@ -512,8 +518,13 @@ header form button strong {
     display: block;
 }
 
+aside#sidebar label,
+aside#sidebar button {
+    margin-top: 0.5em;
+}
+
 aside#sidebar select {
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
     width: 100%;
 }
 
@@ -1067,5 +1078,3 @@ table.diff caption {
 
 /*tbody { display: inline-table; margin: 0 !important; padding: 0 !important; }*/
 
-
-tbody {  display: table-row-group !important; }

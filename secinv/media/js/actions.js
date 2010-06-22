@@ -2,6 +2,13 @@ $(function(){
 
     //$('.ui-selectmenu-menu li a').attr('href', 'blah');
 
+    $('select#machine-hostname, select#machine-ip, select#machine-domain, select#ac-filter-directives-values').change(function(){
+        $(this).closest('form').submit();
+    }).keypress(function(){
+        $(this).closest('form').submit();
+    });
+
+
     $('select#ac-filter-directives').focus(function(){
         //alert('focused!');
         //doPopulate();

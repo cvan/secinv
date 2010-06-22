@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.core import serializers
-from django.http import HttpResponse
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson
@@ -543,13 +544,27 @@ def ac_filter_directives(request):
     return HttpResponse(simplejson.dumps(result),
                         mimetype='application/json')
 
-'''
-def machine_filter(request, criterion, criterion_slug):
-    """Find machine by hostname, IP, or domain and redirect."""
-    if request
 
-    m = Machine.objects.all()
-'''
+def machine_filter(request):
+    """Find machine by hostname, IP, or domain and redirect."""
+    hostname = request.GET.get('machine_hostname', '')
+    ip = request.GET.get('machine_ip', '')
+    domain = request.GET.get('machine_domain', '')
+
+    if request.method != 'GET':
+        return HttpResponse(status=400)
+
+    if hostname:
+        destination = hostname
+    elif ip:
+        destination = ip
+    elif domain:
+        destination = domain
+    else:
+        destination = reverse('machines-index')
+
+    return HttpResponseRedirect(destination)
+
 
 def ac_filter_results(request):
     """Filter ApacheConfig objects by parameters and values."""
