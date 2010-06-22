@@ -394,8 +394,7 @@ def httpd_conf(request, machine_slug, ac_id):
     m = get_object_or_404(Machine, hostname=machine_slug)
     ac = get_object_or_404(ApacheConfig, id=ac_id)
 
-    code = ac.body
-    highlighted_code = highlight(code, ApacheConfLexer(), HtmlFormatter())
+    highlighted_code = highlight(ac.body, ApacheConfLexer(), HtmlFormatter())
 
     # TODO: ADD AS FILTER.
     body = ''
@@ -415,6 +414,9 @@ def httpd_conf(request, machine_slug, ac_id):
             line = '<span class="nb">%s</span> %s' % (ls[0], i_fn)
         body += '%s\n' % line
 
+    # Get historical versions of ApacheConfig object.
+    apacheconfig_versions = get_version_diff_field(ac, 'body')
+
     query = request.GET.get('q', '')
     template_context = {'machine': m,
                         'query': query,
@@ -423,7 +425,8 @@ def httpd_conf(request, machine_slug, ac_id):
                         'all_machines_hn': get_all_machines('-hostname'),
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives()}
+                        'all_directives': get_all_directives(),
+                        'apacheconfig_versions': apacheconfig_versions}
     return render_to_response('machines/httpd_conf.html', template_context,
         context_instance=RequestContext(request))
 
