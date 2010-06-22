@@ -699,20 +699,21 @@ function getTabs(section) {
 
 
           <h5>{{ _('Includes') }}</h5>
+
+
           {% if apacheconfig_includes %}
           <dl>
-            {% for fn, id, ac, body in apacheconfig_includes %}
+            {% for i_ac in apacheconfig_includes %}
             <dt>
-              <a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=id %}">{{ fn }}</a>
-              <!--
-              {{ body|safe }}
-              -->
+              <a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=i_ac.id %}">
+                {{ i_ac.filename }}
+              </a>
             </dt>
             <dd>
-              {% if ac.domains %}
+              {% if i_ac.domains %}
               <ul>
-                {% for domain, ports in ac.domains.items %}
-                <li>{{ domain }}<!-- ({{ ports|join:', ' }})--></li>
+                {% for domain, ports in i_ac.domains.items %}
+                <li>{{ domain }}</li>
                 {% endfor %}
               </ul>
               {% endif %}

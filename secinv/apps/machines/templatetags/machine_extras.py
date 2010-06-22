@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 
 from .. import utils
-
+from ..models import ApacheConfig
 
 register = template.Library()
 

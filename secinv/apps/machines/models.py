@@ -252,10 +252,9 @@ if not reversion.is_registered(SSHConfig):
 class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
 
-    body = CompressedTextField(_('contents'), blank=True, null=True)
+#    body = CompressedTextField(_('contents'), blank=True, null=True)
 
-    # TODO: Store as serialized data field.
-#    body = SerializedDataField(_('contents'), blank=True, null=True)
+    body = SerializedDataField(_('contents'), blank=True, null=True)
 
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
@@ -263,13 +262,6 @@ class ApacheConfig(models.Model):
     directives = SerializedDataField()
     domains = SerializedDataField()
     included = SerializedDataField()
-
-    #directives = models.TextField(_('directives'), blank=True, null=True)
-    #domains = models.TextField(_('domains'), blank=True, null=True)
-    #included = models.TextField(_('included configuration files'), blank=True,
-    #                            null=True)
-
-    # TODO: Store as dictionary (json or python serialized).
 
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)

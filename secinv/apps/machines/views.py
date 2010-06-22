@@ -147,6 +147,33 @@ def history(request, machine_slug):
     return HttpResponse(serializers.serialize('json', system_history),
                         mimetype='application/json')
 
+'''
+class RecurseIncludes:
+    def __init__(self, ac_object):
+        self.ac_object = ac_object
+        self.ac_includes = []
+
+    def recurse(self):
+        ac = self.ac_object
+        for fn in ac.included:
+            try:
+                i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id, filename=fn)
+                self.ac_includes.append([i_ac])
+            except ApacheConfig.DoesNotExist:
+                pass
+            self.recurse()
+'''
+
+def recurse_ac_includes(ac):
+    apacheconfig_includes = []
+    for fn in ac.included:
+        try:
+            i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id, filename=fn)
+            apacheconfig_includes.append([i_ac])
+        except ApacheConfig.DoesNotExist:
+            pass
+    return apacheconfig_includes
+
 
 def detail(request, machine_slug):
     m = get_object_or_404(Machine, hostname=machine_slug)
@@ -289,55 +316,14 @@ def detail(request, machine_slug):
 
         for fn in apacheconfig_latest.included:
             try:
-                i = ApacheConfig.objects.get(machine__id=m.id, filename=fn)
-                
-                highlighted_code = highlight(i.body, ApacheConfLexer(),
-                                             HtmlFormatter())
-        
-                body = ''
-                lines = re.split('\n', highlighted_code)
-                for line in lines:
-                    ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
-                    if len(ls) == 2 and ls[0].lower() == 'include':
-                        # TODO: in Apache Config Parser, handle ``quoted`` Include filenames.
-        
-                        try:
-                            a = ApacheConfig.objects.get(machine__id=m.id,
-                                                         filename__endswith=ls[1])
-                            i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
-                        except (ApacheConfig.DoesNotExist,
-                                ApacheConfig.MultipleObjectsReturned):
-                            i_fn = '%s' % ls[1]
-        
-                        line = '<span class="nb">%s</span> %s' % (ls[0], i_fn)
-                    body += '%s\n' % line
-                
-                apacheconfig_includes.append([fn, i.id, i, body])
+                i_ac = ApacheConfig.objects.get(machine__id=m.id, filename=fn)
+
+                apacheconfig_includes.append(i_ac)
             except ApacheConfig.DoesNotExist:
                 pass
 
-
-    '''
-    all_domains = []
-
-    m_all = Machine.objects.all()
-    for m in m_all:
-        a_m = ApacheConfig.objects.filter(machine__id=m.id).all()
-        for a in a_m:
-            for fn in a.included:
-                try:
-                    i_a = ApacheConfig.objects.get(machine__id=m.id,
-                                                   filename=fn)
-                    if i_a.domains:
-                        # TODO: Want port number (value)?
-                        for k in i_a.domains.keys():
-                            if not [m.hostname, k, i_a.id] in all_domains:
-                                all_domains.append([m.hostname, k, i_a.id])
-                except ApacheConfig.DoesNotExist:
-                    pass
-
-    all_domains.sort()
-    '''
+    # Recurse includes.
+    ac_includes = recurse_ac_includes(ac)
 
     template_context = {'query': query,
                         'machine': m,
@@ -357,6 +343,7 @@ def detail(request, machine_slug):
                         'apacheconfig_versions': apacheconfig_versions,
                         'apacheconfig_latest_body': apacheconfig_latest_body,
                         'apacheconfig_includes': apacheconfig_includes,
+                        'ac_includes': ac_includes,
                         'all_machines_hn': get_all_machines('-hostname'),
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
@@ -417,6 +404,19 @@ def httpd_conf(request, machine_slug, ac_id):
     # Get historical versions of ApacheConfig object.
     apacheconfig_versions = get_version_diff_field(ac, 'body')
 
+    # Get includes.
+    apacheconfig_includes = []
+    for fn in ac.included:
+        try:
+            i_ac = ApacheConfig.objects.get(machine__id=m.id, filename=fn)
+
+            apacheconfig_includes.append(i_ac)
+        except ApacheConfig.DoesNotExist:
+            pass
+
+    # Recurse includes.
+    ac_includes = recurse_ac_includes(ac)
+
     query = request.GET.get('q', '')
     template_context = {'machine': m,
                         'query': query,
@@ -426,7 +426,9 @@ def httpd_conf(request, machine_slug, ac_id):
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
                         'all_directives': get_all_directives(),
-                        'apacheconfig_versions': apacheconfig_versions}
+                        'apacheconfig_versions': apacheconfig_versions,
+                        'apacheconfig_includes': apacheconfig_includes,
+                        'ac_includes': ac_includes}
     return render_to_response('machines/httpd_conf.html', template_context,
         context_instance=RequestContext(request))
 

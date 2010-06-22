@@ -33,11 +33,10 @@
       {{ apacheconfig_latest_body|safe }}
 
 
-      <h5>{{ _('Domains') }}</h5>
+      <h5>{{ _('Domains in this file') }}</h5>
 
       {# TODO: have client send as list, not dictionary. #}
 
-      <h6>{{ _('Domains in this file') }}</h6>
       {% if ac.domains %}
       <ul>
         {% for domain, ports in ac.domains.items %}
@@ -46,34 +45,40 @@
       </ul>
       {% endif %}
 
-      <h6>{{ _('In included .conf files') }}</h6>
+<!--
+      <h5>{{ _('In included .conf files') }}</h5>
       {% if ac.get_domains %}
       <ul>
         {% for domain, ports, i_ac in ac.get_domains %}
-        <li><a href="{% url httpd-conf machine_slug=ac.machine.hostname, ac_id=i_ac.id %}">{{ domain }}</a><!--({{ ports|join:', ' }})--></li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-
-<!--
-      <h5>{{ _('Includes') }}</h5>
-      {% if apacheconfig_includes %}
-      <ul>
-        {% for fn, id, ac, body in apacheconfig_includes %}
-        <li>
-          <strong><a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=id %}">{{ fn }}</a></strong>
-          {% if ac.domains %}
-          <ul>
-            {% for domain, ports in ac.domains.items %}
-            <li>{{ domain }} ({{ ports|join:', ' }})</li>
-            {% endfor %}
-          </ul>
-          {% endif %}
-        </li>
+        <li><a href="{% url httpd-conf machine_slug=ac.machine.hostname, ac_id=i_ac.id %}">{{ domain }}</a> ({{ ports|join:', ' }})</li>
         {% endfor %}
       </ul>
       {% endif %}
 -->
+
+
+          <h5>{{ _('Includes') }}</h5>
+          {% if apacheconfig_includes %}
+          <dl>
+            {% for i_ac in apacheconfig_includes %}
+            <dt>
+              <a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=i_ac.id %}">
+                {{ i_ac.filename }}
+              </a>
+            </dt>
+            <dd>
+              {% if i_ac.domains %}
+              <ul>
+                {% for domain, ports in i_ac.domains.items %}
+                <li>{{ domain }}<!-- ({{ ports|join:', ' }})--></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </dd>
+            {% endfor %}
+          </dl>
+          {% endif %}
+
 
         </div><!-- #apacheconfig-latest -->
         <div id="apacheconfig-history" class="history">
@@ -83,7 +88,6 @@
             <thead>
               <tr>
                 <th class="cmp">{{ _('Compare against') }}</th>
-                <th>{{ _('Filename') }}</th>
                 <th>{{ _('Revisions') }}</th>
                 <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
@@ -92,15 +96,11 @@
             {% for ac_ver in apacheconfig_versions %}
               <tr>
                 <td class="cmp">
-                  {# Do not display '(current)' link if this is the latest version for the filename #}
                   {% if ac_ver.is_newest %}{{ _('(current)') }}{% else %}
                   <a href="{% url diff machine_slug=machine.hostname, section_slug='iptables', version_number=ac_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
                   {% endif %}
 
                   <a href="{% url diff machine_slug=machine.hostname, section_slug='iptables', version_number=ac_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
-                </td>
-                <td>
-                  <a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=ac_ver.fields.id %}">{{ ac_ver.fields.filename }}</a>
                 </td>
                 <td>
                   {{ _('Version') }} #{{ ac_ver.version }}
