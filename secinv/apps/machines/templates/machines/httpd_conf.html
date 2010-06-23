@@ -19,66 +19,40 @@
           <li><a href="#apacheconfig-history" class="history">{{ _('History') }}</a></li>
         </ul>
         <div id="apacheconfig-latest" class="latest">
-
-      <details class="date">
-        <strong>{{ _('Last Modified') }}</strong>
-        <time datetime="{{ ac.date_added|date:'c' }}">
-          {{ ac.date_added }}
-        </time>
-      </details>
-      <div class="clear"></div>
-
-      {{ ac_body|safe }}
-
-      {{ apacheconfig_latest_body|safe }}
-
-
-      <h5>{{ _('Domains in this file') }}</h5>
-
-      {# TODO: have client send as list, not dictionary. #}
-
-      {% if ac.domains %}
-      <ul>
-        {% for domain, ports in ac.domains.items %}
-        <li>{{ domain }}<!-- ({{ ports|join:', ' }})--></li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-
-<!--
-      <h5>{{ _('In included .conf files') }}</h5>
-      {% if ac.get_domains %}
-      <ul>
-        {% for domain, ports, i_ac in ac.get_domains %}
-        <li><a href="{% url httpd-conf machine_slug=ac.machine.hostname, ac_id=i_ac.id %}">{{ domain }}</a> ({{ ports|join:', ' }})</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
--->
-
-
-          <h5>{{ _('Includes') }}</h5>
-          {% if apacheconfig_includes %}
-          <dl>
-            {% for i_ac in apacheconfig_includes %}
-            <dt>
-              <a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=i_ac.id %}">
-                {{ i_ac.filename }}
-              </a>
-            </dt>
-            <dd>
-              {% if i_ac.domains %}
-              <ul>
-                {% for domain, ports in i_ac.domains.items %}
-                <li>{{ domain }}<!-- ({{ ports|join:', ' }})--></li>
-                {% endfor %}
-              </ul>
-              {% endif %}
-            </dd>
+    
+          <details class="date">
+            <strong>{{ _('Last Modified') }}</strong>
+            <time datetime="{{ ac.date_added|date:'c' }}">
+              {{ ac.date_added }}
+            </time>
+          </details>
+          <div class="clear"></div>
+    
+          {{ ac_body|safe }}
+    
+          {{ apacheconfig_latest_body|safe }}
+    
+    
+          <h5>{{ _('Domains in this file') }}</h5>
+    
+          {# TODO: have client send as list, not dictionary. #}
+    
+          {% if ac.domains %}
+          <ul>
+            {% for domain, ports in ac.domains.items %}
+            <li>{{ domain }}<!-- ({{ ports|join:', ' }})--></li>
             {% endfor %}
-          </dl>
+          </ul>
           {% endif %}
 
+          <h5>{{ _('Includes') }}</h5>
+          {% if ac_includes %}
+          <ul class="hierarchy">
+          {% get_nested_items 'filename' machine.id %}
+          {{ ac_includes|unordered_list }}
+          {% endget_nested_items %}
+          </ul>
+          {% endif %}
 
         </div><!-- #apacheconfig-latest -->
         <div id="apacheconfig-history" class="history">

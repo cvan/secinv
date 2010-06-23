@@ -669,7 +669,7 @@ function getTabs(section) {
           <li><a href="#apacheconfig-history" class="history">{{ _('History') }}</a></li>
         </ul>
         <div id="apacheconfig-latest" class="latest">
-          {% if apacheconfig %}
+        {% if apacheconfig %}
           <h4 class="group">{{ apacheconfig.filename }}</h4>
 <!--          <h4 class="group">/etc/httpd/conf/httpd.conf</h4> -->
 
@@ -685,7 +685,6 @@ function getTabs(section) {
 
           {{ apacheconfig_latest_body|safe }}
 
-
           <h5>{{ _('Domains in this file') }}</h5>
           {% if apacheconfig.domains %}
           <ul>
@@ -697,22 +696,16 @@ function getTabs(section) {
           <p>None</p>
           {% endif %}
 
-
           <h5>{{ _('Includes') }}</h5>
-
-<!--
-{{ ac_includes|unordered_list_dl }}
--->
-
           {% if ac_includes %}
           <ul class="hierarchy">
           {% get_nested_items 'filename' machine.id %}
-          {{ ac_includes|unordered_list_dl }}
+          {{ ac_includes|unordered_list }}
           {% endget_nested_items %}
           </ul>
           {% endif %}
 
-          {% endif %}
+        {% endif %}
         </div><!-- #apacheconfig-latest -->
         <div id="apacheconfig-history" class="history">
 
