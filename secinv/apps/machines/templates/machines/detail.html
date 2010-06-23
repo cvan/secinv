@@ -700,29 +700,18 @@ function getTabs(section) {
 
           <h5>{{ _('Includes') }}</h5>
 
+<!--
+{{ ac_includes|unordered_list_dl }}
+-->
 
-          {% if apacheconfig_includes %}
-          <dl>
-            {% for i_ac in apacheconfig_includes %}
-            <dt>
-              <a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=i_ac.id %}">
-                {{ i_ac.filename }}
-              </a>
-            </dt>
-            <dd>
-              {% if i_ac.domains %}
-              <ul>
-                {% for domain, ports in i_ac.domains.items %}
-                <li>{{ domain }}</li>
-                {% endfor %}
-              </ul>
-              {% endif %}
-            </dd>
-            {% endfor %}
-          </dl>
+          {% if ac_includes %}
+          <ul class="hierarchy">
+          {% get_nested_items 'filename' machine.id %}
+          {{ ac_includes|unordered_list_dl }}
+          {% endget_nested_items %}
+          </ul>
           {% endif %}
 
-          <div class="clear"></div>
           {% endif %}
         </div><!-- #apacheconfig-latest -->
         <div id="apacheconfig-history" class="history">

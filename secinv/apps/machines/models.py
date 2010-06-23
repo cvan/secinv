@@ -252,22 +252,33 @@ if not reversion.is_registered(SSHConfig):
 class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
 
-#    body = CompressedTextField(_('contents'), blank=True, null=True)
-
-    body = SerializedDataField(_('contents'), blank=True, null=True)
+    # TODO: Store as SerializedDataField.
+    body = CompressedTextField(_('contents'), blank=True, null=True)
+#    body = SerializedDataField(_('contents'), blank=True, null=True)
 
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
 
     directives = SerializedDataField()
     domains = SerializedDataField()
+
+    # Do not use a ManyToManyField or ForeignKey field, since we may not have
+    # objects for the included Apache config files (since the files themselves
+    # may be unreadable).
     included = SerializedDataField()
+
+#    included = models.ManyToManyField('ApacheConfig')
 
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
+#    def __unicode__(self):
+#        return u'%s' % self.body[0:100]
+
     def __unicode__(self):
-        return u'%s' % self.body[0:100]
+        if re.search('/', self.filename):
+            fn = re.split('/', self.filename)[-1]
+        return u'%s' % fn
 
     @models.permalink
     def get_absolute_url(self):
@@ -398,4 +409,3 @@ class AuthKey(models.Model):
         verbose_name = _('AuthKey')
         verbose_name_plural = _('AuthKeys')
         get_latest_by = 'date_added'
-

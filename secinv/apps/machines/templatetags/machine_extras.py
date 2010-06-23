@@ -1,12 +1,15 @@
 from django.db.models import get_model
 from django import template
 from django.template.defaultfilters import stringfilter
+from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils.safestring import mark_safe, SafeData
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 
 from .. import utils
 from ..models import ApacheConfig
+
+import re
 
 register = template.Library()
 
@@ -77,9 +80,15 @@ diff.needs_autoescape = True
 
 @register.filter
 def enum(value, arg, autoescape=False):
+    if autoescape:
+        from django.utils.html import conditional_escape
+        escaper = conditional_escape
+    else:
+        escaper = lambda x: x
+
     choices = arg.split(',')
-    yes = ugettext('%(yes)s') % {'yes': choices[0]}
-    no = ugettext('%(no)s') % {'no': choices[1]}
+    yes = ugettext('%(yes)s') % {'yes': escaper(force_unicode(choices[0]))}
+    no = ugettext('%(no)s') % {'no': escaper(force_unicode(choices[1]))}
     return yes if value else no
 enum.is_safe = True
 enum.needs_autoescape = True
@@ -174,7 +183,7 @@ def differ(parser, token):
 
     Example::
 
-        {% differ system.diff 'rh_rel' %}{{ system.fields.rh_rel}}{% enddiffer %}
+        {% differ system.diff 'rh_rel' %}{{ system.fields.rh_rel }}{% enddiffer %}
     """
 
     bits = token.split_contents()
@@ -243,10 +252,10 @@ def split_as_list(parser, token):
         delimiter = bits[1]
         if delimiter[0] in ('"', "'") and delimiter[0] == delimiter[-1]:
             delimiter = delimiter[1:-1]
-    
+
         source_string = bits[2]
         destination_list = bits[4]
-    
+
     return SplitAsListNode(source_string, destination_list, delimiter)
 
 
@@ -280,4 +289,198 @@ def engine(f):
 
 register.filter('diff_html', engine(utils.diff_html))
 register.filter('diff_table', engine(utils.diff_table))
+
+
+@register.filter
+def unordered_list_dl(value, autoescape=None):
+    """
+    Recursively takes a self-nested list and returns an HTML unordered list --
+    WITHOUT opening and closing <ul> tags.
+
+    The list is assumed to be in the proper format. For example, if ``var``
+    contains: ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``,
+    then ``{{ var|unordered_list_dl }}`` would return::
+
+        <li>States
+        <ul>
+                <li>Kansas
+                <ul>
+                        <li>Lawrence</li>
+                        <li>Topeka</li>
+                </ul>
+                </li>
+                <li>Illinois</li>
+        </ul>
+        </li>
+    """
+    if autoescape:
+        from django.utils.html import conditional_escape
+        escaper = conditional_escape
+    else:
+        escaper = lambda x: x
+    def convert_old_style_list(list_):
+        """
+        Converts old style lists to the new easier to understand format.
+
+        The old list format looked like:
+            ['Item 1', [['Item 1.1', []], ['Item 1.2', []]]
+
+        And it is converted to:
+            ['Item 1', ['Item 1.1', 'Item 1.2]]
+        """
+        if not isinstance(list_, (tuple, list)) or len(list_) != 2:
+            return list_, False
+        first_item, second_item = list_
+        if second_item == []:
+            return [first_item], True
+        old_style_list = True
+        new_second_item = []
+        for sublist in second_item:
+            item, old_style_list = convert_old_style_list(sublist)
+            if not old_style_list:
+                break
+            new_second_item.extend(item)
+        if old_style_list:
+            second_item = new_second_item
+        return [first_item, second_item], old_style_list
+
+    def _helper(list_, tabs=1):
+        indent = u'    ' * tabs
+        output = []
+
+        list_length = len(list_)
+        i = 0
+        while i < list_length:
+            title = list_[i]
+            sublist = ''
+            sublist_item = None
+            if isinstance(title, (list, tuple)):
+                sublist_item = title
+                title = ''
+            elif i < list_length - 1:
+                next_item = list_[i+1]
+                if next_item and isinstance(next_item, (list, tuple)):
+                    # The next item is a sub-list.
+                    sublist_item = next_item
+                    # We've processed the next item now too.
+                    i += 1
+            if sublist_item:
+                sublist = _helper(sublist_item, tabs+1)
+                sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (indent, sublist,
+                                                         indent, indent)
+            output.append('%s<li>%s%s</li>' % (indent,
+                    escaper(force_unicode(title)), sublist))
+#            output.append('%s<li>%s%s</li>' % (indent,
+#                    title[0], sublist))
+            i += 1
+        return '\n'.join(output)
+    value, converted = convert_old_style_list(value)
+
+    return mark_safe(_helper(value))
+
+unordered_list_dl.is_safe = True
+unordered_list_dl.needs_autoescape = True
+
+
+
+
+
+
+class GetNestedItemsNode(template.Node):
+    """
+    TODO: Merge tag with 'unordered_list_dl'.
+    """
+    def __init__(self, nodelist, field_name, machine_id):
+        self.nodelist = nodelist
+        self.field_name = field_name
+        self.machine_id = machine_id
+
+    def render(self, context):
+        # Remove quotation marks from string value.
+        field_name = self.field_name
+        machine_id = self.machine_id
+
+        if field_name[0] in ('"', "'") and field_name[0] == field_name[-1]:
+            field_name = field_name[1:-1]
+        else:
+            field_name = template.Variable(field_name).resolve(context)
+
+        if machine_id[0] in ('"', "'") and machine_id[0] == machine_id[-1]:
+            machine_id = machine_id[1:-1]
+        else:
+            machine_id = template.Variable(machine_id).resolve(context)
+
+        content = self.nodelist.render(context)
+
+        lines = re.split('\n', content)
+        output = ''
+
+        for line in lines:
+            m = re.compile(r'(\s*)<li>(.+)</li>$').match(line)
+            if m:
+                ws, value = m.groups()
+                closing = '</li>'
+            else:
+                m = re.compile(r'(\s*)<li>(.+)$').match(line)
+                if m:
+                    ws, value = m.groups()
+
+                    closing = ''
+                else:
+                    output += '%s\n' % line
+                    continue
+
+            try:
+                ac = ApacheConfig.objects.get(machine__id=machine_id, filename=value)
+
+                domains = '\n'
+
+                if domains:
+                    domains = '<ul>\n'
+                    for d in ac.domains.keys():
+                        domains += '  <li>%s</li>\n' % d
+                    domains += '</ul>\n'
+
+                line = '%s<li><h6><a href="%s">%s</a></h6>%s%s' % (
+                     ws, ac.get_absolute_url(), value, domains, closing)
+
+            except ApacheConfig.DoesNotExist:
+                pass
+
+            output += '%s\n' % line
+
+
+
+        #matches = re.findall(r'<span class="item">([^<]+)</span>', output)
+        #for m in matches:
+        #    print m
+
+
+        return '%s' % output
+
+
+@register.tag
+def get_nested_items(parser, token):
+    """
+    This wraps the enclosed text with the appropriate element: ins, mark, del.
+
+    Requires two arguments: (1) a dictionary of the field differences,
+    and (2) a string of the field name.
+
+    Example::
+
+        {% get_nested_items 'filename' machine.id %}{{ ac_includes|unordered_list_dl }}{% endget_nested_items %}
+    """
+
+    bits = token.split_contents()
+
+    if len(bits) != 3:
+        raise template.TemplateSyntaxError("%r tag requires two arguments: (field name) and machine_id." % bits[0])
+
+    field_name = bits[1]
+    machine_id = bits[2]
+
+    nodelist = parser.parse(('endget_nested_items',))
+    parser.delete_first_token()
+    return GetNestedItemsNode(nodelist, field_name, machine_id)
 
