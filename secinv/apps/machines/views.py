@@ -148,92 +148,16 @@ def history(request, machine_slug):
                         mimetype='application/json')
 
 
-class RecurseIncludes:
-    def __init__(self):
-        #self.ac_object = ac_object
-        self.ac_includes = []
-
-    def recurse(self, ac):
-        ac_includes = []
-        for fn in ac.included:
-            try:
-                i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id, filename=fn)
-    
-                l = i_ac
-    
-                if i_ac.included:
-                    l = [i_ac, self.recurse(i_ac)]
-
-                    '''
-                    """Recurse BEGIN"""
-                    l = []
-                    l.append(i_ac)
-                    if i_ac.included:
-        
-                        includes2 = []
-                        for fn2 in i_ac.included:
-                            try:
-                                i_ac2 = ApacheConfig.objects.get(machine__id=i_ac.machine_id, filename=fn2)
-                                includes2.append(i_ac2)
-                            except ApacheConfig.DoesNotExist:
-                                pass
-                        l.append(includes2)
-                    """Recurse END"""
-                    '''
-
-                ac_includes.append(l)
-    
-            except ApacheConfig.DoesNotExist:
-                pass
-    
-        return ac_includes
-
-    def get_ac_includes(self, ac):
-        #return self.ri.recurse(ac)
-        return self.ac_includes
-
-
-#, filename__endswith='pfs.conf'
-
-'''
-def recurse_ac_includes(ac):
-    ri = RecurseIncludes()
-    return ri.recurse(ac)
-'''
-
-'''
-
-def recurse_ac_includes(ac):
-    ac_includes = []
-    for fn in ac.included:
-        try:
-            i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id, filename=fn)
-
-            l = i_ac
-
-            if i_ac.included:
-                l = [i_ac, recurse_ac_includes(i_ac)]
-
-            ac_includes.append(l)
-
-        except ApacheConfig.DoesNotExist:
-            pass
-
-    return ac_includes
-'''
-
 def recurse_ac_includes(ac, field_name='filename'):
     ac_includes = []
     for fn in ac.included:
         try:
             i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id, filename=fn)
 
-            #l = {'filename': i_ac.filename, 'id':i_ac.id, 'domains': i_ac.domains}
             l = i_ac.__getattribute__(field_name)
 
             if i_ac.included:
                 l = [i_ac.__getattribute__(field_name), recurse_ac_includes(i_ac)]
-#                l = [l, recurse_ac_includes(i_ac)]
 
             ac_includes.append(l)
 
@@ -242,40 +166,6 @@ def recurse_ac_includes(ac, field_name='filename'):
 
     return ac_includes
 
-
-"""
-def recurse_ac_includes(ac):
-    apacheconfig_includes = []
-    for fn in ac.included:
-        try:
-            i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id, filename=fn)
-
-            if ac.included:
-                l = recurse_ac_includes(i_ac)
-                '''
-                # Recurse BEGIN
-                l = []
-                l.append(i_ac)
-                if i_ac.included:
-    
-                    includes2 = []
-                    for fn2 in i_ac.included:
-                        try:
-                            i_ac2 = ApacheConfig.objects.get(machine__id=i_ac.machine_id, filename=fn2)
-                            includes2.append(i_ac2)
-                        except ApacheConfig.DoesNotExist:
-                            pass
-                    l.append(includes2)
-                '''
-                # Recurse END
-    
-                apacheconfig_includes.append(l)
-
-        except ApacheConfig.DoesNotExist:
-            pass
-
-    return apacheconfig_includes
-"""
 
 def detail(request, machine_slug):
     m = get_object_or_404(Machine, hostname=machine_slug)
