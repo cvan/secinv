@@ -7,7 +7,7 @@ from django.template import RequestContext
 from django.utils import simplejson
 
 from .models import Machine, Services, System, RPMs, Interface, SSHConfig, \
-                    IPTableInfo, ApacheConfig
+                    IPTables, ApacheConfig
 from .forms import MachineSearchForm
 from .utils import diff_list, diff_dict, get_version_diff, get_version_diff_field
 
@@ -248,10 +248,10 @@ def detail(request, machine_slug):
 
     ## iptables.
     iptables_latest = []
-    iptables_history = IPTableInfo.objects.filter(machine__id=m.id).order_by(
+    iptables_history = IPTables.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
-    # Get historical versions of IPTableInfo objects.
+    # Get historical versions of IPTables objects.
     iptables_versions = get_version_diff_field(iptables_history[0], 'body')
 
     if iptables_history.exists():

@@ -363,7 +363,7 @@ if not reversion.is_registered(RPMs):
     reversion.register(RPMs)
 
 
-class IPTableInfo(models.Model):
+class IPTables(models.Model):
     machine = models.ForeignKey('Machine')
     body = models.TextField(_('iptables policies and rules'), blank=True,
                             null=True)
@@ -375,34 +375,12 @@ class IPTableInfo(models.Model):
         return u'%s' % self.body[0:100]
 
     class Meta:
-        verbose_name = _('IPTableInfo')
-        verbose_name_plural = _('IPTableInfo')
-        get_latest_by = 'date_added'
-
-if not reversion.is_registered(IPTableInfo):
-    reversion.register(IPTableInfo)
-
-
-class IPTable(models.Model):
-    machine = models.ForeignKey('Machine')
-    name = models.CharField(_('name'), max_length=255)
-
-    # TODO: `active` field.
-    #active = models.BooleanField(_('active'), default=1)
-
-    date_added = models.DateTimeField(_('date added'),
-                                      default=datetime.datetime.now)
-
-    def __unicode__(self):
-        return u'%s' % (self.name)
-
-    class Meta:
-        verbose_name = _('IPTable')
+        verbose_name = _('IPTables')
         verbose_name_plural = _('IPTables')
         get_latest_by = 'date_added'
 
-#if not reversion.is_registered(IPTable):
-#    reversion.register(IPTable)
+if not reversion.is_registered(IPTables):
+    reversion.register(IPTables)
 
 
 class AuthKey(models.Model):
@@ -415,3 +393,4 @@ class AuthKey(models.Model):
         verbose_name = _('AuthKey')
         verbose_name_plural = _('AuthKeys')
         get_latest_by = 'date_added'
+

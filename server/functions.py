@@ -44,7 +44,7 @@ import reversion
 from apps.machines.models import *
 #from apps.machines.models import Interface, System, Services, RPMs, \
 #                                 SSHConfig, IPTable, IPTableChain, IPTableRules,
-#                                 IPTableInfo, ApacheConfig
+#                                 IPTables, ApacheConfig
 
 
 class ServerFunctions:
@@ -342,14 +342,12 @@ class ServerFunctions:
 
 
         ## iptables.
-        #print 'Received iptables dictionary:\n'
         iptables_rules = ipt_dict['rules']
         iptables_body = ipt_dict['rules']['body']
         iptables_status = ipt_dict['status']
-        #print iptables_rules
 
         try:
-            i_object = IPTableInfo.objects.filter(
+            i_object = IPTables.objects.filter(
                 machine__id=self.machine_id).latest()
 
             if i_object.body != iptables_body or \
@@ -361,68 +359,12 @@ class ServerFunctions:
                 with reversion.revision:
                     i_object.save()
 
-        except IPTableInfo.DoesNotExist:
-            i_object = IPTableInfo.objects.create(machine=self.machine_obj,
-                                                  body=iptables_body,
-                                                  active=iptables_status)
+        except IPTables.DoesNotExist:
+            i_object = IPTables.objects.create(machine=self.machine_obj,
+                                               body=iptables_body,
+                                               active=iptables_status)
             with reversion.revision:
                 i_object.save()
-
-
-        '''
-        # TODO: If unique table names in DB are not in tables_rules --> set as inactive.
-
-        for table_name, v in iptables_rules.iteritems():
-            try:
-                ipt_table = IPTable.objects.filter(
-                    machine__id=self.machine_id, name=table_name).latest()
-                ipt_table_id = ipt_table.id
-            except IPTable.DoesNotExist:
-                i_dict = {'machine': self.machine_obj,
-                          'name': table_name}
-                ipt_table = IPTable.objects.create(**i_dict)
-
-                ipt_table_id = ipt_table.id
-
-
-            for chain in v['chains']:
-                try:
-                    i_object = IPTableChain.objects.filter(
-                        table__id=ipt_table_id, name=chain['name']).latest()
-
-                    i_diff = False
-
-                    # TODO: Check differences.
-
-                    if i_diff:
-                        i_dict = {}
-                        IPTableChain.objects.create(**i_dict)
-                except IPTableChain.DoesNotExist:
-                    i_dict = {'table': ipt_table,
-                              'name': chain['name'],
-                              'policy': chain['policy'],
-                              'packets': chain['packets'],
-                              'bytes': chain['bytes']}
-                    i_obj = IPTableChain.objects.create(**i_dict)
-
-            for rule in v['rules']:
-                try:
-                    i_object = IPTableRule.objects.filter(
-                        table__id=ipt_table_id, rule=rule).latest()
-
-                    i_diff = False
-
-                    # TODO: Check differences.
-
-                    if i_diff:
-                        i_dict = {}
-                        IPTableRule.objects.create(**i_dict)
-
-                except IPTableRule.DoesNotExist:
-                    i_dict = {'table': ipt_table,
-                              'rule': rule}
-                    IPTableRule.objects.create(**i_dict)
-        '''
 
         return True
 
