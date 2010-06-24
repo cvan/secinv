@@ -334,8 +334,8 @@ caption {
 thead th {
     border-top: #666 1px solid;
     border-bottom: #666 3px solid;
-    padding-top: 0;
-    padding-bottom: 0.539em; /* 7px */
+/*    padding-bottom: 0.539em; *//* 7px */
+    padding: 4px auto;
 }
 
 tbody {
@@ -348,8 +348,8 @@ tbody tr td {
 }
 
 th, td {
-    text-align: left;
     padding: 0.308em 0.537em 0.214em 0.231em; /* 4px 7px 3px 7px */
+    text-align: left;
 }
 
 td {
@@ -409,6 +409,9 @@ hgroup#masthead+table.wide {
     margin-bottom: -10px;
 }
 
+table+section {
+    margin-top: 1em;
+}
 
 /* TODO: temporary */
 table.wide thead tr th {
@@ -1144,4 +1147,7 @@ table.diff caption {
 /** {     margin: 0 !important; padding: 0 !important; border-collapse: collapse !important; display: inline-table; } */
 
 /*tbody { display: inline-table; margin: 0 !important; padding: 0 !important; }*/
+
+
+
 

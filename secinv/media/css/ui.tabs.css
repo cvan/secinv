@@ -1,0 +1,9 @@
+/* Nested tabs. */
+
+.ui-tabs .ui-tabs-panel .ui-tabs  {
+/*    background: black; */
+/*    border: #000 3px solid; */
+/*    margin: -0.2em; */
+/*    margin: -1em -1.4em -1em -1.4em; */
+}
+

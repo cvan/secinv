@@ -380,3 +380,49 @@ def get_nested_items(parser, token):
     parser.delete_first_token()
     return GetNestedItemsNode(nodelist, field_name, machine_id)
 
+
+
+
+'''
+def highlight(value, arg=None, autoescape=False):
+    if autoescape:
+        from django.utils.html import conditional_escape
+        escaper = conditional_escape
+    else:
+        escaper = lambda x: x
+'''
+
+@register.filter
+def highlight(value, arg=None, autoescape=None):
+    """
+    Filter syntax-highlights code.
+    Optional argument: lexer.
+    """
+    if autoescape:
+        from django.utils.html import conditional_escape
+        escaper = conditional_escape
+    else:
+        escaper = lambda x: x
+
+    from pygments import highlight
+    from pygments.lexers import PythonLexer
+    from pygments.formatters import HtmlFormatter
+    from pygments.lexers import get_lexer_by_name, guess_lexer
+
+    try:
+        lexer = get_lexer_by_name(arg, stripnl=True, encoding=u'UTF-8')
+    except ValueError:
+        try:
+            # Guess a lexer by the contents of the block.
+            lexer = guess_lexer(value)
+        except ValueError:
+            # Just make it plain text.
+            lexer = get_lexer_by_name(u'text', stripnl=True, encoding=u'UTF-8')
+
+    # TODO: Translation. uggetttext?
+    code = highlight(value, lexer, HtmlFormatter())
+
+    return mark_safe(code)
+highlight.is_safe = True
+
+

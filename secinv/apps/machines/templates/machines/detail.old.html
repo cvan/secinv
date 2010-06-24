@@ -93,6 +93,51 @@ function getTabs(section) {
         </dl>
       </details>
 
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#system">{{ _('System') }}</a></li>
+          <li><a href="#interfaces">{{ _('Interfaces') }}</a></li>
+          <li><a href="#services">{{ _('Services listening') }}</a></li>
+          <li><a href="#sshconfig">{{ _('SSH config') }}</a></li>
+          <li><a href="#rpms">{{ _('RPMs') }}</a></li>
+          <li><a href="#iptables">{{ _('iptables') }}</a></li>
+          <li><a href="#apacheconfig">{{ _('Apache config') }}</a></li>
+        </ul>
+        <div id="system">
+
+          <section class="tabs">
+            <ul>
+              <li><a href="#system-latest" class="latest">{{ _('Current') }}</a></li>
+              <li><a href="#system-history" class="history">{{ _('History') }}</a></li>
+            </ul>
+            <div id="system-latest" class="latest">
+                Latest System
+            </div><!-- #system-latest -->
+            <div id="system-history" class="history">
+                System Versions
+            </div><!-- #system-latest -->
+          </section>
+
+        </div><!-- #system -->
+        <div id="interfaces">
+
+          <section class="tabs">
+            <ul>
+              <li><a href="#interfaces-latest" class="latest">{{ _('Current') }}</a></li>
+              <li><a href="#interfaces-history" class="history">{{ _('History') }}</a></li>
+            </ul>
+            <div id="interfaces-latest" class="latest">
+                Latest Interfaces
+            </div><!-- #interfaces-latest -->
+            <div id="interfaces-history" class="history">
+                Interfaces Versions
+            </div><!-- #interfaces-latest -->
+          </section>
+
+        </div><!-- #interfaces -->
+      </section>
+
 {# TODO: diff for machine #}
       <table class="view sortable">
         <caption>{{ _('Machine details') }}</caption>
@@ -149,17 +194,8 @@ function getTabs(section) {
         </tbody>
       </table>
 
-      <section class="tabs">
-        <ul>
-          <li><a href="#system">{{ _('System') }}</a></li>
-          <li><a href="#interfaces">{{ _('Interfaces') }}</a></li>
-          <li><a href="#services">{{ _('Services listening') }}</a></li>
-          <li><a href="#sshconfig">{{ _('SSH config') }}</a></li>
-          <li><a href="#rpms">{{ _('RPMs') }}</a></li>
-          <li><a href="#iptables">{{ _('iptables') }}</a></li>
-          <li><a href="#apacheconfig">{{ _('Apache config') }}</a></li>
-        </ul>
-        <div id="system">
+
+      <h3>{{ _('System') }}</h3>
 
       <section class="tabs">
         <ul>
@@ -257,9 +293,7 @@ function getTabs(section) {
       </section>
 
 
-        </div><!-- #system -->
-        <div id="interfaces">
-
+      <h3>{{ _('Interfaces') }}</h3>
       <section class="tabs">
         <ul>
           <li><a href="#interfaces-latest" class="latest">{{ _('Current') }}</a></li>
@@ -337,8 +371,8 @@ function getTabs(section) {
         </div><!-- #interfaces-history -->
       </section>
 
-        </div><!-- #interfaces -->
-        <div id="services">
+
+      <h3>{{ _('Services listening') }}</h3>
 
       <section class="tabs">
         <ul>
@@ -433,8 +467,8 @@ function getTabs(section) {
         </div><!-- #services-history -->
       </section>
 
-        </div><!-- #services -->
-        <div id="sshconfig">
+
+      <h3>{{ _('SSH configuration') }}</h3>
 
       <section class="tabs">
         <ul>
@@ -528,10 +562,10 @@ function getTabs(section) {
 
         </div><!-- #sshconfig-history -->
       </section>
-        </div><!-- #sshconfig -->
-        <div id="rpms">
 
 
+
+      <h3>{{ _('RPMs') }}</h3>
       <section class="tabs">
         <ul>
           <li><a href="#rpms-latest" class="latest">{{ _('Current') }}</a></li>
@@ -607,16 +641,15 @@ function getTabs(section) {
         </div><!-- #rpms-history -->
       </section>
 
-        </div><!-- #rpms -->
-        <div id="iptables">
 
+      <h3>{{ _('iptables') }}</h3>
       <section class="tabs">
         <ul>
           <li><a href="#iptables-latest" class="latest">{{ _('Current') }}</a></li>
           <li><a href="#iptables-history" class="history">{{ _('History') }}</a></li>
         </ul>
         <div id="iptables-latest" class="latest">
-          <h4 class="group">{{ _('iptables rule-sets') }}</h4>
+          <h4 class="group">{{ _('iptables') }}</h4>
 
           {% if iptables %}
           <details class="date">
@@ -627,7 +660,7 @@ function getTabs(section) {
           </details>
           <div class="clear"></div>
 
-          {{ iptables.body|highlight:'ini' }}
+          <pre><code>{{ iptables.body }}</code></pre>
 
           <div class="clear"></div>
           {% endif %}
@@ -673,9 +706,8 @@ function getTabs(section) {
         </div><!-- #iptables-history -->
       </section>
 
-        </div><!-- #iptables -->
-        <div id="apacheconfig">
 
+      <h3>{{ _('Apache configuration files') }}</h3>
       <section class="tabs">
         <ul>
           <li><a href="#apacheconfig-latest" class="latest">{{ _('Current') }}</a></li>
@@ -766,9 +798,6 @@ function getTabs(section) {
           </table>
 
         </div><!-- #apacheconfig-history -->
-      </section>
-
-        </div><!-- #apacheconfig -->
       </section>
 
 {% endblock %}
