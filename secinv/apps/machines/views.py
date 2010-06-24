@@ -23,6 +23,7 @@ import json
 
 DIFF_SECTION_SLUGS = ('iptables', 'httpd-conf')
 
+
 def get_all_domains():
     all_domains = []
 

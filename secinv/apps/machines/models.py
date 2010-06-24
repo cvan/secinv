@@ -14,6 +14,7 @@ class Machine(models.Model):
     sys_ip = models.IPAddressField(_('IP address'))
     hostname = models.CharField(max_length=255)
     ext_ip = models.IPAddressField(_('external IP address'), blank=True, null=True)
+    tokens = models.ManyToManyField('AuthToken')
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
     date_modified = models.DateTimeField(_('date modified'),
@@ -92,6 +93,28 @@ if not reversion.is_registered(Machine):
     #reversion.register(Machine)
 
 
+class AuthToken(models.Model):
+    token = models.CharField(_('authorization token'), blank=True,
+                             null=True, max_length=255)
+
+    #token = SerializedTextField(_('authorization token'), blank=True,
+    #                            null=True, max_length=255)
+
+    # TODO: Each time a machine checks in, add to machines.
+    machines = models.ManyToManyField('Machine', blank=True, null=True)
+
+    date_added = models.DateTimeField(_('date added'),
+                                      default=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u'%s' % (self.token)
+
+    class Meta:
+        verbose_name = _('Authorization Token')
+        verbose_name_plural = _('Authorization Tokens')
+        get_latest_by = 'date_added'
+
+
 class Interface(models.Model):
     machine = models.ForeignKey('Machine')
     i_name = models.CharField(_('interface name'), max_length=50)
@@ -125,7 +148,10 @@ class Interface(models.Model):
         return i_diff
 
     class Meta:
+        verbose_name = _('Interface')
+        verbose_name_plural = _('Interfaces')
         get_latest_by = 'date_added'
+
 
 if not reversion.is_registered(Interface):
     reversion.register(Interface)
@@ -166,6 +192,7 @@ class System(models.Model):
         return s_diff
 
     class Meta:
+        verbose_name = _('System')
         verbose_name_plural = _('System')
         get_latest_by = 'date_added'
 
@@ -204,6 +231,7 @@ class Services(models.Model):
         return u'%s - %s' % (self.k_processes, self.v_ports)
 
     class Meta:
+        verbose_name = _('Services')
         verbose_name_plural = _('Services')
         get_latest_by = 'date_added'
 
@@ -241,8 +269,8 @@ class SSHConfig(models.Model):
         return u'%s - %s' % (self.k_parameters, self.v_values)
 
     class Meta:
-        verbose_name = _('SSHConfig')
-        verbose_name_plural = _('SSHConfig')
+        verbose_name = _('SSH Configuration')
+        verbose_name_plural = _('SSH Configuration')
         get_latest_by = 'date_added'
 
 if not reversion.is_registered(SSHConfig):
@@ -252,20 +280,20 @@ if not reversion.is_registered(SSHConfig):
 class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
 
-    # TODO: Store as SerializedDataField.
-    body = CompressedTextField(_('contents'), blank=True, null=True)
-#    body = SerializedDataField(_('contents'), blank=True, null=True)
+    # TODO: Store as SerializedTextField.
+    #body = CompressedTextField(_('contents'), blank=True, null=True)
+    body = SerializedTextField(_('contents'), blank=True, null=True)
 
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
 
-    directives = SerializedDataField()
-    domains = SerializedDataField()
+    directives = SerializedTextField()
+    domains = SerializedTextField()
 
     # Do not use a ManyToManyField or ForeignKey field, since we may not have
     # objects for the included Apache config files (since the files themselves
     # may be unreadable).
-    included = SerializedDataField()
+    included = SerializedTextField()
 
 #    included = models.ManyToManyField('ApacheConfig')
 
@@ -276,6 +304,7 @@ class ApacheConfig(models.Model):
 #        return u'%s' % self.body[0:100]
 
     def __unicode__(self):
+        fn = self.filename
         if re.search('/', self.filename):
             fn = re.split('/', self.filename)[-1]
         return u'%s' % fn
@@ -284,20 +313,6 @@ class ApacheConfig(models.Model):
     def get_absolute_url(self):
         return ('httpd-conf', (), {'machine_slug': self.machine.hostname,
                                    'ac_id': str(self.id)})
-
-    '''
-    def get_domains(self):
-        domains = {}
-        for fn in self.included:
-            try:
-                a = ApacheConfig.objects.get(machine__id=self.machine_id,
-                                             filename=fn)
-                if a.domains:
-                    domains = dict(domains, **a.domains)
-            except ApacheConfig.DoesNotExist:
-                pass
-        return domains
-    '''
 
     def get_domains(self):
         domains = []
@@ -317,11 +332,12 @@ class ApacheConfig(models.Model):
                         domains.append([k, v, a])
             except ApacheConfig.DoesNotExist:
                 pass
+
         return domains
 
     class Meta:
-        verbose_name = _('ApacheConfig')
-        verbose_name_plural = _('ApacheConfig')
+        verbose_name = _('Apache Configuration')
+        verbose_name_plural = _('Apache Configuration')
         get_latest_by = 'date_added'
 
 if not reversion.is_registered(ApacheConfig):
@@ -375,22 +391,10 @@ class IPTables(models.Model):
         return u'%s' % self.body[0:100]
 
     class Meta:
-        verbose_name = _('IPTables')
-        verbose_name_plural = _('IPTables')
+        verbose_name = _('iptables')
+        verbose_name_plural = _('iptables')
         get_latest_by = 'date_added'
 
 if not reversion.is_registered(IPTables):
     reversion.register(IPTables)
-
-
-class AuthKey(models.Model):
-    machine = models.ForeignKey('Machine')
-    key = models.CharField(_('authorization key'), max_length=255)
-    date_added = models.DateTimeField(_('date added'),
-                                      default=datetime.datetime.now)
-
-    class Meta:
-        verbose_name = _('AuthKey')
-        verbose_name_plural = _('AuthKeys')
-        get_latest_by = 'date_added'
 

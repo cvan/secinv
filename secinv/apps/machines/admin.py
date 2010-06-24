@@ -43,3 +43,6 @@ class MachineAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_added'
 
 admin.site.register(Machine, MachineAdmin)
+
+admin.site.register(AuthToken)
+

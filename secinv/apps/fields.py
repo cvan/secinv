@@ -29,7 +29,8 @@ class SerializedDataField(models.TextField):
         return base64.b64encode(pickle.dumps(value))
 '''
 
-class SerializedDataField(models.TextField):
+
+class SerializedTextField(models.TextField):
     """
     A field which serializes python values to the database, and returns
     them intact.
@@ -37,15 +38,18 @@ class SerializedDataField(models.TextField):
     __metaclass__ = models.SubfieldBase
 
     def to_python(self, value):
-        if value is None or value is "": return
-        if not isinstance(value, basestring): return value
+        if value is None or value is '':
+            return
+        if not isinstance(value, basestring):
+            return value
         try:
             return pickle.loads(base64.b64decode(value))
         except:
             return
 
     def get_db_prep_save(self, value):
-        if value is None or value is "": return
+        if value is None or value is '':
+            return
         return base64.b64encode(pickle.dumps(value))
 
 
