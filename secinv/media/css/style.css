@@ -387,7 +387,7 @@ tbody tbody tr:first-child td {
 tbody td[colspan] {
     padding: 0;
 }
-table table {/**/
+table table {
     border-bottom-width: 0;
 }
 tbody tbody {
@@ -504,14 +504,14 @@ header nav form label {
     padding-right: 0.5em;
 }
 
-form fieldset {
+fieldset {
     margin: 10px 0 20px 0;
     padding: 0 10px 10px 10px;
 }
-form fieldset legend {
+fieldset legend {
     color: #008cc2;
 }
-form fieldset label {
+fieldset label {
     color: #333;
 }
 
@@ -845,18 +845,19 @@ h4 span {
 */
 
 /*
-.tabs .history>table {
-    width: 320px;
-}
-.tabs .history>table>thead>th {
-    position: fixed;
+.tabs .history>table>thead tr {
+    position: relative;
 }
 .tabs .history>table>tbody {
 height: 200px;
+margin-top: 10px;
     overflow: scroll;
 }
-*/
 
+.tabs .history>table thead tr {
+position:relative;
+}
+*/
 
 .tabs table thead th {
     vertical-align: middle;
@@ -929,34 +930,33 @@ details.differences dl {
 
 /*.enabled mark,
 .disabled mark,*/
-figure.added,
-figure.changed,
-figure.deleted {
+span.added,
+span.changed,
+span.deleted {
     background: black;
     -moz-border-radius: 135px;
     -webkit-border-radius: 135px;
     border-radius: 135px;
     display: block;
     height: 1px;
-    width: 1px;
     padding: 5px;
+    width: 1px;
 }
 
 /*.enabled mark,*/
-figure.added {
+span.added {
     background-color: #080;
 }
-figure.changed {
+span.changed {
     background-color: #c50;
 }
 /*.disabled mark,*/
-figure.deleted {
+span.deleted {
     background-color: #800;
 }
 
 .enabled mark {
     color: #080;
-    display: block;
 }
 .disabled mark {
     color: #800;
@@ -964,6 +964,7 @@ figure.deleted {
 
 .enabled mark,
 .disabled mark {
+    display: block;
     margin: 0 auto;
 /*    text-indent: -9999px; */
 }

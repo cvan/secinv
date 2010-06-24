@@ -410,14 +410,14 @@ def highlight(value, arg=None, autoescape=None):
     from pygments.lexers import get_lexer_by_name, guess_lexer
 
     try:
-        lexer = get_lexer_by_name(arg, stripnl=True, encoding=u'UTF-8')
+        lexer = get_lexer_by_name(arg, stripnl=False, encoding=u'UTF-8')
     except ValueError:
         try:
             # Guess a lexer by the contents of the block.
             lexer = guess_lexer(value)
         except ValueError:
             # Just make it plain text.
-            lexer = get_lexer_by_name(u'text', stripnl=True, encoding=u'UTF-8')
+            lexer = get_lexer_by_name(u'text', stripnl=False, encoding=u'UTF-8')
 
     # TODO: Translation. uggetttext?
     code = highlight(value, lexer, HtmlFormatter())

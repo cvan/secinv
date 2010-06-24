@@ -6,7 +6,7 @@
 {% block sidebar %}
 
           <h2>{{ _('Machines') }}</h2>
-          <form action="{% url machine-filter %}" method="get">
+
           	<fieldset>
           	  <legend>{{ _('Filter Machines') }}</legend>
 
@@ -20,6 +20,7 @@
               {% endif %}
               -->
 
+          <form action="{% url machine-filter %}" method="get">
           	  <label for="machine-hostname">{{ _('Select by <strong>hostname</strong>') }}</label>
               <select name="machine_hostname" id="machine-hostname">
                 <option selected value="">*</option>
@@ -27,7 +28,9 @@
                 <option value="{{ m.hostname }}">{{ m.hostname }} ({{ m.sys_ip }})</option>
               {% endfor %}
               </select>
+          </form>
 
+          <form action="{% url machine-filter %}" method="get">
           	  <label for="machine-ip">{{ _('Select by <strong>IP address</strong>') }}</label>
               <select name="machine_ip" id="machine-ip">
                 <option selected value="">*</option>
@@ -35,7 +38,9 @@
                 <option value="{{ m.hostname }}">{{ m.sys_ip }} ({{ m.hostname }})</option>
               {% endfor %}
               </select>
+          </form>
 
+          <form action="{% url machine-filter %}" method="get">
               <label for="machine-domain">{{ _('Select by <strong>domain</strong>') }}</label>
               <select name="machine_domain" id="machine-domain">
                 <option selected value="">*</option>
@@ -43,6 +48,7 @@
                 <option value="{{ hostname }}">{{ domain }}</option>
               {% endfor %}
               </select>
+          </form>
 
 <!--
           	  <h3>{{ _('Select by hostname') }}</h3>
@@ -76,7 +82,7 @@
 -->
 
             </fieldset>
-          </form>
+
 
           <form action="{% url ac-filter-results %}" method="get">
           	<fieldset>
@@ -85,6 +91,8 @@
               <script type="text/javascript">
                 var urlAllDirs = '{% url ac-filter-directives-all %}';
                 var urlDirs = '{% url ac-filter-directives %}';
+                var ac_parameter = '{{ ac_parameter }}';
+                var ac_value = '{{ ac_value }}';
               </script>
 
               <label for="ac-filter-directives">{{ _('Filter by <strong>parameter</strong>') }}</label>

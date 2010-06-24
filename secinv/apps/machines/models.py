@@ -301,6 +301,12 @@ class ApacheConfig(models.Model):
 
     def get_domains(self):
         domains = []
+
+        # Append domains defined in this config file.
+        for k, v in self.domains.iteritems():
+            domains.append([k, v, self])
+
+        # Append domains defined in included config files.
         for fn in self.included:
             try:
                 a = ApacheConfig.objects.get(machine__id=self.machine_id,

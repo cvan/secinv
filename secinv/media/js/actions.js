@@ -51,10 +51,19 @@ function doPopulate()
 {
     $.getJSON(urlAllDirs, function(data) {
         var newHTML = "";
+        var foundSelected = false;
 
         $.each(data, function(key, value) {
 
-            $('select#ac-filter-directives').append("<option>" + data[key] + "</option>\n");
+            var selected = '';
+
+            if (ac_parameter == data[key])
+            {
+                selected = ' selected';
+                foundSelected = true;
+            }
+
+            $('select#ac-filter-directives').append("<option" + selected + ">" + data[key] + "</option>\n");
 
             //newHTML += "key: " + data[key] + "<br>\n";
 
@@ -67,6 +76,10 @@ function doPopulate()
 
         });
         //$('select#ac-filter-directives').selectmenu({style:'dropdown'});
+
+        if (foundSelected)
+            doChange();
+
     });
 }
 
@@ -82,7 +95,11 @@ function doChange()
             var newOptions = '<option value="">*</option>\n';
     
             $.each(data, function(key, value) {
-                newOptions += "<option>" + value + "</option>\n";
+                var selected = '';
+                if (ac_value == value)
+                    selected = ' selected';
+    
+                newOptions += "<option" + selected + ">" + value + "</option>\n";
             });
     
             $('select#ac-filter-directives-values').html(newOptions);
