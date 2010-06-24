@@ -22,6 +22,9 @@ class ServicesInline(admin.TabularInline):
 class RPMSInline(admin.TabularInline):
     model = RPMs
 
+class ApacheConfigInline(admin.TabularInline):
+    model = ApacheConfig
+
 class MachineAdmin(admin.ModelAdmin):
     #fields = ['sys_ip', 'hostname', 'ext_ip']
     fieldsets = [(None,               {'fields': ['sys_ip',
@@ -29,7 +32,8 @@ class MachineAdmin(admin.ModelAdmin):
                  ('Date information', {'fields': ['date_modified',
                                                   'date_scanned'],
                                        'classes': 'collapse'}),]
-    inlines = [SystemInline, ServicesInline, RPMSInline, InterfaceInline]
+    inlines = [SystemInline, ServicesInline, RPMSInline, InterfaceInline,
+               ApacheConfigInline]
 
     list_display = ('sys_ip', 'hostname', 'ext_ip',
                     'date_added', 'date_modified', 'date_scanned')

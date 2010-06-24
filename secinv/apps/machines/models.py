@@ -283,6 +283,7 @@ class ApacheConfig(models.Model):
     # TODO: Store as SerializedTextField.
     #body = CompressedTextField(_('contents'), blank=True, null=True)
     body = SerializedTextField(_('contents'), blank=True, null=True)
+#    body = SerializedTextField(blank=True, null=True)
 
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
