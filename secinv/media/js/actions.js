@@ -4,30 +4,45 @@ $(function(){
 
     $('select#machine-hostname, select#machine-ip, select#machine-domain, select#ac-filter-directives-values').change(function(){
         $(this).closest('form').submit();
-    }).keypress(function(){
+    }).keyup(function(){
+        $(this).closest('form').submit();
+    }).keydown(function(){
         $(this).closest('form').submit();
     });
 
+    var selected = $('select#ac-filter-directives').val();
+    var numChildren = $('select#ac-filter-directives').find('option').length;
 
+    if (selected == '' && numChildren == 1)
+        doPopulate();
+
+    $('select#ac-filter-directives').change(function(){
+        doChange();
+    }).keyup(function(){
+        doChange();
+    }).keydown(function(){
+        doChange();
+    });
+
+/*
     $('select#ac-filter-directives').focus(function(){
         //alert('focused!');
         //doPopulate();
         //var options = $('select#ac-filter-directives').children('option').html();
 
         var selected = $('select#ac-filter-directives').val();
-
         var numChildren = $('select#ac-filter-directives').find('option').length;
-        //alert(numChildren);
 
         if (selected == '' && numChildren == 1)
             doPopulate();
     }).change(function(){
-        //alert('changed!');
         doChange();
-    }).keypress(function(){
-        //alert('keydown!');
+    }).keyup(function(){
+        doChange();
+    }).keydown(function(){
         doChange();
     });
+*/
 
 });
 
@@ -74,7 +89,7 @@ function doChange()
 
             //$('select#ac-filter-directives-values').selectmenu({style:'dropdown'});
 
-            $('select#ac-filter-directives-values').focus();
+            //$('select#ac-filter-directives-values').focus();
         });
     }
 }

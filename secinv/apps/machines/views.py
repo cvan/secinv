@@ -574,6 +574,7 @@ def machine_filter(request):
     if request.method != 'GET':
         return HttpResponse(status=400)
 
+    m_hn = ''
     if hostname:
         m_hn = hostname
     elif ip:
@@ -581,11 +582,11 @@ def machine_filter(request):
     elif domain:
         m_hn = domain
 
-    if not m_hn:
+    if m_hn:
+        m = get_object_or_404(Machine, hostname=m_hn)
+        destination = reverse('machines-detail', args=[m.hostname])
+    else:
         destination = reverse('machines-index')
-
-    m = get_object_or_404(Machine, hostname=m_hn)
-    destination = reverse('machines-detail', args=[m.hostname])
 
     return HttpResponseRedirect(destination)
     #return HttpResponse(destination)

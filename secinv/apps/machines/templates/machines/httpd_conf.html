@@ -43,6 +43,8 @@
             <li>{{ domain }}<!-- ({{ ports|join:', ' }})--></li>
             {% endfor %}
           </ul>
+          {% else %}
+          <p class="none">{{ _('None') }}</p>
           {% endif %}
 
           <h5>{{ _('Includes') }}</h5>
@@ -52,6 +54,8 @@
           {{ ac_includes|unordered_list }}
           {% endget_nested_items %}
           </ul>
+          {% else %}
+          <p class="none">{{ _('None') }}</p>
           {% endif %}
 
         </div><!-- #apacheconfig-latest -->

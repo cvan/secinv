@@ -693,7 +693,7 @@ function getTabs(section) {
             {% endfor %}
           </ul>
           {% else %}
-          <p>None</p>
+          <p class="none">{{ _('None') }}</p>
           {% endif %}
 
           <h5>{{ _('Includes') }}</h5>
@@ -703,6 +703,8 @@ function getTabs(section) {
           {{ ac_includes|unordered_list }}
           {% endget_nested_items %}
           </ul>
+          {% else %}
+          <p class="none">{{ _('None') }}</p>
           {% endif %}
 
         {% endif %}

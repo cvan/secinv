@@ -3,7 +3,7 @@ body {
 	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
 	background: -moz-linear-gradient(top,  #fff,  #ededed);
 	background: linear-gradient(top,  #fff,  #ededed);
-	margin-bottom: 20px;
+	margin: 20px 0;
 }
 
 body, header {
@@ -31,9 +31,10 @@ ul.hierarchy li li {
 /*    list-style-type: circle; */
 }
 
-ul.hierarchy a {
+ul.hierarchy h6 a {
     background-color: #eee;
     border-top: #666 1px solid;
+    border-bottom: #999 1px solid;
     color: #333;
     display: block;
     padding: 4px 8px;
@@ -41,29 +42,55 @@ ul.hierarchy a {
 ul.hierarchy a:hover {
     color: #000;
 }
-.clear {
-    clear: both;
+
+.none {
+/*
+    background: #eee;
+    border: #ccc 1px solid;
+*/
+    color: #999;
+    font-style: italic;
+    font-weight: bold;
+/*    padding: 0.5em 1em; */
 }
 
 /* @group Header */
 header figure {
-    padding: 10px 0;
+/*
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+
+    background: #008cc2;
+    background: -webkit-gradient(linear, left top, left bottom, from(#4dcce7), to(#3acf2a));
+*/
+/*    background: -moz-linear-gradient(top, #e0f5fc, #73d2f3); */
+/*    background: -moz-linear-gradient(top, #fff 10%, #ededed 50%, #73d2f3); */
+/*    background: -moz-linear-gradient(top, #fff 10%, #ededed 50%, #73d2f3); */
+/*
+    background: linear-gradient(top, #eee, #008cc2);
+*/
+
+/*    padding: 20px 0; */
 }
 
 h1 {
     line-height: 1.3;
-    padding: 0 10px;
 }
 header .logo {
     font-size: 1.5em;
 /*    font-weight: 700; */
-
+    font-family: "American Typewriter", Georgia, serif;
     text-shadow: 0 2px 1px #999;
     /*filter: Shadow(Color=#666666, Direction=135, Strength=3);*/
 }
 header .logo a {
-    font-family: "American Typewriter", Georgia, serif;
+    display: block;
     color: #666;
+    padding: 0 10px 10px 10px;
     text-decoration: none;
 }
 header .logo a:hover {
@@ -90,6 +117,7 @@ header nav {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 
+/*    border-top: #0f84ad 1px solid; */
     border-bottom: #00648d 1px solid;
     color: #fff;
     padding: 10px;
@@ -233,28 +261,28 @@ footer a:hover {
 /* size headings using classic scale of 16, 18, 24, 36 */
 
 h1 {
-    font-size: 2.571em /* 36px */;
-    line-height: 1em /* 36px */;
-    margin-top: 0.1667em /* 6px */;
-    margin-bottom: 0.5833em /* 21px */;
+    font-size: 2.571em; /* 36px */
+    line-height: 1em; /* 36px */
+    margin-top: 0.1667em; /* 6px */
+    margin-bottom: 0.5833em; /* 21px */
 }
 h1 { margin: 0; }
 
 h2 {
-    font-size: 2.154em /* 28px */;
+    font-size: 2.154em; /* 28px */
     font-weight: normal;
-    line-height: 1em /* 28px */;
-    margin-top: 0.5em /* 42px */;
-    margin-bottom: 0.5em /* 14px */;
+    line-height: 1em; /* 28px */
+    margin-top: 0.5em; /* 42px */
+    margin-bottom: 0.5em; /* 14px */
     color: #c63717;
 }
 h3 {
     color: #011234;
-    font-size: 1.385em /* 18px */;
+    font-size: 1.385em; /* 18px */
     font-weight: normal;
-    line-height: 1.111em /* 20px */;
-    margin-top: 1.556em /* 28px */;
-    margin-bottom: 0.778em /* 14px */;
+    line-height: 1.111em; /* 20px */
+    margin-top: 1.556em; /* 28px */
+    margin-bottom: 0.778em; /* 14px */
 }
 h3 {
     font-size: 1.8em;
@@ -265,7 +293,7 @@ h4 {
     font-size: 1.5em;
 }
 h5, h6 {
-    font-size: 1em /* 13px */;
+    font-size: 1em; /* 13px */
 }
 h5 {
     font-size: 1.385em;
@@ -274,17 +302,17 @@ h5 {
 
 h3 em {
     color: #666;
-    font-weight: normal;
     display: inline-block;
+    text-shadow: none;
     font-size: 0.6em;
     font-style: normal;
-    text-shadow: none;
+    font-weight: normal;
 }
 h4 em {
     color: #999;
-    font-style: normal;
-    font-size: 0.6em;
     display: block;
+    font-size: 0.6em;
+    font-style: normal;
 }
 
 /* @end */
@@ -830,7 +858,7 @@ height: 200px;
 .tabs table thead th {
     vertical-align: middle;
 }
-.tabs table td {
+.tabs table tbody td {
     vertical-align: top;
 }
 
