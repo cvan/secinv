@@ -2,7 +2,6 @@
 /* 52framework General StyleSheet - contains styles for all the HTML elements this framework supports */
 
 body {
-	font-family: Arial, Helvetica, sans-serif;
 	font-size: 52%/1.52em;
 }
 
@@ -101,3 +100,4 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
 }
+

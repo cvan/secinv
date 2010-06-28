@@ -153,15 +153,16 @@ def get_version_diff_field(obj_item, field_name):
 
             old_v = obj_version[index - 1]
 
-            code = generate_patch(old_v, ver, field_name)
+            try:
+                code = generate_patch(old_v, ver, field_name)
 
-            l = guess_lexer(patch_txt)
-            l.add_filter(VisibleWhitespaceFilter(newlines=True))
-            #diff_highlighted = highlight(code, PythonLexer(), HtmlFormatter())
-            diff_highlighted = highlight(code, l, HtmlFormatter())
+                l = guess_lexer(patch_txt)
+                l.add_filter(VisibleWhitespaceFilter(newlines=True))
+                #diff_highlighted = highlight(code, PythonLexer(), HtmlFormatter())
+                diff_highlighted = highlight(code, l, HtmlFormatter())
+            except:
+                diff_highlighted = old_v
         except AssertionError:
-            old_v = {}
-            #patch = ''
             '''
             dmp = diff_match_patch()
             diffs = dmp.diff_main('', ver.field_dict[field_name].replace('\r',''))
@@ -175,9 +176,14 @@ def get_version_diff_field(obj_item, field_name):
             '''
 
             patch_txt = ver.field_dict[field_name]
-            l = guess_lexer(patch_txt)
-            l.add_filter(VisibleWhitespaceFilter(newlines=True))
-            diff_highlighted = highlight(patch_txt, l, HtmlFormatter())
+            try:
+                # Guess a lexer by the contents of the block.
+                l = guess_lexer(patch_txt)
+
+                l.add_filter(VisibleWhitespaceFilter(newlines=True))
+                diff_highlighted = highlight(patch_txt, l, HtmlFormatter())
+            except:
+                diff_highlighted = patch_txt
 
 
         versions.append({'fields': ver.field_dict, 'diff': diff_highlighted,

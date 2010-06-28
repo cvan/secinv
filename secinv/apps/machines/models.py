@@ -14,7 +14,6 @@ class Machine(models.Model):
     sys_ip = models.IPAddressField(_('IP address'))
     hostname = models.CharField(max_length=255)
     ext_ip = models.IPAddressField(_('external IP address'), blank=True, null=True)
-    tokens = models.ManyToManyField('AuthToken')
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
     date_modified = models.DateTimeField(_('date modified'),
@@ -99,10 +98,6 @@ class AuthToken(models.Model):
 
     #token = SerializedTextField(_('authorization token'), blank=True,
     #                            null=True, max_length=255)
-
-    # TODO: Each time a machine checks in, add to machines.
-    machines = models.ManyToManyField('Machine', blank=True, null=True)
-
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
@@ -281,8 +276,9 @@ class ApacheConfig(models.Model):
     machine = models.ForeignKey('Machine')
 
     # TODO: Store as SerializedTextField.
-    #body = CompressedTextField(_('contents'), blank=True, null=True)
-    body = SerializedTextField(_('contents'), blank=True, null=True)
+    body = CompressedTextField(_('contents'), blank=True, null=True)
+    #body = SerializedTextField(_('contents'), blank=True, null=True)
+    #body = SerializedTextField()
 #    body = SerializedTextField(blank=True, null=True)
 
     filename = models.CharField(_('filename'), max_length=255, blank=True,

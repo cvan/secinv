@@ -283,28 +283,31 @@ def detail(request, machine_slug):
         apacheconfig_latest = ApacheConfig.objects.get(machine__id=m.id,
             filename__endswith='/httpd.conf')
 
-        apacheconfig_latest_body = highlight(apacheconfig_latest.body,
-                                             ApacheConfLexer(),
-                                             HtmlFormatter())
+        try:
+            apacheconfig_latest_body = highlight(apacheconfig_latest.body,
+                                                 ApacheConfLexer(),
+                                                 HtmlFormatter())
 
-        body = ''
-        lines = re.split('\n', apacheconfig_latest_body)
-        for line in lines:
-            ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
-            if len(ls) == 2 and ls[0].lower() == 'include':
-                # TODO: in Apache Config Parser, handle ``quoted`` Include filenames.
-
-                try:
-                    a = ApacheConfig.objects.get(machine__id=m.id,
-                                                 filename__endswith=ls[1])
-                    i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
-                except (ApacheConfig.DoesNotExist,
-                        ApacheConfig.MultipleObjectsReturned):
-                    i_fn = '%s' % ls[1]
-
-                line = '<span class="nb">%s</span> %s' % (ls[0], i_fn)
-            body += '%s\n' % line
-        apacheconfig_latest_body = body
+            body = ''
+            lines = re.split('\n', apacheconfig_latest_body)
+            for line in lines:
+                ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
+                if len(ls) == 2 and ls[0].lower() == 'include':
+                    # TODO: in Apache Config Parser, handle ``quoted`` Include filenames.
+    
+                    try:
+                        a = ApacheConfig.objects.get(machine__id=m.id,
+                                                     filename__endswith=ls[1])
+                        i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
+                    except (ApacheConfig.DoesNotExist,
+                            ApacheConfig.MultipleObjectsReturned):
+                        i_fn = '%s' % ls[1]
+    
+                    line = '<span class="nb">%s</span> %s' % (ls[0], i_fn)
+                body += '%s\n' % line
+            apacheconfig_latest_body = body
+        except TypeError:
+            apacheconfig_latest_body = apacheconfig_latest.body
 
 
         for fn in apacheconfig_latest.included:

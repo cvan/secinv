@@ -108,6 +108,7 @@ INSTALLED_APPS = (
     'secinv.apps.devices',
     #'secinv.apps.haystack',
     'secinv.apps.fulltext',
+    'secinv.apps.assessments',
     'reversion',
 )
 

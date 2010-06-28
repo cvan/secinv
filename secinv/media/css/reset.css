@@ -32,13 +32,8 @@ body {
 	font: 75%/1.5em Helvetica, "Liberation Sans", "Bitstream Vera Sans", sans-serif;
 }
 
-article, aside, dialog, figure, footer, header, 
-hgroup, nav, section { 
-    display:block;
-}
-
 nav ul {
-    list-style:none;
+    list-style: none;
 }
 
 blockquote, q {
@@ -120,7 +115,6 @@ input, select {
 }
 
 /* HTML 5 block elements */
-section, nav, article, aside, hgroup, header, footer, details
-{
+article, aside, details, dialog, figure, footer, header, hgroup, nav, section {
     display: block;
 }

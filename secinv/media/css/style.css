@@ -765,7 +765,7 @@ input[type=submit]:active, input[type=button]:active {
 /* @group Content */
 
 hgroup#masthead {
-    background: #f1f1f1;
+    background: #333;
 	background: -webkit-gradient(radial, left top, left bottom, from(#000), to(#666));
 	background: -moz-radial-gradient(top left, #666, #000);
 	background: radial-gradient(top left, #666, #000);
