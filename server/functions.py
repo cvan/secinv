@@ -43,32 +43,30 @@ import reversion
 
 from apps.machines.models import *
 #from apps.machines.models import Interface, System, Services, RPMs, \
-#                                 SSHConfig, IPTable, IPTableChain, IPTableRules,
-#                                 IPTables, ApacheConfig
+#                                 SSHConfig, IPTables, ApacheConfig, \
+#                                 AuthToken
 
 
 class ServerFunctions:
-    def __init__(self, AUTH_KEY):
+    def __init__(self):
         self.machine_ip = '0.0.0.0'
         self.machine_id = 0
-        self.auth_key = AUTH_KEY
         self.is_authenticated = False
 
         # Create logger.
         #self.logger = logging.getLogger('secinv')
 
-    def authenticate(self, auth_key):
+    def authenticate(self, auth_token):
         """
-        Compare server's auth_key against client's auth_key.
+        Check if client's authorization token is valid.
         """
-        if self.auth_key != auth_key:
+        try:
+            a = AuthToken.objects.get(token=auth_token, active=True)
+            if a:
+                self.is_authenticated = True
+                return True
+        except AuthToken.DoesNotExist:
             return False
-
-        #try:
-        #    a = AuthKey.objects.filter(machine=self.machine)
-
-        self.is_authenticated = True
-        return True
 
     def machine(self, ip_dict, system_dict, services_dict, rpms_dict,
                 sshconfig_dict, ipt_dict, acl_list):

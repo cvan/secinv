@@ -23,11 +23,12 @@ class Machine(models.Model):
     # TODO: DRY. Keep in one place.
     search_fields = ['sys_ip', 'hostname', 'ext_ip',
                      'system__kernel_rel', 'system__rh_rel', 'system__nfs',
-                     'system__ip_fwd', 'system__iptables',
-                     'services__k_processes', 'services__v_ports',
-                     'rpms__v_rpms',
                      'interface__i_name', 'interface__i_ip',
-                     'interface__i_mac', 'interface__i_mask']
+                     'interface__i_mac', 'interface__i_mask',
+                     'services__k_processes', 'services__v_ports',
+                     'sshconfig__k_parameters', 'sshconfig__v_values',
+                     'rpms__v_rpms', 'iptables__body',
+                     'apacheconfig__body']
 
     def __unicode__(self):
         return u'%s - %s' % (self.sys_ip, self.hostname)
@@ -95,9 +96,7 @@ if not reversion.is_registered(Machine):
 class AuthToken(models.Model):
     token = models.CharField(_('authorization token'), blank=True,
                              null=True, max_length=255)
-
-    #token = SerializedTextField(_('authorization token'), blank=True,
-    #                            null=True, max_length=255)
+    active = models.BooleanField(_('active'), default=1)
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 

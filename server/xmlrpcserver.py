@@ -13,8 +13,6 @@ except IOError:
     sys.exit("Error: Cannot open server configuration file '%s'"
              % SERVER_CONFIG_FN)
 
-AUTH_KEY = server_config.get('server', 'auth_key')
-
 LISTEN_HOST = server_config.get('server', 'listen_host')
 LISTEN_PORT = server_config.get('server', 'listen_port')
 
@@ -111,7 +109,7 @@ def process(HandlerClass=RequestHandler, ServerClass=SecureXMLRPCServer):
     server = ServerClass(server_address, HandlerClass)
 
     # Register XML-RPC functions.
-    server.register_instance(ServerFunctions(AUTH_KEY))
+    server.register_instance(ServerFunctions())
     server.register_multicall_functions()
 
     on_host, on_port = server.socket.getsockname()
