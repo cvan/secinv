@@ -436,7 +436,7 @@ def httpd_conf(request, machine_slug, ac_id):
         context_instance=RequestContext(request))
 
 
-def diff(request, machine_slug, section_slug, version_number,
+def diff(request, machine_slug, section_slug, item_id, version_number,
          compare_with='previous'):
     if section_slug not in DIFF_SECTION_SLUGS:
         raise Http404
@@ -449,11 +449,12 @@ def diff(request, machine_slug, section_slug, version_number,
     body_previous = ''
 
     if section_slug == 'iptables':
-        past_history = ApacheConfig.objects.filter(machine__id=m.id).order_by(
+        past_history = IPTables.objects.filter(machine__id=m.id).order_by(
             '-date_added').all()
     elif section_slug == 'httpd-conf':
-        past_history = ApacheConfig.objects.filter(machine__id=m.id).order_by(
-            '-date_added').all()
+        past_history = ApacheConfig.objects.filter(machine__id=m.id, id=item_id
+            ).order_by('-date_added').all()
+
 
     if past_history.exists():
         if compare_with == 'current':
@@ -489,6 +490,8 @@ def diff(request, machine_slug, section_slug, version_number,
                 older_version = ''
             if newer_version < 0:
                 newer_version = ''
+    else:
+        raise Http404
 
     v_num_previous = 0
     if v_num > 0:
@@ -496,7 +499,7 @@ def diff(request, machine_slug, section_slug, version_number,
 
     template_context = {'machine': m,
                         'query': query,
-                        'section': 'httpd-conf',
+                        'section': section_slug,
                         'obj_current': past_history[0],
                         'body_current': body_current,
                         'body_previous': body_previous,

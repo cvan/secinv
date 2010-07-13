@@ -51,7 +51,11 @@
 
               {% if older_version %}
                 <br>
+               {% if section == 'httpd-conf' %}
+                <a href="{% url diff-ac machine_slug=machine.hostname, section_slug=section, item_id=obj_current.id, version_number=version_previous, compare_with='current' %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
+                {% else %}
                 <a href="{% url diff machine_slug=machine.hostname, section_slug=section, version_number=version_previous, compare_with='current' %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
+                {% endif %}
               {% endif %}
 
             {% else %}
@@ -59,7 +63,12 @@
 
               {% if older_version %}
                 <br>
+
+               {% if section == 'httpd-conf' %}
+                <a href="{% url diff-ac machine_slug=machine.hostname, section_slug=section, item_id=obj_current.id, version_number=version_previous, compare_with=compare_with %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
+                {% else %}
                 <a href="{% url diff machine_slug=machine.hostname, section_slug=section, version_number=version_previous, compare_with=compare_with %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
+                {% endif %}
               {% endif %}
 
             {% endif %}
@@ -72,7 +81,11 @@
 
               {% if newer_version %}
                 <br>
+               {% if section == 'httpd-conf' %}
+                <a href="{% url diff-ac machine_slug=machine.hostname, section_slug=section, item_id=obj_current.id, version_number=newer_version, compare_with=compare_with %}">&rarr; {{ _('Newer version') }}<!-- (#{{ newer_version }})--></a>
+                {% else %}
                 <a href="{% url diff machine_slug=machine.hostname, section_slug=section, version_number=newer_version, compare_with=compare_with %}">&rarr; {{ _('Newer version') }}<!-- (#{{ newer_version }})--></a>
+                {% endif %}
               {% endif %}
 
             {% endif %}

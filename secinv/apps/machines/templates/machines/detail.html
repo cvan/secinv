@@ -691,7 +691,7 @@ function getTabs(section) {
             <thead>
               <tr>
                 <th class="cmp">{{ _('Compare against') }}</th>
-                <th>{{ _('Revisions') }}</th>
+                <th>{{ _('Revision #') }}</th>
                 <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
@@ -706,7 +706,7 @@ function getTabs(section) {
                   <a href="{% url diff machine_slug=machine.hostname, section_slug='iptables', version_number=ipt_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
                 </td>
                 <td>
-                  {{ _('Version') }} #{{ ipt_ver.version }}
+                  <!--{{ _('Version') }} #-->{{ ipt_ver.version }}
                 </td>
                 <td class="timestamp">
                   <time datetime="{{ ipt_ver.fields.date_added|date:'c' }}">
@@ -779,7 +779,7 @@ function getTabs(section) {
               <tr>
                 <th class="cmp">{{ _('Compare against') }}</th>
                 <th>{{ _('Filename') }}</th>
-                <th>{{ _('Revisions') }}</th>
+                <th>{{ _('Revision #') }}</th>
                 <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
@@ -787,18 +787,17 @@ function getTabs(section) {
             {% for ac_ver in apacheconfig_versions %}
               <tr>
                 <td class="cmp">
-                  {# Do not display '(current)' link if this is the latest version for the filename #}
                   {% if ac_ver.is_newest %}{{ _('(current)') }}{% else %}
-                  <a href="{% url diff machine_slug=machine.hostname, section_slug='iptables', version_number=ac_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
+                  <a href="{% url diff-ac machine_slug=machine.hostname, section_slug='httpd-conf', item_id=ac_ver.fields.id, version_number=ac_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
                   {% endif %}
 
-                  <a href="{% url diff machine_slug=machine.hostname, section_slug='iptables', version_number=ac_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
+                  <a href="{% url diff-ac machine_slug=machine.hostname, section_slug='httpd-conf', item_id=ac_ver.fields.id, version_number=ac_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
                 </td>
                 <td>
                   <a href="{% url httpd-conf machine_slug=machine.hostname, ac_id=ac_ver.fields.id %}">{{ ac_ver.fields.filename }}</a>
                 </td>
                 <td>
-                  {{ _('Version') }} #{{ ac_ver.version }}
+                  <!--{{ _('Version') }} #-->{{ ac_ver.version }}
                 </td>
                 <td class="timestamp">
                   <time datetime="{{ ac_ver.fields.date_added|date:'c' }}">

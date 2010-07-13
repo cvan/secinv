@@ -149,7 +149,10 @@ class DifferNode(template.Node):
         if field_name[0] in ('"', "'") and field_name[0] == field_name[-1]:
             field_name = field_name[1:-1]
         else:
-            field_name = template.Variable(field_name).resolve(context)
+            try:
+                field_name = template.Variable(field_name).resolve(context)
+            except template.VariableDoesNotExist:
+                field_name = ''
 
         try:
             diff_dict = template.Variable(self.diff_dict).resolve(context)
