@@ -285,6 +285,7 @@ class ServerFunctions:
         #
 
         for ac in acl_list:
+            #print '-', ac['filename']
             try:
                 a_object = ApacheConfig.objects.get(
                     machine__id=self.machine_id, filename=ac['filename'])

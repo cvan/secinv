@@ -151,8 +151,10 @@ class DifferNode(template.Node):
         else:
             field_name = template.Variable(field_name).resolve(context)
 
-
-        diff_dict = template.Variable(self.diff_dict).resolve(context)
+        try:
+            diff_dict = template.Variable(self.diff_dict).resolve(context)
+        except template.VariableDoesNotExist:
+            diff_dict = {}
 
         emphasis_tag = ''
 
@@ -164,6 +166,7 @@ class DifferNode(template.Node):
 
         if 'removed' in diff_dict and field_name in diff_dict['removed']:
             emphasis_tag = 'del'
+
 
         output = self.nodelist.render(context)
 

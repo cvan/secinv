@@ -174,26 +174,29 @@ def detail(request, machine_slug):
 
     ## System.
     system_latest = []
+    system_versions = []
     system_history = System.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
-    # Get historical versions of System objects.
-    system_versions = get_version_diff(system_history[0])
 
     if system_history.exists():
         system_latest = system_history[0]
 
+        # Get historical versions of System objects.
+        system_versions = get_version_diff(system_history[0])
 
     ## Services.
     services_latest = []
+    services_versions = []
     services_history = Services.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
-    # Get historical versions of Services objects.
-    services_versions = get_version_diff(services_history[0], ',')
-
     if services_history.exists():
         services_latest = services_history[0]
+
+        # Get historical versions of Services objects.
+        services_versions = get_version_diff(services_history[0], ',')
+    
 
 
     ## Interfaces.
@@ -221,50 +224,51 @@ def detail(request, machine_slug):
 
     ## SSHConfig.
     sshconfig_latest = []
+    sshconfig_versions = []
     sshconfig_history = SSHConfig.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
-    # Get historical versions of SSHConfig objects.
-    sshconfig_versions = get_version_diff(sshconfig_history[0], '\n')
-
     if sshconfig_history.exists():
         sshconfig_latest = sshconfig_history[0]
+
+        sshconfig_versions = get_version_diff(sshconfig_history[0], '\n')
 
 
     # RPMs.
     rpms_list = []
     rpms_date_added = None
+    rpms_versions = []
     rpms_history = RPMs.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
-
-    # Get historical versions of RPMs objects.
-    rpms_versions = get_version_diff(rpms_history[0], '\n')
 
     if rpms_history.exists():
         rpms_list = re.split('\n', rpms_history[0].v_rpms)
         rpms_date_added = rpms_history[0].date_added
+
+        rpms_versions = get_version_diff(rpms_history[0], '\n')
+    
 
     rpms_latest = {'installed': rpms_list, 'date_added': rpms_date_added}
 
 
     ## iptables.
     iptables_latest = []
+    iptables_versions = []
     iptables_history = IPTables.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
-    # Get historical versions of IPTables objects.
-    iptables_versions = get_version_diff_field(iptables_history[0], 'body')
-
     if iptables_history.exists():
         iptables_latest = iptables_history[0]
+
+        iptables_versions = get_version_diff_field(iptables_history[0], 'body')
 
 
     ## Apache configuration files.
     apacheconfig_latest = []
     apacheconfig_includes = []
+    ac_includes = []
     apacheconfig_history = ApacheConfig.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
-
 
 
     # Get historical versions of ApacheConfig objects.
@@ -278,10 +282,13 @@ def detail(request, machine_slug):
                                        key=lambda k: k['timestamp'],
                                        reverse=True)
 
+    apacheconfig_latest_body = ''
     if apacheconfig_history.exists():
-        # TODO: get main `httpd.conf` file.
-        apacheconfig_latest = ApacheConfig.objects.get(machine__id=m.id,
-            filename__endswith='/httpd.conf')
+        try:
+            apacheconfig_latest = ApacheConfig.objects.filter(machine__id=m.id,
+                filename__endswith='/httpd.conf').order_by('-date_added').all()[0]
+        except:
+            pass
 
         try:
             apacheconfig_latest_body = highlight(apacheconfig_latest.body,
@@ -318,8 +325,8 @@ def detail(request, machine_slug):
             except ApacheConfig.DoesNotExist:
                 pass
 
-    # Recurse includes.
-    ac_includes = recurse_ac_includes(apacheconfig_latest)
+        # Recurse includes.
+        ac_includes = recurse_ac_includes(apacheconfig_latest)
 
     template_context = {'query': query,
                         'machine': m,

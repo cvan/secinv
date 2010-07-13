@@ -67,7 +67,7 @@ function getTabs(section) {
             newHTML += "\n</tbody>\n</table>\n";
 
             $(".system #" + section + ".ui-widget-content").html(newHTML);
-            
+
         });
     }
 
@@ -600,9 +600,11 @@ function getTabs(section) {
             {% endfor %}
           </ul>
 
+          <!--
           {% with rpms.installed|join:'\n' as rpms_body %}
             {{ rpms_body|highlight }}
           {% endwith %}
+          -->
 
           {% else %}
           <div class="clear"></div>
@@ -734,7 +736,6 @@ function getTabs(section) {
         <div id="apacheconfig-latest" class="latest">
         {% if apacheconfig %}
           <h4 class="group">{{ apacheconfig.filename }}</h4>
-<!--          <h4 class="group">/etc/httpd/conf/httpd.conf</h4> -->
 
           <details class="date">
             <strong>{{ _('Last Modified') }}</strong>
@@ -743,8 +744,6 @@ function getTabs(section) {
             </time>
           </details>
           <div class="clear"></div>
-
-<!--          <pre><code>{{ apacheconfig.body }}</code></pre> -->
 
           {{ apacheconfig_latest_body|safe }}
 

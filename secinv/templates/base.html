@@ -62,11 +62,13 @@
             </li>
             -->
             <li class="profiles">
-              <a href="{% url machines-index %}" class="button black pill">{{ _('Profiles') }}</a>
+              <a href="{% url machines-index %}" class="button black pill">{{ _('Vector Profiles') }}</a>
             </li>
+            <!--
             <li class="config">
               <a href="{% url machines-index %}" class="button black pill">{{ _('Configuration Files') }}</a>
             </li>
+            -->
           </ul>
           <form action="{% url machines-search %}" method="get">
             <label for="q">{{ _('Search') }}</label>

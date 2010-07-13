@@ -34,50 +34,83 @@ class Machine(models.Model):
         return u'%s - %s' % (self.sys_ip, self.hostname)
 
     def httpd(self):
-        s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        processes = re.split(',', s.k_processes)
-        return 'httpd' in processes
+        try:
+            s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            processes = re.split(',', s.k_processes)
+            return 'httpd' in processes
+        except IndexError:
+            return False
 
     def mysqld(self):
-        s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        processes = re.split(',', s.k_processes)
-        return 'mysqld' in processes
+        try:
+            s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            processes = re.split(',', s.k_processes)
+            return 'mysqld' in processes
+        except IndexError:
+            return False
 
     def openvpn(self):
-        s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        processes = re.split(',', s.k_processes)
-        return 'openvpn' in processes
+        try:
+            s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            processes = re.split(',', s.k_processes)
+            return 'openvpn' in processes
+        except IndexError:
+            return False
 
     def nfs(self):
-        s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        return s.nfs
+        try:
+            s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            return s.nfs
+        except IndexError:
+            return False
 
     def ip_fwd(self):
-        s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        return s.ip_fwd
+        try:
+            s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            return s.ip_fwd
+        except IndexError:
+            return False
 
     def iptables(self):
-        s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        return s.iptables
+        try:
+            s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            return s.iptables
+        except IndexError:
+            return False
 
     def excerpt(self):
         excerpt = ''
 
-        i = Interface.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        sys = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        serv = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-        r = RPMs.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        try:
+            i = Interface.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        except IndexError:
+            i = None
+
+        try:
+            sys = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        except IndexError:
+            sys = None
+
+        try:
+            serv = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        except IndexError:
+            serv = None
+
+        try:
+            r = RPMs.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        except IndexError:
+            r = None
 
         for sf in self.search_fields:
             if not re.search('__', sf):
                 val = self.__getattribute__(sf)
-            elif re.search('interface__', sf):
+            elif i and re.search('interface__', sf):
                 val = i.__getattribute__(re.split('__', sf)[1])
-            elif re.search('system__', sf):
+            elif sys and re.search('system__', sf):
                 val = sys.__getattribute__(re.split('__', sf)[1])
-            elif re.search('services__', sf):
+            elif serv and re.search('services__', sf):
                 val = serv.__getattribute__(re.split('__', sf)[1])
-            elif re.search('rpms__', sf):
+            elif r and re.search('rpms__', sf):
                 val = r.__getattribute__(re.split('__', sf)[1])
 
             excerpt += '%s ' % val
@@ -137,7 +170,7 @@ class Interface(models.Model):
             if i_v:
                 i_diff = i_v[0]
         except Interface.DoesNotExist:
-            pass
+            i_diff = {'diff': ''}
 
         return i_diff
 
@@ -181,7 +214,11 @@ class System(models.Model):
             if s_v:
                 s_diff = s_v[0]
         except System.DoesNotExist:
-            pass
+            s_diff = {'fields': ['kernel_rel'],
+                      'diff': {'kernel_rel': ''},
+                      'timestamp': '',
+                      'version': ''}
+
 
         return s_diff
 
