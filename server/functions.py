@@ -283,13 +283,13 @@ class ServerFunctions:
         # TODO: Mark deleted .conf files as `inactive`.
         # Add `active` field, a la Interfaces.
         #
+        acl_filenames = []
 
         for ac in acl_list:
-            #print '-', ac['filename']
             try:
                 a_object = ApacheConfig.objects.get(
                     machine__id=self.machine_id, filename=ac['filename'])
-
+                #print 'AC %s Exists ...' % ac['filename']
                 if a_object.body != ac['body'] or \
                    a_object.directives != ac['directives'] or \
                    a_object.domains != ac['domains'] or \
@@ -299,9 +299,16 @@ class ServerFunctions:
                     a_object.directives = ac['directives']
                     a_object.domains = ac['domains']
                     a_object.included = ac['included']
+                    a_object.active = True
                     a_object.date_added = datetime.datetime.now()
                     with reversion.revision:
                         a_object.save()
+                    #print 'Updating AC %s ...' % ac['filename']
+                elif not a_object.active:
+                    a_object.active = True
+                    with reversion.revision:
+                        a_object.save()
+                    #print 'Activating AC %s ...' % ac['filename']
 
             except ApacheConfig.DoesNotExist:
                 a_object = ApacheConfig.objects.create(machine=self.machine_obj,
@@ -310,6 +317,29 @@ class ServerFunctions:
                     included=ac['included'])
                 with reversion.revision:
                     a_object.save()
+                #print 'Adding AC % ...' % ac['filename']
+
+            acl_filenames.append(ac['filename'])
+
+        # Get latest Apache Config files (select by distinct filename).
+        distinct_acs = ApacheConfig.objects.filter(
+            machine__id=self.machine_id, active=True).values_list(
+            'filename', flat=True).distinct()
+
+        a_diff = diff_list(distinct_acs, acl_filenames)
+
+        # Update each deactivated Apache Config as inactive.
+        for a in a_diff['removed']:
+            try:
+                a_latest = ApacheConfig.objects.filter(
+                    machine__id=self.machine_id,
+                    filename=a, active=True).latest()
+            except ApacheConfig.DoesNotExist:
+                continue
+
+            a_latest.active = False
+            with reversion.revision:
+                a_latest.save()
 
 
         ## SSH configuration file.

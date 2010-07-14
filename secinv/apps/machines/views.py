@@ -29,12 +29,13 @@ def get_all_domains():
 
     m_all = Machine.objects.all()
     for m in m_all:
-        a_m = ApacheConfig.objects.filter(machine__id=m.id).all()
+        a_m = ApacheConfig.objects.filter(machine__id=m.id, active=True).all()
         for a in a_m:
             for fn in a.included:
                 try:
                     i_a = ApacheConfig.objects.get(machine__id=m.id,
-                                                   filename=fn)
+                                                   filename=fn,
+                                                   active=True)
                     if i_a.domains:
                         # TODO: Want port number (value)?
                         for k in i_a.domains.keys():
@@ -61,7 +62,7 @@ def get_all_machines(order_by='id'):
 def get_all_directives():
     all_directives_dict = {}
 
-    a_all = ApacheConfig.objects.all()
+    a_all = ApacheConfig.objects.filter(active=True).all()
     for a in a_all:
         if a.directives:
             for k, v in a.directives.iteritems():
@@ -153,7 +154,8 @@ def recurse_ac_includes(ac, field_name='filename'):
     ac_includes = []
     for fn in ac.included:
         try:
-            i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id, filename=fn)
+            i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id, filename=fn,
+                                            active=True)
 
             l = i_ac.__getattribute__(field_name)
 
@@ -267,8 +269,8 @@ def detail(request, machine_slug):
     apacheconfig_latest = []
     apacheconfig_includes = []
     ac_includes = []
-    apacheconfig_history = ApacheConfig.objects.filter(machine__id=m.id).order_by(
-        '-date_added').all()
+    apacheconfig_history = ApacheConfig.objects.filter(machine__id=m.id,
+        active=True).order_by('-date_added').all()
 
 
     # Get historical versions of ApacheConfig objects.
@@ -286,7 +288,8 @@ def detail(request, machine_slug):
     if apacheconfig_history.exists():
         try:
             apacheconfig_latest = ApacheConfig.objects.filter(machine__id=m.id,
-                filename__endswith='/httpd.conf').order_by('-date_added').all()[0]
+                filename__endswith='/httpd.conf', active=True).order_by(
+                '-date_added').all()[0]
         except:
             pass
 
@@ -304,7 +307,8 @@ def detail(request, machine_slug):
     
                     try:
                         a = ApacheConfig.objects.get(machine__id=m.id,
-                                                     filename__endswith=ls[1])
+                                                     filename__endswith=ls[1],
+                                                     active=True)
                         i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
                     except (ApacheConfig.DoesNotExist,
                             ApacheConfig.MultipleObjectsReturned):
@@ -319,7 +323,8 @@ def detail(request, machine_slug):
 
         for fn in apacheconfig_latest.included:
             try:
-                i_ac = ApacheConfig.objects.get(machine__id=m.id, filename=fn)
+                i_ac = ApacheConfig.objects.get(machine__id=m.id, filename=fn,
+                                                active=True)
 
                 apacheconfig_includes.append(i_ac)
             except ApacheConfig.DoesNotExist:
@@ -396,7 +401,8 @@ def httpd_conf(request, machine_slug, ac_id):
 
             try:
                 a = ApacheConfig.objects.get(machine__id=m.id,
-                                             filename__endswith=ls[1])
+                                             filename__endswith=ls[1],
+                                             active=True)
                 i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
             except (ApacheConfig.DoesNotExist, ApacheConfig.MultipleObjectsReturned):
                 i_fn = '%s' % ls[1]
@@ -411,7 +417,8 @@ def httpd_conf(request, machine_slug, ac_id):
     apacheconfig_includes = []
     for fn in ac.included:
         try:
-            i_ac = ApacheConfig.objects.get(machine__id=m.id, filename=fn)
+            i_ac = ApacheConfig.objects.get(machine__id=m.id, filename=fn,
+                                            active=True)
 
             apacheconfig_includes.append(i_ac)
         except ApacheConfig.DoesNotExist:
@@ -436,8 +443,8 @@ def httpd_conf(request, machine_slug, ac_id):
         context_instance=RequestContext(request))
 
 
-def diff(request, machine_slug, section_slug, item_id, version_number,
-         compare_with='previous'):
+def diff(request, machine_slug, section_slug, version_number,
+         compare_with='previous', item_id=None):
     if section_slug not in DIFF_SECTION_SLUGS:
         raise Http404
 
@@ -452,8 +459,8 @@ def diff(request, machine_slug, section_slug, item_id, version_number,
         past_history = IPTables.objects.filter(machine__id=m.id).order_by(
             '-date_added').all()
     elif section_slug == 'httpd-conf':
-        past_history = ApacheConfig.objects.filter(machine__id=m.id, id=item_id
-            ).order_by('-date_added').all()
+        past_history = ApacheConfig.objects.filter(machine__id=m.id,
+            id=item_id, active=True).order_by('-date_added').all()
 
 
     if past_history.exists():
@@ -618,7 +625,7 @@ def ac_filter_results(request):
     results = []
 
     # Store matching ApacheConfig objects in results list.
-    a_all = ApacheConfig.objects.all()
+    a_all = ApacheConfig.objects.filter(active=True).all()
     for a in a_all:
         if a.directives:
             for param, values in a.directives.iteritems():

@@ -330,6 +330,8 @@ class ApacheConfig(models.Model):
 
 #    included = models.ManyToManyField('ApacheConfig')
 
+    active = models.BooleanField(_('status'), default=1)
+
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
