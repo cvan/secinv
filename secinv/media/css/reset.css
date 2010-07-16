@@ -60,7 +60,7 @@ ins {
     color:#000;
     text-decoration:none;
 }
-.highlight {
+span.highlight {
     background-color: #ff6;
     font-weight: bold;
 }

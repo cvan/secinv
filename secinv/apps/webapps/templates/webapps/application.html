@@ -41,7 +41,7 @@
             <td>{{ application.source_code_url|urlize }}</td>
           </tr>
           <tr>
-            <th>{{ _('Source Code path') }}</th>
+            <th>{{ _('Source Code Path') }}</th>
             <td>{{ application.source_code_path }}</td>
           </tr>
           <tr>
@@ -56,31 +56,27 @@
             <th>{{ _('Visibility') }}</th>
             <td>{{ application.visibility_value }}</td>
           </tr>
-
           <tr title="{% if application.cc %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
               class="{% if application.cc %}enabled{% else %}disabled{% endif %}">
-            <th>{{ _('Accepts Credit Cards') }}</th>
+            <th>{{ _('Handles Credit Cards') }}</th>
             <td>
               <mark>{% if application.cc %}&#10004;{% else %}&#10006;{% endif %}</mark>
             </td>
           </tr>
-
           <tr title="{% if application.pii %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
               class="{% if application.pii %}enabled{% else %}disabled{% endif %}">
-            <th>{{ _('PII') }}</th>
+            <th>{{ _('Accepts PII') }}</th>
             <td>
               <mark>{% if application.pii %}&#10004;{% else %}&#10006;{% endif %}</mark>
             </td>
           </tr>
-
           <tr title="{% if application.logins %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
               class="{% if application.logins %}enabled{% else %}disabled{% endif %}">
-            <th>{{ _('Logins') }}</th>
+            <th>{{ _('Allows Logins') }}</th>
             <td>
               <mark>{% if application.logins %}&#10004;{% else %}&#10006;{% endif %}</mark>
             </td>
           </tr>
-
           <tr>
             <th>{{ _('User Roles') }}</th>
             {% if application.logins and application.user_roles %}
@@ -89,23 +85,20 @@
             <td class="none">{{ _('None') }}</td>
             {% endif %}
           </tr>
-
           <tr title="{% if application.file_uploads %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
               class="{% if application.file_uploads %}enabled{% else %}disabled{% endif %}">
-            <th>{{ _('File Uploads') }}</th>
+            <th>{{ _('Allows File Uploads') }}</th>
             <td>
               <mark>{% if application.file_uploads %}&#10004;{% else %}&#10006;{% endif %}</mark>
             </td>
           </tr>
-
           <tr title="{% if application.arcsight %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
               class="{% if application.arcsight %}enabled{% else %}disabled{% endif %}">
-            <th>{{ _('ArcSight') }}</th>
+            <th>{{ _('Monitored via ArcSight') }}</th>
             <td>
               <mark>{% if application.arcsight %}&#10004;{% else %}&#10006;{% endif %}</mark>
             </td>
           </tr>
-
           <tr>
             <th>{{ _('Assessments') }}</th>
             <td>
@@ -118,7 +111,6 @@
             {% endif %}
             </td>   
           </tr>
-
           <tr>
             <th>{{ _('Added') }}</th>
             <td>

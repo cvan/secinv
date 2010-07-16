@@ -31,7 +31,7 @@ for c in CLASSIFICATION_CHOICES:
 
 
 class Application(models.Model):
-    machine = models.ForeignKey('machines.Machine')
+    machine = models.ManyToManyField('machines.Machine')
     name = models.CharField(_('application name'), max_length=255, blank=True,
                             null=True)
 
@@ -71,7 +71,7 @@ class Application(models.Model):
                                         default=datetime.datetime.now)
 
     # Add search fields.
-    search_fields = []
+    #search_fields = []
 
     def __unicode__(self):
         return u'%s' % (self.name)
@@ -105,7 +105,8 @@ class Assessment(models.Model):
     bugs = models.TextField(_('Bugzilla links'), blank=True, null=True)
 
     # TODO: Multiple Checkbox Field.
-    classification = models.CharField(_('assessment type (code review, app penetration, risk assessment)'), max_length=255,
+    classification = models.CharField(_('assessment type (code review, app penetration, risk assessment)'),
+                                      max_length=255,
                                       blank=True, null=True)
                                       #choices=CLASSIFICATION_CHOICES)
 
@@ -115,7 +116,7 @@ class Assessment(models.Model):
                                         default=datetime.datetime.now)
 
     # Add search fields.
-    search_fields = []
+    #search_fields = []
 
     def __unicode__(self):
         return u'%s by %s' % (self.application.name, self.reviewer)

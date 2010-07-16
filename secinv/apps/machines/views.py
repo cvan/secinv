@@ -21,7 +21,7 @@ from reversion.models import Version
 import re
 import json
 
-DIFF_SECTION_SLUGS = ('iptables', 'httpd-conf', 'php-config')
+DIFF_SECTION_SLUGS = ('iptables', 'httpd-conf', 'php-config', 'mysql-config')
 
 
 def get_all_domains():
@@ -309,6 +309,18 @@ def detail(request, machine_slug):
         phpconfig_versions = get_version_diff_field(phpconfig_history[0], 'body')
 
 
+    ## MySQL configuration file.
+    mysqlconfig_latest = []
+    mysqlconfig_versions = []
+    mysqlconfig_history = MySQLConfig.objects.filter(machine__id=m.id, active=True
+        ).order_by('-date_added').all()
+
+    if mysqlconfig_history.exists():
+        mysqlconfig_latest = mysqlconfig_history[0]
+
+        mysqlconfig_versions = get_version_diff_field(mysqlconfig_history[0], 'body')
+
+
     template_context = {'query': query,
                         'machine': m,
                         'system': system_latest,
@@ -318,7 +330,7 @@ def detail(request, machine_slug):
                         'rpms': rpms_latest,
                         'rpms_versions': rpms_versions,
                         'interfaces': interfaces_latest,
-                        'interfaces_versions': interfaces_versions,
+                        'interfacess_versions': interfaces_versions,
                         'sshconfig': sshconfig_latest,
                         'sshconfig_versions': sshconfig_versions,
                         'iptables': iptables_latest,
@@ -330,6 +342,8 @@ def detail(request, machine_slug):
                         'ac_includes': ac_includes,
                         'phpconfig': phpconfig_latest,
                         'phpconfig_versions': phpconfig_versions,
+                        'mysqlconfig': mysqlconfig_latest,
+                        'mysqlconfig_versions': mysqlconfig_versions,
                         'all_machines_hn': get_all_machines('-hostname'),
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
@@ -420,15 +434,6 @@ def httpd_conf(request, machine_slug, ac_id):
     return render_to_response('machines/httpd_conf.html', template_context,
         context_instance=RequestContext(request))
 
-
-def php_config(request, machine_slug, item_id):
-    pass
-
-
-def mysql_config(request, machine_slug, item_id):
-    pass
-
-
 def diff(request, machine_slug, section_slug, version_number,
          compare_with='previous', item_id=None):
     if section_slug not in DIFF_SECTION_SLUGS:
@@ -449,6 +454,9 @@ def diff(request, machine_slug, section_slug, version_number,
             id=item_id, active=True).order_by('-date_added').all()
     elif section_slug == 'php-config':
         past_history = PHPConfig.objects.filter(machine__id=m.id,
+            active=True).order_by('-date_added').all()
+    elif section_slug == 'mysql-config':
+        past_history = MySQLConfig.objects.filter(machine__id=m.id,
             active=True).order_by('-date_added').all()
 
 

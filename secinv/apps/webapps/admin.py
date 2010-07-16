@@ -30,9 +30,9 @@ class ClassificationForm(forms.ModelForm):
 
 
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('machine', 'name', 'url', 'date_added', 'date_modified')
+    list_display = ('name', 'url', 'date_added', 'date_modified')
     list_filter = ['name']
-    search_fields = ['machine', 'overview', 'contacts', 'url',
+    search_fields = ['machine', 'machine__hostname', 'machine__sys_ip', 'overview', 'contacts', 'url',
                      'source_code_url', 'source_code_path',
                      'bugzilla_product', 'bugzilla_component',
                      'visibility']
@@ -54,5 +54,4 @@ class AssessmentAdmin(admin.ModelAdmin):
     #    model.save()
 
 admin.site.register(Assessment, AssessmentAdmin)
-
 

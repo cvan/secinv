@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load machine_extras %}
 
-{% block head_title %}{% if section == 'iptables' %}{{ _('iptables') }}{% endif %}{% if section == 'httpd-conf' %}{{ _('Apache configuration file') }}: {{ obj_current.filename }}{% endif %}{% if section == 'php-config' %}{{ _('PHP configuration file') }}: {{ obj_current.filename }}{% endif %} | {{ machine.hostname }} | {{ block.super }}{% endblock %}
+{% block head_title %}{% if section == 'iptables' %}{{ _('iptables') }}{% endif %}{% if section == 'httpd-conf' %}{{ _('Apache configuration file') }}: {{ obj_current.filename }}{% endif %}{% if section == 'php-config' %}{{ _('PHP configuration file') }}: {{ obj_current.filename }}{% endif %}{% if section == 'mysql-config' %}{{ _('MySQL configuration file') }}: {{ obj_current.filename }}{% endif %} | {{ machine.hostname }} | {{ block.super }}{% endblock %}
 
 {% block content %}
       <hgroup id="masthead">
@@ -18,6 +18,9 @@
         {% endif %}
         {% if section == 'php-config' %}
         <h4>{{ _('PHP configuration file') }} <em>{{ obj_current.filename }}</em></h4>
+        {% endif %}
+        {% if section == 'mysql-config' %}
+        <h4>{{ _('MySQL configuration file') }} <em>{{ obj_current.filename }}</em></h4>
         {% endif %}
       </hgroup>
       <div class="clear"></div>

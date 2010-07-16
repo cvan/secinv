@@ -21,8 +21,6 @@ urlpatterns = patterns('secinv.apps.machines.views',
     url(r'^filters/httpd-conf/$', 'ac_filter_directives_keys', name='ac-filter-directives-all'),
 
     url(r'^%s/httpd-conf/%s/$' % (machine_slug, ac_id), 'httpd_conf', name='httpd-conf'),
-    url(r'^%s/php-config/%s/$' % (machine_slug, item_id), 'php_config', name='php-config'),
-    url(r'^%s/mysql-config/%s/$' % (machine_slug, item_id), 'mysql_config', name='mysql-config'),
 
     url(r'^%s/diff/%s/r/%s/%s/$' % (machine_slug, section_slug, version_number, compare_with), 'diff', name='diff'),
     url(r'^%s/diff/%s/%s/r/%s/%s/$' % (machine_slug, section_slug, item_id, version_number, compare_with), 'diff', name='diff-ac'),

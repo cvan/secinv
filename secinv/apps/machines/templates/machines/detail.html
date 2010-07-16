@@ -157,8 +157,9 @@ function getTabs(section) {
           <li><a href="#sshconfig">{{ _('SSH config') }}</a></li>
           <li><a href="#rpms">{{ _('RPMs') }}</a></li>
           <li><a href="#iptables">{{ _('iptables') }}</a></li>
-          <li><a href="#apacheconfig">{{ _('Apache config') }}</a></li>
-          <li><a href="#phpconfig">{{ _('PHP config') }}</a></li>
+          <li><a href="#apacheconfig">{{ _('Apache') }}</a></li>
+          <li><a href="#phpconfig">{{ _('php.ini') }}</a></li>
+          <li><a href="#mysqlconfig">{{ _('my.cnf') }}</a></li>
         </ul>
         <div id="system">
 
@@ -851,7 +852,7 @@ function getTabs(section) {
             <thead>
               <tr>
                 <th class="cmp">{{ _('Compare against') }}</th>
-                <th>{{ _('Filename') }}</th>
+                <!--<th>{{ _('Filename') }}</th>-->
                 <th>{{ _('Revision') }}</th>
                 <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
@@ -866,12 +867,8 @@ function getTabs(section) {
 
                   <a href="{% url diff machine_slug=machine.hostname, section_slug='php-config', version_number=pc_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
                 </td>
-                <td>
-                  {{ pc_ver.fields.filename }}
-                </td>
-                <td>
-                  {{ pc_ver.version }}
-                </td>
+                <!--<td>{{ pc_ver.fields.filename }}</td>-->
+                <td>{{ pc_ver.version }}</td>
                 <td class="timestamp">
                   <time datetime="{{ pc_ver.fields.date_added|date:'c' }}">
                     {{ pc_ver.fields.date_added }}
@@ -890,6 +887,74 @@ function getTabs(section) {
       </section>
 
         </div><!-- #phpconfig -->
+
+        <div id="mysqlconfig">
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#mysqlconfig-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#mysqlconfig-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="mysqlconfig-latest" class="latest">
+        {% if mysqlconfig %}
+
+          <h4 class="group">{{ mysqlconfig.filename }}</h4>
+
+          <details class="date">
+            <strong>{{ _('Last Modified') }}</strong>
+            <time datetime="{{ mysqlconfig.date_added|date:'c' }}">
+              {{ mysqlconfig.date_added }}
+            </time>
+          </details>
+          <div class="clear"></div>
+
+          {{ mysqlconfig.body|highlight:'ini' }}
+
+        {% endif %}
+        </div><!-- #mysqlconfig-latest -->
+        <div id="mysqlconfig-history" class="history">
+
+          <table>
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th class="cmp">{{ _('Compare against') }}</th>
+                <!--<th>{{ _('Filename') }}</th>-->
+                <th>{{ _('Revision') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for pc_ver in mysqlconfig_versions %}
+              <tr>
+                <td class="cmp">
+                  {% if pc_ver.is_newest %}{{ _('(current)') }}{% else %}
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='mysql-config', version_number=pc_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
+                  {% endif %}
+
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='mysql-config', version_number=pc_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
+                </td>
+                <!--<td>{{ pc_ver.fields.filename }}</td>-->
+                <td>{{ pc_ver.version }}</td>
+                <td class="timestamp">
+                  <time datetime="{{ pc_ver.fields.date_added|date:'c' }}">
+                    {{ pc_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #mysqlconfig-history -->
+      </section>
+
+        </div><!-- #mysqlconfig -->
+
 
       </section>
 
