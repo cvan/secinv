@@ -153,11 +153,12 @@ function getTabs(section) {
         <ul>
           <li><a href="#system">{{ _('System') }}</a></li>
           <li><a href="#interfaces">{{ _('Interfaces') }}</a></li>
-          <li><a href="#services">{{ _('Services listening') }}</a></li>
+          <li><a href="#services">{{ _('Services') }}</a></li>
           <li><a href="#sshconfig">{{ _('SSH config') }}</a></li>
           <li><a href="#rpms">{{ _('RPMs') }}</a></li>
           <li><a href="#iptables">{{ _('iptables') }}</a></li>
           <li><a href="#apacheconfig">{{ _('Apache config') }}</a></li>
+          <li><a href="#phpconfig">{{ _('PHP config') }}</a></li>
         </ul>
         <div id="system">
 
@@ -817,6 +818,80 @@ function getTabs(section) {
       </section>
 
         </div><!-- #apacheconfig -->
+
+
+        <div id="phpconfig">
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#phpconfig-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#phpconfig-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="phpconfig-latest" class="latest">
+        {% if phpconfig %}
+
+          <h4 class="group">{{ phpconfig.filename }}</h4>
+
+          <details class="date">
+            <strong>{{ _('Last Modified') }}</strong>
+            <time datetime="{{ phpconfig.date_added|date:'c' }}">
+              {{ phpconfig.date_added }}
+            </time>
+          </details>
+          <div class="clear"></div>
+
+          {{ phpconfig.body|highlight:'ini' }}
+
+        {% endif %}
+        </div><!-- #phpconfig-latest -->
+        <div id="phpconfig-history" class="history">
+
+          <table>
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th class="cmp">{{ _('Compare against') }}</th>
+                <th>{{ _('Filename') }}</th>
+                <th>{{ _('Revision') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for pc_ver in phpconfig_versions %}
+              <tr>
+                <td class="cmp">
+                  {% if pc_ver.is_newest %}{{ _('(current)') }}{% else %}
+                  <a href="{% url diff-ac machine_slug=machine.hostname, section_slug='php-config', item_id=pc_ver.fields.id, version_number=pc_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
+                  {% endif %}
+
+                  <a href="{% url diff-ac machine_slug=machine.hostname, section_slug='php-config', item_id=pc_ver.fields.id, version_number=pc_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
+                </td>
+                <td>
+                  <a href="{% url php-config machine_slug=machine.hostname, item_id=pc_ver.fields.id %}">{{ pc_ver.fields.filename }}</a>
+                </td>
+                <td>
+                  {{ pc_ver.version }}
+                </td>
+                <td class="timestamp">
+                  <time datetime="{{ pc_ver.fields.date_added|date:'c' }}">
+                    {{ pc_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #phpconfig-history -->
+      </section>
+
+        </div><!-- #phpconfig -->
+
+
       </section>
 
 {% endblock %}

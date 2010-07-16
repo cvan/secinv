@@ -1,0 +1,146 @@
+{% extends "webapps/base.html" %}
+{% load i18n %}
+{% load machine_extras %}
+
+{% block head_title %}{{ application.name }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+      <hgroup id="masthead">
+        <h2><a href="{% url webapps-index %}">{{ _('Web Applications') }}</a></h2>
+        <h3>{{ application.name }}</h3>
+      </hgroup>
+      <div class="clear"></div>
+
+      <table class="view sortable">
+        <caption>{{ _('Application details') }}</caption>
+        <tbody>
+          <tr>
+            <th>{{ _('Application Name') }}</th>
+            <td>{{ application.name }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Machine') }}</th>
+            <td>
+              <a href="{% url machines-detail machine_slug=application.machine.hostname %}">{{ application.machine.hostname }}</a>
+            </td>
+          </tr>
+          <tr>
+            <th>{{ _('Overview') }}</th>
+            <td>{{ application.overview|urlize|linebreaksbr }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Contacts') }}</th>
+            <td>{{ application.contacts|urlize|linebreaksbr }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('URL') }}</th>
+            <td>{{ application.url|urlize }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Source Code URL') }}</th>
+            <td>{{ application.source_code_url|urlize }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Source Code path') }}</th>
+            <td>{{ application.source_code_path }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Bugzilla Product') }}</th>
+            <td>{{ application.bugzilla_product }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Bugzilla Component') }}</th>
+            <td>{{ application.bugzilla_component }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Visibility') }}</th>
+            <td>{{ application.visibility_value }}</td>
+          </tr>
+
+          <tr title="{% if application.cc %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+              class="{% if application.cc %}enabled{% else %}disabled{% endif %}">
+            <th>{{ _('Accepts Credit Cards') }}</th>
+            <td>
+              <mark>{% if application.cc %}&#10004;{% else %}&#10006;{% endif %}</mark>
+            </td>
+          </tr>
+
+          <tr title="{% if application.pii %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+              class="{% if application.pii %}enabled{% else %}disabled{% endif %}">
+            <th>{{ _('PII') }}</th>
+            <td>
+              <mark>{% if application.pii %}&#10004;{% else %}&#10006;{% endif %}</mark>
+            </td>
+          </tr>
+
+          <tr title="{% if application.logins %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+              class="{% if application.logins %}enabled{% else %}disabled{% endif %}">
+            <th>{{ _('Logins') }}</th>
+            <td>
+              <mark>{% if application.logins %}&#10004;{% else %}&#10006;{% endif %}</mark>
+            </td>
+          </tr>
+
+          <tr>
+            <th>{{ _('User Roles') }}</th>
+            {% if application.logins and application.user_roles %}
+            <td>{{ application.user_roles|linebreaksbr }}</td>
+            {% else %}
+            <td class="none">{{ _('None') }}</td>
+            {% endif %}
+          </tr>
+
+          <tr title="{% if application.file_uploads %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+              class="{% if application.file_uploads %}enabled{% else %}disabled{% endif %}">
+            <th>{{ _('File Uploads') }}</th>
+            <td>
+              <mark>{% if application.file_uploads %}&#10004;{% else %}&#10006;{% endif %}</mark>
+            </td>
+          </tr>
+
+          <tr title="{% if application.arcsight %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+              class="{% if application.arcsight %}enabled{% else %}disabled{% endif %}">
+            <th>{{ _('ArcSight') }}</th>
+            <td>
+              <mark>{% if application.arcsight %}&#10004;{% else %}&#10006;{% endif %}</mark>
+            </td>
+          </tr>
+
+          <tr>
+            <th>{{ _('Assessments') }}</th>
+            <td>
+            {% if application.assessments %}
+              <ol>
+              {% for assessment in application.assessments %}
+                <li><a href="{% url assessment application_id=application.id, assessment_id=assessment.id %}">{{ _('on') }} {{ assessment.date_added|date:'m/d/Y g:s a' }} {{ _('by') }} {{ assessment.reviewer }}</a></li>
+              {% endfor %}
+              </ol>
+            {% endif %}
+            </td>   
+          </tr>
+
+          <tr>
+            <th>{{ _('Added') }}</th>
+            <td>
+              {% if application.date_added %}
+              <time datetime="{{ application.date_added|date:'c' }}">
+                {{ application.date_added|date:'m/d/Y g:s a' }}
+              </time>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <th>{{ _('Modified') }}</th>
+            <td>
+              {% if application.date_modified %}
+              <time datetime="{{ application.date_modified|date:'c' }}">
+                {{ application.date_modified|date:'m/d/Y g:s a' }}
+              </time>
+              {% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+{% endblock %}
+

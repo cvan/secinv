@@ -433,3 +433,59 @@ class IPTables(models.Model):
 if not reversion.is_registered(IPTables):
     reversion.register(IPTables)
 
+
+class PHPConfig(models.Model):
+    machine = models.ForeignKey('Machine')
+    body = CompressedTextField(_('contents'), blank=True, null=True)
+    filename = models.CharField(_('filename'), max_length=255, blank=True,
+                                null=True)
+    items = SerializedTextField()
+    active = models.BooleanField(_('status'), default=1)
+
+    date_added = models.DateTimeField(_('date added'),
+                                      default=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.filename, self.body[0:50])
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('php-config', (), {'machine_slug': self.machine.hostname,
+                                   'phpconfig_id': str(self.id)})
+
+    class Meta:
+        verbose_name = _('PHP Configuration')
+        verbose_name_plural = _('PHP Configuration')
+        get_latest_by = 'date_added'
+
+if not reversion.is_registered(PHPConfig):
+    reversion.register(PHPConfig)
+
+
+class MySQLConfig(models.Model):
+    machine = models.ForeignKey('Machine')
+    body = CompressedTextField(_('contents'), blank=True, null=True)
+    filename = models.CharField(_('filename'), max_length=255, blank=True,
+                                null=True)
+    items = SerializedTextField()
+    active = models.BooleanField(_('status'), default=1)
+
+    date_added = models.DateTimeField(_('date added'),
+                                      default=datetime.datetime.now)
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.filename, self.body[0:50])
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('mysql-config', (), {'machine_slug': self.machine.hostname,
+                                     'mysql_id': str(self.id)})
+
+    class Meta:
+        verbose_name = _('MySQL Configuration')
+        verbose_name_plural = _('MySQL Configuration')
+        get_latest_by = 'date_added'
+
+if not reversion.is_registered(MySQLConfig):
+    reversion.register(MySQLConfig)
+

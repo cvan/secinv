@@ -1,0 +1,28 @@
+{% extends "../../../templates/base.html" %}
+{% load i18n %}
+
+{% block body_class %}webapps{% endblock %}
+
+{% block sidebar %}
+
+          <h2>{{ _('Web Applications') }}</h2>
+
+          {% for app in applications %}
+
+            <ul>
+              <li{% if application.id == app.id %} class="current"{% endif %}>
+                <h3><a href="{% url application application_id=app.id %}">{{ app.name }}</a></h3>
+                {% if app.assessments %}
+                  <ol>
+                  {% for assess in app.assessments %}
+                    <li{% if assessment.id == assess.id %} class="current"{% endif %}><a href="{% url assessment application_id=app.id, assessment_id=assess.id %}">{{ _('on') }} {{ assess.date_added|date:'m/d/Y g:s a' }} {{ _('by') }} {{ assess.reviewer }}</a></li>
+                  {% endfor %}
+                  </ol>
+                {% endif %}
+              </li>
+            </ul>
+
+          {% endfor %}
+
+{% endblock %}
+

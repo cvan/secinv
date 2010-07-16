@@ -44,7 +44,7 @@ import reversion
 from apps.machines.models import *
 #from apps.machines.models import Interface, System, Services, RPMs, \
 #                                 SSHConfig, IPTables, ApacheConfig, \
-#                                 AuthToken
+#                                 AuthToken, PHPConfig, MySQLConfig
 
 
 class ServerFunctions:
@@ -69,7 +69,7 @@ class ServerFunctions:
             return False
 
     def machine(self, ip_dict, system_dict, services_dict, rpms_dict,
-                sshconfig_dict, ipt_dict, acl_list):
+                sshconfig_dict, ipt_dict, acl_list, phpini_dict, mycnf_dict):
         if not self.is_authenticated:
             return False
 
@@ -277,12 +277,61 @@ class ServerFunctions:
                 r_object.save()
 
 
-        ## Apache configuration files.
+        ## SSH Configuration file.
+        params = sshconfig_dict.keys()
+        csv_params = '\n'.join(params)
+        values = sshconfig_dict.values()
+        csv_values = '\n'.join(values)
 
-        #
-        # TODO: Mark deleted .conf files as `inactive`.
-        # Add `active` field, a la Interfaces.
-        #
+        try:
+            s_object = SSHConfig.objects.filter(
+                machine__id=self.machine_id).latest()
+
+            if s_object.k_parameters != csv_params or \
+               s_object.v_values != csv_values:
+
+                s_object.machine = self.machine_obj
+                s_object.k_parameters = csv_params
+                s_object.v_values = csv_values
+                s_object.date_added = datetime.datetime.now()
+                with reversion.revision:
+                    s_object.save()
+
+        except SSHConfig.DoesNotExist:
+            s_object = SSHConfig.objects.create(machine=self.machine_obj,
+                                                k_parameters=csv_params,
+                                                v_values=csv_values)
+            with reversion.revision:
+                s_object.save()
+
+
+        ## iptables.
+        iptables_rules = ipt_dict['rules']
+        iptables_body = ipt_dict['rules']['body']
+        iptables_status = ipt_dict['status']
+
+        try:
+            i_object = IPTables.objects.filter(
+                machine__id=self.machine_id).latest()
+
+            if i_object.body != iptables_body or \
+               i_object.active != iptables_status:
+                i_object.machine = self.machine_obj
+                i_object.body = iptables_body
+                i_object.active = iptables_status
+                i_object.date_added = datetime.datetime.now()
+                with reversion.revision:
+                    i_object.save()
+
+        except IPTables.DoesNotExist:
+            i_object = IPTables.objects.create(machine=self.machine_obj,
+                                               body=iptables_body,
+                                               active=iptables_status)
+            with reversion.revision:
+                i_object.save()
+
+
+        ## Apache Configuration files.
         acl_filenames = []
 
         for ac in acl_list:
@@ -342,58 +391,53 @@ class ServerFunctions:
                 a_latest.save()
 
 
-        ## SSH configuration file.
-        params = sshconfig_dict.keys()
-        csv_params = '\n'.join(params)
-        values = sshconfig_dict.values()
-        csv_values = '\n'.join(values)
-
+        ## PHP Configuration files.
         try:
-            s_object = SSHConfig.objects.filter(
-                machine__id=self.machine_id).latest()
+            p_object = PHPConfig.objects.get(machine__id=self.machine_id)
+            print 'PHP Config exists ...'
+            if p_object.body != phpini_dict['body'] or \
+               p_object.items != phpini_dict['items'] or \
+               p_object.filename != phpini_dict['filename']:
 
-            if s_object.k_parameters != csv_params or \
-               s_object.v_values != csv_values:
-
-                s_object.machine = self.machine_obj
-                s_object.k_parameters = csv_params
-                s_object.v_values = csv_values
-                s_object.date_added = datetime.datetime.now()
+                p_object.body = phpini_dict['body']
+                p_object.items = phpini_dict['items']
+                p_object.filename = phpini_dict['filename']
+                p_object.date_added = datetime.datetime.now()
                 with reversion.revision:
-                    s_object.save()
+                    p_object.save()
 
-        except SSHConfig.DoesNotExist:
-            s_object = SSHConfig.objects.create(machine=self.machine_obj,
-                                                k_parameters=csv_params,
-                                                v_values=csv_values)
+                print 'Updating PHP Config ...'
+        except PHPConfig.DoesNotExist:
+            p_object = PHPConfig.objects.create(machine=self.machine_obj,
+                body=phpini_dict['body'], items=phpini_dict['items'],
+                filename=phpini_dict['filename'])
             with reversion.revision:
-                s_object.save()
+                p_object.save()
+            print 'Adding PHP Config ...'
 
 
-        ## iptables.
-        iptables_rules = ipt_dict['rules']
-        iptables_body = ipt_dict['rules']['body']
-        iptables_status = ipt_dict['status']
-
+        # MySQL Configuration files.
         try:
-            i_object = IPTables.objects.filter(
-                machine__id=self.machine_id).latest()
+            m_object = MySQLConfig.objects.get(machine__id=self.machine_id)
+            print 'MySQL Config exists ...'
+            if m_object.body != mycnf_dict['body'] or \
+               m_object.items != mycnf_dict['items'] or \
+               m_object.filename != mycnf_dict['filename']:
 
-            if i_object.body != iptables_body or \
-               i_object.active != iptables_status:
-                i_object.machine = self.machine_obj
-                i_object.body = iptables_body
-                i_object.active = iptables_status
-                i_object.date_added = datetime.datetime.now()
+                m_object.body = mycnf_dict['body']
+                m_object.items = mycnf_dict['items']
+                m_object.filename = mycnf_dict['filename']
                 with reversion.revision:
-                    i_object.save()
+                    p_object.save()
 
-        except IPTables.DoesNotExist:
-            i_object = IPTables.objects.create(machine=self.machine_obj,
-                                               body=iptables_body,
-                                               active=iptables_status)
+                print 'Updating MySQL Config ...'
+        except MySQLConfig.DoesNotExist:
+            m_object = MySQLConfig.objects.create(machine=self.machine_obj,
+                body=mycnf_dict['body'], items=mycnf_dict['items'],
+                filename=mycnf_dict['filename'])
             with reversion.revision:
-                i_object.save()
+                m_object.save()
+            print 'Adding MySQL Config ...'
 
         return True
 

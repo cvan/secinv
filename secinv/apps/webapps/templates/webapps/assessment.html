@@ -1,0 +1,65 @@
+{% extends "webapps/base.html" %}
+{% load i18n %}
+{% load machine_extras %}
+
+{% block head_title %}{{ _('Assessment') }} | {{ application.name }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+      <hgroup id="masthead">
+        <h2 class="sub">{{ _('Web Applications') }}</h2>
+        <h3><a href="{% url webapps-index %}">{{ _('Assessments') }}</a></h3>
+        <h4><a href="{% url application application_id=application.id %}">{{ application.name }}</a> <em><span>{{ _('on') }}</span> {{ assessment.date_added|date:'m/d/Y g:s a' }} <span>{{ _('by') }}</span> {{ assessment.reviewer }}</em></h4>
+      </hgroup>
+      <div class="clear"></div>
+
+      <table class="view sortable">
+        <caption>{{ _('Application details') }}</caption>
+        <tbody>
+          <tr>
+            <th>{{ _('Application') }}</th>
+            <td>{{ application.name }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Reviewer') }}</th>
+            <td>{{ assessment.reviewer|urlize }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Notes') }}</th>
+            <td>
+              {{ assessment.notes|urlize|linebreaksbr }}
+            </td>
+          </tr>
+          <tr>
+            <th>{{ _('Bugzilla Bugs') }}</th>
+            <td>{{ assessment.bugs|urlize|linebreaksbr }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Assessment Type') }}</th>
+            <td>{{ assessment.classification_value }}</td>
+          </tr>
+          <tr>
+            <th>{{ _('Added') }}</th>
+            <td>
+              {% if assessment.date_added %}
+              <time datetime="{{ assessment.date_added|date:'c' }}">
+                {{ assessment.date_added|date:'m/d/Y g:s a' }}
+              </time>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <th>{{ _('Modified') }}</th>
+            <td>
+              {% if assessment.date_modified %}
+              <time datetime="{{ assessment.date_modified|date:'c' }}">
+                {{ assessment.date_modified|date:'m/d/Y g:s a' }}
+              </time>
+              {% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+
+{% endblock %}
+

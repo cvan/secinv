@@ -7,7 +7,7 @@ from django.template import RequestContext
 from django.utils import simplejson
 
 from .models import Machine, Services, System, RPMs, Interface, SSHConfig, \
-                    IPTables, ApacheConfig
+                    IPTables, ApacheConfig, PHPConfig, MySQLConfig
 from .forms import MachineSearchForm
 from .utils import diff_list, diff_dict, get_version_diff, get_version_diff_field
 
@@ -21,7 +21,7 @@ from reversion.models import Version
 import re
 import json
 
-DIFF_SECTION_SLUGS = ('iptables', 'httpd-conf')
+DIFF_SECTION_SLUGS = ('iptables', 'httpd-conf', 'php-config')
 
 
 def get_all_domains():
@@ -79,43 +79,6 @@ def get_all_directives():
     all_directives.sort()
     return all_directives
 
-
-'''
-def get_all_directives():
-    all_directives_dict = {}
-
-    m_all = Machine.objects.all()
-    for m in m_all:
-        a_m = ApacheConfig.objects.filter(machine__id=m.id).all()
-        for a in a_m:
-            if a.directives:
-                for k, v in a.directives.iteritems():
-                    if k in all_directives_dict:
-                        all_directives_dict[k] += v
-                    else:
-                        all_directives_dict[k] = v
-
-            for fn in a.included:
-                try:
-                    i_a = ApacheConfig.objects.get(machine__id=m.id,
-                                                   filename=fn)
-                    if i_a.directives:
-                        for k, v in i_a.directives.iteritems():
-                            if k in all_directives_dict:
-                                all_directives_dict[k] += v
-                            else:
-                                all_directives_dict[k] = v
-                except ApacheConfig.DoesNotExist:
-                    pass
-
-    all_directives = []
-
-    for key, values in all_directives_dict.iteritems():
-        all_directives.append([key, list(set(values))])
-
-    all_directives.sort()
-    return all_directives
-'''
 
 def index(request):
     """Machines index page."""
@@ -333,6 +296,19 @@ def detail(request, machine_slug):
         # Recurse includes.
         ac_includes = recurse_ac_includes(apacheconfig_latest)
 
+
+    ## PHP configuration file.
+    phpconfig_latest = []
+    phpconfig_versions = []
+    phpconfig_history = PHPConfig.objects.filter(machine__id=m.id, active=True
+        ).order_by('-date_added').all()
+
+    if phpconfig_history.exists():
+        phpconfig_latest = phpconfig_history[0]
+
+        phpconfig_versions = get_version_diff_field(phpconfig_history[0], 'body')
+
+
     template_context = {'query': query,
                         'machine': m,
                         'system': system_latest,
@@ -352,6 +328,8 @@ def detail(request, machine_slug):
                         'apacheconfig_latest_body': apacheconfig_latest_body,
                         'apacheconfig_includes': apacheconfig_includes,
                         'ac_includes': ac_includes,
+                        'phpconfig': phpconfig_latest,
+                        'phpconfig_versions': phpconfig_versions,
                         'all_machines_hn': get_all_machines('-hostname'),
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
@@ -443,6 +421,14 @@ def httpd_conf(request, machine_slug, ac_id):
         context_instance=RequestContext(request))
 
 
+def php_config(request, machine_slug, item_id):
+    pass
+
+
+def mysql_config(request, machine_slug, item_id):
+    pass
+
+
 def diff(request, machine_slug, section_slug, version_number,
          compare_with='previous', item_id=None):
     if section_slug not in DIFF_SECTION_SLUGS:
@@ -460,6 +446,9 @@ def diff(request, machine_slug, section_slug, version_number,
             '-date_added').all()
     elif section_slug == 'httpd-conf':
         past_history = ApacheConfig.objects.filter(machine__id=m.id,
+            id=item_id, active=True).order_by('-date_added').all()
+    elif section_slug == 'php-config':
+        past_history = PHPConfig.objects.filter(machine__id=m.id,
             id=item_id, active=True).order_by('-date_added').all()
 
 

@@ -1,0 +1,164 @@
+{% extends "webapps/base.html" %}
+{% load i18n %}
+
+{% block head_title %}{{ _('Web Applications') }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+      <hgroup id="masthead">
+        <h2>{{ _('Web Applications') }}</h2>
+      </hgroup>
+
+{% if applications %}
+
+      <table class="wide">
+        <caption>{{ _('Applications') }}</caption>
+        <thead>
+          <tr>
+            <th>{{ _('App Name') }}</th>
+            <th>{{ _('Machine') }}</th>
+            <th>{{ _('Assessments') }}</th>
+            <th>{{ _('Added') }}</th>
+            <th>{{ _('Modified') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+      {% for application in applications %}
+          <tr>
+            <td><a href="{% url application application_id=application.id %}">{{ application.name }}</a></td>
+            <td>
+              <a href="{% url machines-detail machine_slug=application.machine.hostname %}">{{ application.machine.hostname }}</a>
+            </td>
+            <td>
+            {% if application.assessments %}
+              <ol>
+              {% for assessment in application.assessments %}
+                <li><a href="{% url assessment application_id=application.id, assessment_id=assessment.id %}">{{ _('on') }} {{ assessment.date_added|date:'m/d/Y g:s a' }} {{ _('by') }} {{ assessment.reviewer }}</a></li>
+              {% endfor %}
+              </ol>
+            {% endif %}
+            </td>
+            <td>
+              {% if application.date_added %}
+              <time datetime="{{ application.date_added|date:'c' }}">
+                {{ application.date_added|date:'m/d/Y g:s a' }}
+              </time>
+              {% endif %}
+            </td>
+            <td>
+              {% if application.date_modified %}
+              <time datetime="{{ application.date_modified|date:'c' }}">
+                {{ application.date_modified|date:'m/d/Y g:s a' }}
+              </time>
+              {% endif %}
+            </td>
+          </tr>
+      {% endfor %}
+        </tbody>
+      </table>
+
+<!--
+      <table class="wide">
+        <caption>{{ _('Applications') }}</caption>
+        <thead>
+          <tr>
+            <th>{{ _('Name') }}</th>
+            <th>{{ _('Overview') }}</th>
+            <th>{{ _('Contacts') }}</th>
+            <th>{{ _('URL') }}</th>
+            <th>{{ _('Source Code URL') }}</th>
+            <th>{{ _('Source Code Local Path') }}</th>
+            <th>{{ _('Bugzilla Product') }}</th>
+            <th>{{ _('Bugzilla Component') }}</th>
+            <th>{{ _('Visibility') }}</th>
+            <th>{{ _('Credit Cards') }}</th>
+            <th>{{ _('PII') }}</th>
+            <th>{{ _('Logins') }}</th>
+            <th>{{ _('User Roles') }}</th>
+            <th>{{ _('File Uploads') }}</th>
+            <th>{{ _('ArcSight') }}</th>
+            <th>{{ _('Added') }}</th>
+            <th>{{ _('Modified') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+      {% for application in applications %}
+          <tr>
+            <td>{{ application.name }}</td>
+            <td>{{ application.overview }}</td>
+            <td>{{ application.contacts }}</td>
+            <td>{{ application.url|urlize }}</td>
+            <td>{{ application.source_code_url|urlize }}</td>
+            <td>{{ application.source_code_path }}</td>
+            <td>{{ application.bugzilla_product }}</td>
+            <td>{{ application.bugzilla_component }}</td>
+            <td>{{ application.visibility }}</td>
+            <td>{{ application.cc }}</td>
+            <td>{{ application.pii }}</td>
+            <td>{{ application.logins }}</td>
+            <td>{{ application.user_roles }}</td>
+            <td>{{ application.file_uploads }}</td>
+            <td>{{ application.arcsight }}</td>
+            <td>{{ application.date_added }}</td>
+            <td>{{ application.date_modified }}</td>
+          </tr>
+      {% endfor %}
+
+      {% for machine in machines %}
+          <tr>
+            <td>{{ machine.sys_ip }}</td>
+            <td>
+              <a href="{% url machines-detail machine_slug=machine.hostname %}">
+                {{ machine.hostname }}
+              </a>
+            </td>
+            <td>{% if machine.ext_ip == 'None' %}{{ machine.ext_ip }}{% endif %}</td>
+            <td title="{% if machine.httpd %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+                class="{% if machine.httpd %}enabled{% else %}disabled{% endif %}">
+              <mark>{% if machine.httpd %}&#10004;{% else %}&#10006;{% endif %}</mark>
+            </td>
+            <td title="{% if machine.mysqld %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+                class="{% if machine.mysqld %}enabled{% else %}disabled{% endif %}">
+              <mark>{% if machine.mysqld %}&#10004;{% else %}&#10006;{% endif %}</mark>
+            </td>
+            <td title="{% if machine.openvpn %}{{ _('enabled') }}{% else %}{{ _('disabled') }}{% endif %}"
+                class="{% if machine.openvpn %}enabled{% else %}disabled{% endif %}">
+              <mark>{% if machine.openvpn %}&#10004;{% else %}&#10006;{% endif %}</mark>
+            </td>
+            <td title="{% if machine.nfs %}{{ _('yes') }}{% else %}{{ _('no') }}{% endif %}"
+                class="{% if machine.nfs %}enabled{% else %}disabled{% endif %}">
+              <mark>{% if machine.nfs %}&#10004;{% else %}&#10006;{% endif %}</mark>
+            </td>
+{# TODO: uniform date format #}
+            <td>
+              {% if machine.date_added %}
+              <time datetime="{{ machine.date_added|date:'c' }}">
+                {{ machine.date_added|date:'m/d/Y g:s a' }}
+              </time>
+              {% endif %}
+            </td>
+            <td>
+              {% if machine.date_modified %}
+              <time datetime="{{ machine.date_modified|date:'c' }}">
+                {{ machine.date_modified|date:'m/d/Y' }}
+              </time>
+              {% endif %}
+            </td>
+
+            <td>
+              {% if machine.date_scanned %}
+              <time datetime="{{ machine.date_scanned|date:'c' }}">
+                {{ machine.date_scanned|date:'m/d/Y g:s a' }}
+              </time>
+              {% endif %}
+            </td>
+          </tr>
+      {% endfor %}
+        </tbody>
+      </table>
+-->
+
+{% else %}
+      <p>No assessments are available.</p>
+{% endif %}
+{% endblock %}
+

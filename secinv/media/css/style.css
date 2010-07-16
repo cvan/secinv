@@ -10,6 +10,10 @@ body, header {
     background: #ddd;
 }
 
+ol {
+    margin-left: 1.65em;
+}
+
 ul {
     list-style: none;
 }
@@ -95,9 +99,17 @@ header .logo a {
 }
 header .logo a:hover {
     color: #60cff5;
+    -webkit-transition: line-height 0.1s linear;
+	-moz-transition: all 0.1s linear;
+	-o-transition: all 0.1s linear;
+	transition: all 0.1s linear;
 }
 header .logo a:hover strong {
     color: #00648d;
+    -webkit-transition: line-height 0.3s linear;
+	-moz-transition: all 0.3s linear;
+	-o-transition: all 0.3s linear;
+	transition: all 0.3s linear;
 }
 
 header .logo strong {
@@ -160,6 +172,8 @@ nav ul li a:visited {
 
 body.machines header nav ul li.machines a,
 body.machines header nav ul li.machines a:hover,
+body.webapps header nav ul li.webapps a,
+body.webapps header nav ul li.webapps a:hover,
 body.devices header nav ul li.devices a,
 body.devices header nav ul li.devices a:hover,
 body.profiles header nav ul li.profiles a,
@@ -181,10 +195,10 @@ body.config header nav ul li.config a:hover {
 		0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
 		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
 		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
-		-webkit-transition: line-height 0.1s linear;
-		-moz-transition: all 0.1s linear;
-		-o-transition: all 0.1s linear;
-		transition: all 0.1s linear;
+    -webkit-transition: line-height 0.1s linear;
+	-moz-transition: all 0.1s linear;
+	-o-transition: all 0.1s linear;
+	transition: all 0.1s linear;
 /*
         box-shadow: inset 0 1px 3px #fff, inset 0 -2px #cbe6f2, 0 0 3px #8ec1da;
         -o-box-shadow: inset 0 1px 3px #fff, inset 0 -2px #cbe6f2, 0 0 3px #8ec1da;
@@ -209,6 +223,40 @@ aside#sidebar h2 {
     left: -9999px;
 }
 /* @end */
+
+
+aside#sidebar li a {
+    display: block;
+}
+
+aside#sidebar li h3 {
+    background-color: #fff;
+    border-bottom: #ccc 1px solid;
+    font-size: 1.5em;
+    line-height: 1.5em;
+    padding: 4px 8px;
+}
+
+aside#sidebar li h3 a {
+    text-decoration: none;
+}
+
+aside#sidebar ol>li.current,
+aside#sidebar li.current h3 {
+    background-color: #ffc;
+}
+
+aside#sidebar li.current h3 {
+    color: #000;
+    font-weight: bold;
+    margin-top: 0.5em;
+}
+
+aside#sidebar ol {
+    /*margin-left: 3.5em;*/
+    padding: 0 8px;
+}
+
 
 .submit, .submit:visited {
     background: #525252; 
@@ -470,6 +518,9 @@ td.cmp {
     width: 25%;
 }
 
+table.view th {
+    width: 25%;
+}
 
 /* @end */
 
@@ -781,6 +832,9 @@ hgroup#masthead h4 {
     text-shadow: #000 0 1px 1px;
     margin: 0;
 }
+hgroup#masthead h2 {
+    margin-bottom: 0.125em;
+}
 hgroup#masthead h2.sub {
     position: absolute;
     left: -9999px;
@@ -807,6 +861,17 @@ hgroup#masthead h3 a:hover {
 hgroup#masthead h3 a:hover em {
     color: #999;
 }
+
+hgroup#masthead h2 a,
+hgroup#masthead h4 a {
+    color: #fff;
+    text-decoration: none;
+}
+hgroup#masthead h2 a:hover,
+hgroup#masthead h4 a:hover {
+    color: #ccc;
+}
+
 
 
 hgroup#masthead h4 {
