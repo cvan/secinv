@@ -861,13 +861,13 @@ function getTabs(section) {
               <tr>
                 <td class="cmp">
                   {% if pc_ver.is_newest %}{{ _('(current)') }}{% else %}
-                  <a href="{% url diff-ac machine_slug=machine.hostname, section_slug='php-config', item_id=pc_ver.fields.id, version_number=pc_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='php-config', version_number=pc_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
                   {% endif %}
 
-                  <a href="{% url diff-ac machine_slug=machine.hostname, section_slug='php-config', item_id=pc_ver.fields.id, version_number=pc_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='php-config', version_number=pc_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
                 </td>
                 <td>
-                  <a href="{% url php-config machine_slug=machine.hostname, item_id=pc_ver.fields.id %}">{{ pc_ver.fields.filename }}</a>
+                  {{ pc_ver.fields.filename }}
                 </td>
                 <td>
                   {{ pc_ver.version }}
@@ -890,7 +890,6 @@ function getTabs(section) {
       </section>
 
         </div><!-- #phpconfig -->
-
 
       </section>
 

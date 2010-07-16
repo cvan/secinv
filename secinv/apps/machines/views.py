@@ -449,7 +449,7 @@ def diff(request, machine_slug, section_slug, version_number,
             id=item_id, active=True).order_by('-date_added').all()
     elif section_slug == 'php-config':
         past_history = PHPConfig.objects.filter(machine__id=m.id,
-            id=item_id, active=True).order_by('-date_added').all()
+            active=True).order_by('-date_added').all()
 
 
     if past_history.exists():

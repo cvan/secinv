@@ -428,7 +428,7 @@ class ServerFunctions:
                 m_object.items = mycnf_dict['items']
                 m_object.filename = mycnf_dict['filename']
                 with reversion.revision:
-                    p_object.save()
+                    m_object.save()
 
                 print 'Updating MySQL Config ...'
         except MySQLConfig.DoesNotExist:
