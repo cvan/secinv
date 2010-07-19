@@ -41,15 +41,15 @@
             <td>
               {% if cf.get_domains %}
               <ul>
-                {% for domain, ports, i_ac in cf.get_domains %}
-                <li><a href="{% url httpd-conf machine_slug=cf.machine.hostname, ac_id=i_cf.id %}">{{ domain }}</a><!--({{ ports|join:', ' }})--></li>
+                {% for domain, ports, i_cf in cf.get_domains %}
+                <li><a href="{% url apacheconfig machine_slug=cf.machine.hostname, ac_id=i_cf.id %}">{{ domain }}</a><!--({{ ports|join:', ' }})--></li>
                 {% endfor %}
               </ul>
               {% endif %}
             </td>
 {% endif %}
 {% if section_slug == 'apacheconfig' %}
-            <td><a href="{% url httpd-conf machine_slug=cf.machine.hostname, ac_id=cf.id %}">{{ cf.filename }}</a></td>
+            <td><a href="{% url apacheconfig machine_slug=cf.machine.hostname, ac_id=cf.id %}">{{ cf.filename }}</a></td>
 {% else %}
             <td>{{ cf.filename }}</td>
 {% endif %}

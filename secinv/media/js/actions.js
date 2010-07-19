@@ -1,9 +1,7 @@
-//var sections = ['apacheconfig', 'mysqlconfig', 'phpconfig'];
-
 
 $(function() {
 
-    $('select#machine-hostname, select#machine-ip, select#machine-domain').change(function() {
+    $('select#machine-hostname, select#machine-ip, select#machine-domain, select[id$=-parameter]').change(function() {
         $(this).closest('form').submit();
     }).keyup(function() {
         $(this).closest('form').submit();
@@ -13,8 +11,8 @@ $(function() {
 
     $("select[id$='-parameter']").each(function(index) {
         var section = $(this).attr('id').split('-')[0];
-        //$('#masthead').append($(this).attr('id').split('-')[0] + " " + urls[section][0] + " -- " + urls[section][1] + "\n");
 
+        /*
         $('select#' + section + '-value').change(function() {
             $(this).closest('form').submit();
         }).keyup(function() {
@@ -22,6 +20,7 @@ $(function() {
         }).keydown(function() {
             $(this).closest('form').submit();
         });
+        */
 
 
         if ($('select#' + section + '-parameter').val() == '' &&
@@ -61,19 +60,12 @@ function doPopulate(section) {
 }
 
 function doChange(section) {
-    //if ($('select#' + section + '-value').val() != '')
-    //    return;
-
-    //$('#masthead').append(section + "<br>\n");
-
     var paramVal = $('select#' + section + '-parameter').val();
 
     if (paramVal == '')
         $('select#' + section + '-value').html('<option value="">*</option>\n');
     else {
         $.post(urls[section][1], { parameter: paramVal }, function(data) {
-
-            //$('#masthead').append("changing ... " + section + "<br>\n");
 
             var newOptions = '<option value="">*</option>\n';
 

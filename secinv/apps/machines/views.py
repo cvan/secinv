@@ -636,41 +636,6 @@ def machine_filter(request):
 
     return HttpResponseRedirect(destination)
 
-'''
-def ac_filter_results(request):
-    """Filter ApacheConfig objects by parameters and values."""
-    if request.method != 'GET':
-        return HttpResponse(status=400)
-
-    query = request.GET.get('q', '')
-    ac_parameter = request.GET.get('ac_parameter', '')
-    ac_value = request.GET.get('ac_value', '')
-
-    results = []
-
-    # Store matching ApacheConfig objects in results list.
-    a_all = ApacheConfig.objects.filter(active=True).all()
-    for a in a_all:
-        for param, values in a.directives.iteritems():
-            if param == ac_parameter or ac_parameter == '':
-                for v in values:
-                    if v == ac_value or ac_value == '':
-                        results.append([param, v, a])
-
-    results.sort()
-
-    template_context = {'query': query,
-                        'ac_parameter': ac_parameter,
-                        'ac_value': ac_value,
-                        'results': results,
-                        'all_machines_hn': get_all_machines('-hostname'),
-                        'all_machines_ip': get_all_machines('-sys_ip'),
-                        'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives()}
-    return render_to_response('machines/httpd_results.html', template_context,
-                              context_instance=RequestContext(request))
-'''
-
 
 def conf_filter_results(request, section_slug):
     """Filter other configuration objects by parameters and values."""
