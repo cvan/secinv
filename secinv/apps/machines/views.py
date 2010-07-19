@@ -21,7 +21,7 @@ from reversion.models import Version
 import re
 import json
 
-DIFF_SECTION_SLUGS = ('iptables', 'apache-config', 'phpconfig', 'mysqlconfig')
+DIFF_SECTION_SLUGS = ('iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig')
 CONFIG_SECTIONS = ('apacheconfig', 'phpconfig', 'mysqlconfig')
 
 def get_all_domains():
@@ -116,9 +116,8 @@ def index(request):
                               context_instance=RequestContext(request))
 
 
-# View that that returns the JSON result.
 def history(request, machine_slug):
-    # TODO: prevent calls
+    # TODO: prevent calls.
     #if not request.is_ajax():
     #    return HttpResponse(status=400)
 
@@ -395,7 +394,9 @@ def search(request):
                         'all_machines_hn': get_all_machines('-hostname'),
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives()}
+                        'all_directives': get_all_directives(),
+                        'all_php_items': get_all_items('phpconfig'),
+                        'all_mysql_items': get_all_items('mysqlconfig'),}
     return render_to_response('machines/search.html', template_context,
         context_instance=RequestContext(request))
 
@@ -539,7 +540,9 @@ def diff(request, machine_slug, section_slug, version_number,
                         'all_machines_hn': get_all_machines('-hostname'),
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives()}
+                        'all_directives': get_all_directives(),
+                        'all_php_items': get_all_items('phpconfig'),
+                        'all_mysql_items': get_all_items('mysqlconfig'),}
     return render_to_response('machines/diff.html', template_context,
                               context_instance=RequestContext(request))
 

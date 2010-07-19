@@ -11,7 +11,12 @@ class MachineSearchForm(BaseSearchForm):
                          'services__k_processes', 'services__v_ports',
                          'rpms__v_rpms',
                          'interface__i_name', 'interface__i_ip',
-                         'interface__i_mac', 'interface__i_mask']
+                         'interface__i_mac', 'interface__i_mask',
+                         'sshconfig__k_parameters', 'sshconfig__v_values',
+                         'apacheconfig__body', 'apacheconfig__filename',
+                         'iptables__body',
+                         'phpconfig__body', 'phpconfig__filename',
+                         'mysqlconfig__body', 'mysqlconfig__filename']
 
     """ 
     A custom addition - the absence of a clean_category method means

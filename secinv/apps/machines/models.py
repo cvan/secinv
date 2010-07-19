@@ -23,13 +23,16 @@ class Machine(models.Model):
     # TODO: DRY. Keep in one place.
     search_fields = ['sys_ip', 'hostname', 'ext_ip',
                      'system__kernel_rel', 'system__rh_rel', 'system__nfs',
+                     'system__ip_fwd', 'system__iptables',
+                     'services__k_processes', 'services__v_ports',
+                     'rpms__v_rpms',
                      'interface__i_name', 'interface__i_ip',
                      'interface__i_mac', 'interface__i_mask',
-                     'services__k_processes', 'services__v_ports',
                      'sshconfig__k_parameters', 'sshconfig__v_values',
-                     'rpms__v_rpms', 'iptables__body',
-                     'apacheconfig__body']
-
+                     'apacheconfig__body', 'apacheconfig__filename',
+                     'iptables__body',
+                     'phpconfig__body', 'phpconfig__filename',
+                     'mysqlconfig__body', 'mysqlconfig__filename']
     def __unicode__(self):
         return u'%s - %s' % (self.sys_ip, self.hostname)
 
@@ -101,17 +104,60 @@ class Machine(models.Model):
         except IndexError:
             r = None
 
+        try:
+            ipt = IPTables.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        except IndexError:
+            ipt = None
+
+        try:
+            sc = SSHConfig.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        except IndexError:
+            sc = None
+
+        try:
+            ac = ApacheConfig.objects.filter(machine__id=self.id).order_by('-date_added').all()
+        except IndexError:
+            ac = None
+
+        try:
+            pc = PHPConfig.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        except IndexError:
+            pc = None
+
+        try:
+            mc = MySQLConfig.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+        except IndexError:
+            mc = None
+
         for sf in self.search_fields:
-            if not re.search('__', sf):
+            val = ''
+
+            if not '__' in sf:
                 val = self.__getattribute__(sf)
-            elif i and re.search('interface__', sf):
+            elif i and 'interface__' in sf:
                 val = i.__getattribute__(re.split('__', sf)[1])
-            elif sys and re.search('system__', sf):
+            elif sys and 'system__' in sf:
                 val = sys.__getattribute__(re.split('__', sf)[1])
-            elif serv and re.search('services__', sf):
+            elif serv and 'services__' in sf:
                 val = serv.__getattribute__(re.split('__', sf)[1])
-            elif r and re.search('rpms__', sf):
+            elif r and 'rpms__' in sf:
                 val = r.__getattribute__(re.split('__', sf)[1])
+            elif ipt and 'iptables__' in sf:
+                val = ipt.__getattribute__(re.split('__', sf)[1])
+            elif sc and 'sshconfig__' in sf:
+                val = sc.__getattribute__(re.split('__', sf)[1])
+            elif ac and 'apacheconfig__' in sf:
+                #if type(ac) is list:
+                #    for o in ac:
+                #        val += '%s ' % o.__getattribute__(re.split('__', sf)[1])
+                #else:
+                #    val = ac.__getattribute__(re.split('__', sf)[1])
+                #val = ac[1].__getattribute__(re.split('__', sf)[1])
+                val = ' '.join([o.__getattribute__(re.split('__', sf)[1]) for o in ac])
+            elif pc and 'phpconfig__' in sf:
+                val = pc.__getattribute__(re.split('__', sf)[1])
+            elif mc and 'mysqlconfig__' in sf:
+                val = mc.__getattribute__(re.split('__', sf)[1])
 
             excerpt += '%s ' % val
 

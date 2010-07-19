@@ -39,9 +39,10 @@
           {{ result.hostname|highlight:terms }} ({{ result.sys_ip }})
         </a>
         {% searchexcerpt terms 6 1 as content %}
-        {{ result.excerpt|striptags }}
+          {{ result.excerpt|safe }}
         {% endsearchexcerpt %}
-        <p class="context">{{ content.excerpt|highlight:terms }}</p>
+
+       <p class="context">{{ content.excerpt|highlight:terms }}</p>
       </li>
   {% empty %}
       <li>{{ _('No results found.') }}</li>
