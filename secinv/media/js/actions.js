@@ -3,7 +3,7 @@
 
 $(function() {
 
-    $('select#machine-hostname, select#machine-ip, select#machine-domain, select#apacheconfig-value').change(function() {
+    $('select#machine-hostname, select#machine-ip, select#machine-domain').change(function() {
         $(this).closest('form').submit();
     }).keyup(function() {
         $(this).closest('form').submit();
@@ -28,9 +28,19 @@ $(function() {
     }
 */
 
+
     $("select[id$='-parameter']").each(function(index) {
         var section = $(this).attr('id').split('-')[0];
         //$('#masthead').append($(this).attr('id').split('-')[0] + " " + urls[section][0] + " -- " + urls[section][1] + "\n");
+
+        $('select#' + section + '-value').change(function() {
+            $(this).closest('form').submit();
+        }).keyup(function() {
+            $(this).closest('form').submit();
+        }).keydown(function() {
+            $(this).closest('form').submit();
+        });
+
 
         if ($('select#' + section + '-parameter').val() == '' && $('select#' + section + '-parameter').find('option').length == 1)
             doPopulate(section);

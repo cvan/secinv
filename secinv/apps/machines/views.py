@@ -636,7 +636,7 @@ def machine_filter(request):
 
     return HttpResponseRedirect(destination)
 
-
+'''
 def ac_filter_results(request):
     """Filter ApacheConfig objects by parameters and values."""
     if request.method != 'GET':
@@ -669,12 +669,12 @@ def ac_filter_results(request):
                         'all_directives': get_all_directives()}
     return render_to_response('machines/httpd_results.html', template_context,
                               context_instance=RequestContext(request))
+'''
 
 
-
-def conf_filter_results(request):
+def conf_filter_results(request, section_slug):
     """Filter other configuration objects by parameters and values."""
-    if request.method != 'GET':
+    if request.method != 'GET' or not section_slug in CONFIG_SECTIONS:
         return HttpResponse(status=400)
 
     query = request.GET.get('q', '')
@@ -683,10 +683,19 @@ def conf_filter_results(request):
 
     results = []
 
-    # Store matching ApacheConfig objects in results list.
-    a_all = ApacheConfig.objects.filter(active=True).all()
+    # Store matching objects in results list.
+
+    parameters_fn = 'items'
+    if section_slug == 'apacheconfig':
+        a_all = ApacheConfig.objects.filter(active=True).all()
+        parameters_fn = 'directives'
+    elif section_slug == 'phpconfig':
+        a_all = PHPConfig.objects.filter(active=True).all()
+    elif section_slug == 'mysqlconfig':
+        a_all = MySQLConfig.objects.filter(active=True).all()
+
     for a in a_all:
-        for param, values in a.directives.iteritems():
+        for param, values in a.__getattribute__(parameters_fn).iteritems():
             if param == conf_parameter or conf_parameter == '':
                 for v in values:
                     if conf_value == v or conf_value == '':
@@ -694,14 +703,18 @@ def conf_filter_results(request):
 
     results.sort()
 
+
     template_context = {'query': query,
-                        'ac_parameter': ac_parameter,
-                        'ac_value': ac_value,
+                        'conf_parameter': conf_parameter,
+                        'conf_value': conf_value,
                         'results': results,
+                        'section_slug': section_slug,
                         'all_machines_hn': get_all_machines('-hostname'),
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives()}
-    return render_to_response('machines/httpd_results.html', template_context,
+                        'all_directives': get_all_directives(),
+                        'all_php_items': get_all_items('phpconfig'),
+                        'all_mysql_items': get_all_items('mysqlconfig'),}
+    return render_to_response('machines/conf_results.html', template_context,
                               context_instance=RequestContext(request))
 
