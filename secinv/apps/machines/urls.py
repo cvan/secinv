@@ -25,7 +25,7 @@ urlpatterns = patterns('secinv.apps.machines.views',
 
     url(r'^%s/$' % machine_slug, 'detail', name='machines-detail'),
 
-    url(r'^%s/apacheconfig/%s/$' % (machine_slug, ac_id), 'httpd_conf', name='httpd-conf'),
+    url(r'^%s/apacheconfig/%s/$' % (machine_slug, ac_id), 'apacheconfig', name='apacheconfig'),
 
     url(r'^%s/diff/%s/r/%s/%s/$' % (machine_slug, section_slug, version_number, compare_with), 'diff', name='diff'),
     url(r'^%s/diff/%s/%s/r/%s/%s/$' % (machine_slug, section_slug, item_id, version_number, compare_with), 'diff', name='diff-ac'),

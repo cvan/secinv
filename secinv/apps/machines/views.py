@@ -21,7 +21,7 @@ from reversion.models import Version
 import re
 import json
 
-DIFF_SECTION_SLUGS = ('iptables', 'httpd-conf', 'php-config', 'mysql-config')
+DIFF_SECTION_SLUGS = ('iptables', 'apache-config', 'phpconfig', 'mysqlconfig')
 CONFIG_SECTIONS = ('apacheconfig', 'phpconfig', 'mysqlconfig')
 
 def get_all_domains():
@@ -400,7 +400,7 @@ def search(request):
         context_instance=RequestContext(request))
 
 
-def httpd_conf(request, machine_slug, ac_id):
+def apacheconfig(request, machine_slug, ac_id):
     m = get_object_or_404(Machine, hostname=machine_slug)
     ac = get_object_or_404(ApacheConfig, id=ac_id)
 
@@ -454,7 +454,7 @@ def httpd_conf(request, machine_slug, ac_id):
                         'apacheconfig_versions': apacheconfig_versions,
                         'apacheconfig_includes': apacheconfig_includes,
                         'ac_includes': ac_includes}
-    return render_to_response('machines/httpd_conf.html', template_context,
+    return render_to_response('machines/apacheconfig.html', template_context,
         context_instance=RequestContext(request))
 
 
@@ -473,13 +473,13 @@ def diff(request, machine_slug, section_slug, version_number,
     if section_slug == 'iptables':
         past_history = IPTables.objects.filter(machine__id=m.id).order_by(
             '-date_added').all()
-    elif section_slug == 'httpd-conf':
+    elif section_slug == 'apacheconfig':
         past_history = ApacheConfig.objects.filter(machine__id=m.id,
             id=item_id, active=True).order_by('-date_added').all()
-    elif section_slug == 'php-config':
+    elif section_slug == 'phpconfig':
         past_history = PHPConfig.objects.filter(machine__id=m.id,
             active=True).order_by('-date_added').all()
-    elif section_slug == 'mysql-config':
+    elif section_slug == 'mysqlconfig':
         past_history = MySQLConfig.objects.filter(machine__id=m.id,
             active=True).order_by('-date_added').all()
 

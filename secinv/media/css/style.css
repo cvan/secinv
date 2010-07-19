@@ -897,7 +897,8 @@ h4 span {
     padding: 0 10px 10px 10px;
     margin-left: 0;
     margin-right: -2px;
-    min-height: 425px;
+/*    min-height: 425px; */
+    min-height: 775px;
     overflow: visible;
 }
 
@@ -1206,14 +1207,6 @@ table.diff caption {
     font-weight: normal;
 }
 
-
 /* @end */
-
-
-/** {     margin: 0 !important; padding: 0 !important; border-collapse: collapse !important; display: inline-table; } */
-
-/*tbody { display: inline-table; margin: 0 !important; padding: 0 !important; }*/
-
-
 
 

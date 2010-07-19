@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load machine_extras %}
 
-{% block head_title %}{% if section == 'iptables' %}{{ _('iptables') }}{% endif %}{% if section == 'httpd-conf' %}{{ _('Apache configuration file') }}: {{ obj_current.filename }}{% endif %}{% if section == 'php-config' %}{{ _('PHP configuration file') }}: {{ obj_current.filename }}{% endif %}{% if section == 'mysql-config' %}{{ _('MySQL configuration file') }}: {{ obj_current.filename }}{% endif %} | {{ machine.hostname }} | {{ block.super }}{% endblock %}
+{% block head_title %}{% if section == 'iptables' %}{{ _('iptables') }}{% endif %}{% if section == 'apacheconfig' %}{{ _('Apache configuration file') }}: {{ obj_current.filename }}{% endif %}{% if section == 'phpconfig' %}{{ _('PHP configuration file') }}: {{ obj_current.filename }}{% endif %}{% if section == 'mysqlconfig' %}{{ _('MySQL configuration file') }}: {{ obj_current.filename }}{% endif %} | {{ machine.hostname }} | {{ block.super }}{% endblock %}
 
 {% block content %}
       <hgroup id="masthead">
@@ -13,13 +13,13 @@
         {% if section == 'iptables' %}
         <h4>{{ _('iptables') }}</h4>
         {% endif %}
-        {% if section == 'httpd-conf' %}
+        {% if section == 'apacheconfig' %}
         <h4>{{ _('Apache configuration file') }} <em>{{ obj_current.filename }}</em></h4>
         {% endif %}
-        {% if section == 'php-config' %}
+        {% if section == 'phpconfig' %}
         <h4>{{ _('PHP configuration file') }} <em>{{ obj_current.filename }}</em></h4>
         {% endif %}
-        {% if section == 'mysql-config' %}
+        {% if section == 'mysqlconfig' %}
         <h4>{{ _('MySQL configuration file') }} <em>{{ obj_current.filename }}</em></h4>
         {% endif %}
       </hgroup>
@@ -57,7 +57,7 @@
 
               {% if older_version %}
                 <br>
-               {% if section == 'httpd-conf' %}
+               {% if section == 'apacheconfig' %}
                 <a href="{% url diff-ac machine_slug=machine.hostname, section_slug=section, item_id=obj_current.id, version_number=version_previous, compare_with='current' %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
                 {% else %}
                 <a href="{% url diff machine_slug=machine.hostname, section_slug=section, version_number=version_previous, compare_with='current' %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
@@ -70,7 +70,7 @@
               {% if older_version %}
                 <br>
 
-               {% if section == 'httpd-conf' %}
+               {% if section == 'apacheconfig' %}
                 <a href="{% url diff-ac machine_slug=machine.hostname, section_slug=section, item_id=obj_current.id, version_number=version_previous, compare_with=compare_with %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
                 {% else %}
                 <a href="{% url diff machine_slug=machine.hostname, section_slug=section, version_number=version_previous, compare_with=compare_with %}">&larr; {{ _('Older version') }}<!-- (#{{ older_version }})--></a>
@@ -87,7 +87,7 @@
 
               {% if newer_version %}
                 <br>
-               {% if section == 'httpd-conf' %}
+               {% if section == 'apacheconfig' %}
                 <a href="{% url diff-ac machine_slug=machine.hostname, section_slug=section, item_id=obj_current.id, version_number=newer_version, compare_with=compare_with %}">&rarr; {{ _('Newer version') }}<!-- (#{{ newer_version }})--></a>
                 {% else %}
                 <a href="{% url diff machine_slug=machine.hostname, section_slug=section, version_number=newer_version, compare_with=compare_with %}">&rarr; {{ _('Newer version') }}<!-- (#{{ newer_version }})--></a>

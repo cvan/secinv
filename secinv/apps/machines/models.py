@@ -346,8 +346,8 @@ class ApacheConfig(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('httpd-conf', (), {'machine_slug': self.machine.hostname,
-                                   'ac_id': str(self.id)})
+        return ('apacheconfig', (), {'machine_slug': self.machine.hostname,
+                                     'ac_id': str(self.id)})
 
     def get_domains(self):
         domains = []
@@ -450,8 +450,8 @@ class PHPConfig(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('php-config', (), {'machine_slug': self.machine.hostname,
-                                   'phpconfig_id': str(self.id)})
+        return ('phpconfig', (), {'machine_slug': self.machine.hostname,
+                                  'phpconfig_id': str(self.id)})
 
     class Meta:
         verbose_name = _('PHP Configuration')
@@ -478,8 +478,8 @@ class MySQLConfig(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('mysql-config', (), {'machine_slug': self.machine.hostname,
-                                     'mysql_id': str(self.id)})
+        return ('mysqlconfig', (), {'machine_slug': self.machine.hostname,
+                                    'mysql_id': str(self.id)})
 
     class Meta:
         verbose_name = _('MySQL Configuration')

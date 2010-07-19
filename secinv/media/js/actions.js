@@ -11,24 +11,6 @@ $(function() {
         $(this).closest('form').submit();
     });
 
-/*
-    for (section_index in sections) {
-        var section = sections[section_index];
-
-        if ($('select#' + section + '-parameter').val() == '' && $('select#' + section + '-parameter').find('option').length == 1)
-            doPopulate(section);
-
-        $('select#' + section + '-parameter').change(function() {
-            doChange(section);
-        }).keyup(function() {
-            doChange(section);
-        }).keydown(function() {
-            doChange(section);
-        });
-    }
-*/
-
-
     $("select[id$='-parameter']").each(function(index) {
         var section = $(this).attr('id').split('-')[0];
         //$('#masthead').append($(this).attr('id').split('-')[0] + " " + urls[section][0] + " -- " + urls[section][1] + "\n");
@@ -42,7 +24,8 @@ $(function() {
         });
 
 
-        if ($('select#' + section + '-parameter').val() == '' && $('select#' + section + '-parameter').find('option').length == 1)
+        if ($('select#' + section + '-parameter').val() == '' &&
+            $('select#' + section + '-parameter').find('option').length == 1)
             doPopulate(section);
 
         $('select#' + section + '-parameter').change(function() {
@@ -52,7 +35,6 @@ $(function() {
         }).keydown(function() {
             doChange(section);
         });
-
     });
 
 });
@@ -103,7 +85,7 @@ function doChange(section) {
                 newOptions += "<option" + selected + ">" + value + "</option>\n";
             });
 
-            $('select#' + section + '-value').html(newOptions); 
+            $('select#' + section + '-value').html(newOptions);
         });
     }
 }
