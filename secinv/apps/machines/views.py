@@ -22,7 +22,7 @@ import re
 import json
 
 DIFF_SECTION_SLUGS = ('iptables', 'httpd-conf', 'php-config', 'mysql-config')
-
+CONFIG_SECTIONS = ('apacheconfig', 'phpconfig', 'mysqlconfig')
 
 def get_all_domains():
     all_domains = []
@@ -36,11 +36,9 @@ def get_all_domains():
                     i_a = ApacheConfig.objects.get(machine__id=m.id,
                                                    filename=fn,
                                                    active=True)
-                    if i_a.domains:
-                        # TODO: Want port number (value)?
-                        for k in i_a.domains.keys():
-                            if not [m.hostname, k, i_a.id] in all_domains:
-                                all_domains.append([m.hostname, k, i_a.id])
+                    for k in i_a.domains.keys():
+                        if not [m.hostname, k, i_a.id] in all_domains:
+                            all_domains.append([m.hostname, k, i_a.id])
                 except ApacheConfig.DoesNotExist:
                     pass
 
@@ -51,12 +49,6 @@ def get_all_machines(order_by='id'):
     return Machine.objects.all().order_by(order_by)
 
 #
-# TODO: Save in a table.
-#
-# TODO: Update after each scan.
-#
-
-#
 # TODO: Apache Parser -- Force directives to be uppercased.
 #
 def get_all_directives():
@@ -64,12 +56,11 @@ def get_all_directives():
 
     a_all = ApacheConfig.objects.filter(active=True).all()
     for a in a_all:
-        if a.directives:
-            for k, v in a.directives.iteritems():
-                if k in all_directives_dict:
-                    all_directives_dict[k] += v
-                else:
-                    all_directives_dict[k] = v
+        for k, v in a.directives.iteritems():
+            if k in all_directives_dict:
+                all_directives_dict[k] += v
+            else:
+                all_directives_dict[k] = v
 
     all_directives = []
 
@@ -78,6 +69,34 @@ def get_all_directives():
 
     all_directives.sort()
     return all_directives
+
+
+def get_all_items(section_slug):
+    if not section_slug in CONFIG_SECTIONS:
+        raise ValueError
+        #return []
+
+    all_items_dict = {}
+
+    if section_slug == 'phpconfig':
+        a_all = PHPConfig.objects.filter(active=True).all()
+    elif section_slug == 'mysqlconfig':
+        a_all = MySQLConfig.objects.filter(active=True).all()
+
+    for a in a_all:
+        for k, v in a.items.iteritems():
+            if k in all_items_dict:
+                all_items_dict[k] += v
+            else:
+                all_items_dict[k] = v
+
+    all_items = []
+
+    for key, values in all_items_dict.iteritems():
+        all_items.append([key, list(set(values))])
+
+    all_items.sort()
+    return all_items
 
 
 def index(request):
@@ -90,7 +109,9 @@ def index(request):
                         'all_machines_hn': get_all_machines('-hostname'),
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives()}
+                        'all_directives': get_all_directives(),
+                        'all_php_items': get_all_items('phpconfig'),
+                        'all_mysql_items': get_all_items('mysqlconfig'),}
     return render_to_response('machines/index.html', template_context,
                               context_instance=RequestContext(request))
 
@@ -347,7 +368,9 @@ def detail(request, machine_slug):
                         'all_machines_hn': get_all_machines('-hostname'),
                         'all_machines_ip': get_all_machines('-sys_ip'),
                         'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives()}
+                        'all_directives': get_all_directives(),
+                        'all_php_items': get_all_items('phpconfig'),
+                        'all_mysql_items': get_all_items('mysqlconfig'),}
     return render_to_response('machines/detail.html', template_context,
                               context_instance=RequestContext(request))
 
@@ -433,6 +456,7 @@ def httpd_conf(request, machine_slug, ac_id):
                         'ac_includes': ac_includes}
     return render_to_response('machines/httpd_conf.html', template_context,
         context_instance=RequestContext(request))
+
 
 def diff(request, machine_slug, section_slug, version_number,
          compare_with='previous', item_id=None):
@@ -520,34 +544,7 @@ def diff(request, machine_slug, section_slug, version_number,
                               context_instance=RequestContext(request))
 
 
-# View that that returns the JSON result.
-'''
-def ac_filter_directives(request, directive_slug=None):
-    # TODO: prevent calls
-    #if not request.is_ajax():
-    #    return HttpResponse(status=400)
-
-    all_directives = get_all_directives()
-    if directive_slug:
-        for v in all_directives:
-            if v[0] == directive_slug:
-                result = v[1]
-                break
-    else:
-        result = [f[0] for f in all_directives]
-        #result = []
-        #for f in all_directives:
-        #    result.append(f[0])
-
-    # Serialize the result of the database retrieval to JSON and send an
-    # application/json response.
-#    return HttpResponse(serializers.serialize('json', get_all_domains()),
-    return HttpResponse(simplejson.dumps(result),
-                        mimetype='application/json')
-'''
-
 def ac_filter_directives_keys(request):
-    # TODO: prevent calls
     #if not request.is_ajax():
     #    return HttpResponse(status=400)
 
@@ -556,41 +553,72 @@ def ac_filter_directives_keys(request):
 
     # Serialize the result of the database retrieval to JSON and send an
     # application/json response.
-    return HttpResponse(simplejson.dumps(result),
-                        mimetype='application/json')
+    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
 
 def ac_filter_directives(request):
-    # TODO: prevent calls
-    # if not request.is_ajax():
+    #if not request.is_ajax() or request.method != 'POST':
     #    return HttpResponse(status=400)
 
-    if request.method == 'POST': # and request.is_ajax():
-        #result = 'Raw Data: "%s"' % request.raw_post_data
-        directive = request.POST.get('directive', '')
+    result = ''
+    if request.method == 'POST':
+        directive = request.POST.get('parameter', '')
 
-        all_directives = get_all_directives()
         if directive:
+            all_directives = get_all_directives()
             for v in all_directives:
                 if v[0] == directive:
                     result = v[1]
                     break
-    else:
-        return HttpResponse(status=400)
+
+    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+
+
+def conf_filter_parameters_keys(request, section_slug):
+    #if not request.is_ajax() or not section_slug in CONFIG_SECTIONS:
+    #    return HttpResponse(status=400)
+
+    if section_slug == 'apacheconfig':
+        all_params = get_all_directives()
+    elif section_slug in ('phpconfig', 'mysqlconfig'):
+        all_params = get_all_items(section_slug)
+
+    result = [f[0] for f in all_params]
 
     # Serialize the result of the database retrieval to JSON and send an
     # application/json response.
-    return HttpResponse(simplejson.dumps(result),
-                        mimetype='application/json')
+    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+
+def conf_filter_parameters(request, section_slug):
+    #if not request.is_ajax() or request.method != 'POST' or \
+    #   not section_slug in CONFIG_SECTIONS:
+    #    return HttpResponse(status=400)
+
+    result = ''
+    if request.method == 'POST':
+        parameter = request.POST.get('parameter', '')
+
+        if parameter:
+            if section_slug == 'apacheconfig':
+                all_params = get_all_directives()
+            elif section_slug in ('phpconfig', 'mysqlconfig'):
+                all_params = get_all_items(section_slug)
+
+            for v in all_params:
+                if v[0] == parameter:
+                    result = v[1]
+                    break
+
+    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
 
 
 def machine_filter(request):
     """Find machine by hostname, IP, or domain and redirect."""
+    if request.method != 'GET':
+        return HttpResponse(status=400)
+
     hostname = request.GET.get('machine_hostname', '')
     ip = request.GET.get('machine_ip', '')
     domain = request.GET.get('machine_domain', '')
-
-    if request.method != 'GET':
-        return HttpResponse(status=400)
 
     m_hn = ''
     if hostname:
@@ -607,29 +635,27 @@ def machine_filter(request):
         destination = reverse('machines-index')
 
     return HttpResponseRedirect(destination)
-    #return HttpResponse(destination)
 
 
 def ac_filter_results(request):
     """Filter ApacheConfig objects by parameters and values."""
+    if request.method != 'GET':
+        return HttpResponse(status=400)
+
     query = request.GET.get('q', '')
     ac_parameter = request.GET.get('ac_parameter', '')
     ac_value = request.GET.get('ac_value', '')
-
-    if request.method != 'GET':
-        return HttpResponse(status=400)
 
     results = []
 
     # Store matching ApacheConfig objects in results list.
     a_all = ApacheConfig.objects.filter(active=True).all()
     for a in a_all:
-        if a.directives:
-            for param, values in a.directives.iteritems():
-                if param == ac_parameter or ac_parameter == '':
-                    for v in values:
-                        if v == ac_value or ac_value == '':
-                            results.append([param, v, a])
+        for param, values in a.directives.iteritems():
+            if param == ac_parameter or ac_parameter == '':
+                for v in values:
+                    if v == ac_value or ac_value == '':
+                        results.append([param, v, a])
 
     results.sort()
 
@@ -643,3 +669,39 @@ def ac_filter_results(request):
                         'all_directives': get_all_directives()}
     return render_to_response('machines/httpd_results.html', template_context,
                               context_instance=RequestContext(request))
+
+
+
+def conf_filter_results(request):
+    """Filter other configuration objects by parameters and values."""
+    if request.method != 'GET':
+        return HttpResponse(status=400)
+
+    query = request.GET.get('q', '')
+    conf_parameter = request.GET.get('conf_parameter', '')
+    conf_value = request.GET.get('conf_value', '')
+
+    results = []
+
+    # Store matching ApacheConfig objects in results list.
+    a_all = ApacheConfig.objects.filter(active=True).all()
+    for a in a_all:
+        for param, values in a.directives.iteritems():
+            if param == conf_parameter or conf_parameter == '':
+                for v in values:
+                    if conf_value == v or conf_value == '':
+                        results.append([param, v, a])
+
+    results.sort()
+
+    template_context = {'query': query,
+                        'ac_parameter': ac_parameter,
+                        'ac_value': ac_value,
+                        'results': results,
+                        'all_machines_hn': get_all_machines('-hostname'),
+                        'all_machines_ip': get_all_machines('-sys_ip'),
+                        'all_domains': get_all_domains(),
+                        'all_directives': get_all_directives()}
+    return render_to_response('machines/httpd_results.html', template_context,
+                              context_instance=RequestContext(request))
+

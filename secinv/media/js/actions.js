@@ -1,112 +1,100 @@
-$(function(){
+//var sections = ['apacheconfig', 'mysqlconfig', 'phpconfig'];
 
-    //$('.ui-selectmenu-menu li a').attr('href', 'blah');
 
-    $('select#machine-hostname, select#machine-ip, select#machine-domain, select#ac-filter-directives-values').change(function(){
+$(function() {
+
+    $('select#machine-hostname, select#machine-ip, select#machine-domain, select#apacheconfig-value').change(function() {
         $(this).closest('form').submit();
-    }).keyup(function(){
+    }).keyup(function() {
         $(this).closest('form').submit();
-    }).keydown(function(){
+    }).keydown(function() {
         $(this).closest('form').submit();
-    });
-
-    var selected = $('select#ac-filter-directives').val();
-    var numChildren = $('select#ac-filter-directives').find('option').length;
-
-    if (selected == '' && numChildren == 1)
-        doPopulate();
-
-    $('select#ac-filter-directives').change(function(){
-        doChange();
-    }).keyup(function(){
-        doChange();
-    }).keydown(function(){
-        doChange();
     });
 
 /*
-    $('select#ac-filter-directives').focus(function(){
-        //alert('focused!');
-        //doPopulate();
-        //var options = $('select#ac-filter-directives').children('option').html();
+    for (section_index in sections) {
+        var section = sections[section_index];
 
-        var selected = $('select#ac-filter-directives').val();
-        var numChildren = $('select#ac-filter-directives').find('option').length;
+        if ($('select#' + section + '-parameter').val() == '' && $('select#' + section + '-parameter').find('option').length == 1)
+            doPopulate(section);
 
-        if (selected == '' && numChildren == 1)
-            doPopulate();
-    }).change(function(){
-        doChange();
-    }).keyup(function(){
-        doChange();
-    }).keydown(function(){
-        doChange();
-    });
+        $('select#' + section + '-parameter').change(function() {
+            doChange(section);
+        }).keyup(function() {
+            doChange(section);
+        }).keydown(function() {
+            doChange(section);
+        });
+    }
 */
+
+    $("select[id$='-parameter']").each(function(index) {
+        var section = $(this).attr('id').split('-')[0];
+        //$('#masthead').append($(this).attr('id').split('-')[0] + " " + urls[section][0] + " -- " + urls[section][1] + "\n");
+
+        if ($('select#' + section + '-parameter').val() == '' && $('select#' + section + '-parameter').find('option').length == 1)
+            doPopulate(section);
+
+        $('select#' + section + '-parameter').change(function() {
+            doChange(section);
+        }).keyup(function() {
+            doChange(section);
+        }).keydown(function() {
+            doChange(section);
+        });
+
+    });
 
 });
 
 
-function doPopulate()
-{
-    $.getJSON(urlAllDirs, function(data) {
-        var newHTML = "";
+function doPopulate(section) {
+    $.getJSON(urls[section][0], function(data) {
         var foundSelected = false;
 
         $.each(data, function(key, value) {
-
             var selected = '';
 
-            if (ac_parameter == data[key])
-            {
+            if (acParameter == data[key]) {
                 selected = ' selected';
                 foundSelected = true;
             }
 
-            $('select#ac-filter-directives').append("<option" + selected + ">" + data[key] + "</option>\n");
-
-            //newHTML += "key: " + data[key] + "<br>\n";
-
-            /*
-            $.each(data[key][1], function(k, v) {
-                newHTML += "&nbsp;&nbsp; - " + v + "<br>\n";
-            });
-            */
-            //newHTML += key + " - " + value;
-
+            $('select#' + section + '-parameter').append("<option" + selected + ">" + value + "</option>\n");
         });
-        //$('select#ac-filter-directives').selectmenu({style:'dropdown'});
 
         if (foundSelected)
-            doChange();
-
+            doChange(section);
     });
 }
 
-function doChange()
-{
-    var dirVal = $('select#ac-filter-directives').val();
+function doChange(section) {
+    //if ($('select#' + section + '-value').val() != '')
+    //    return;
 
-    if (dirVal == '')
-        $('select#ac-filter-directives-values').html('<option value="">*</option>\n');
-    else
-    {
-        $.post(urlDirs, { directive: dirVal }, function(data) {
+    //$('#masthead').append(section + "<br>\n");
+
+    var paramVal = $('select#' + section + '-parameter').val();
+
+    if (paramVal == '')
+        $('select#' + section + '-value').html('<option value="">*</option>\n');
+    else {
+        $.post(urls[section][1], { parameter: paramVal }, function(data) {
+
+            //$('#masthead').append("changing ... " + section + "<br>\n");
+
             var newOptions = '<option value="">*</option>\n';
-    
+
             $.each(data, function(key, value) {
                 var selected = '';
-                if (ac_value == value)
+                if (acValue == value)
                     selected = ' selected';
-    
+
                 newOptions += "<option" + selected + ">" + value + "</option>\n";
             });
-    
-            $('select#ac-filter-directives-values').html(newOptions);
 
-            //$('select#ac-filter-directives-values').selectmenu({style:'dropdown'});
-
-            //$('select#ac-filter-directives-values').focus();
+            $('select#' + section + '-value').html(newOptions); 
         });
     }
 }
+

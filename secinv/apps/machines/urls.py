@@ -13,12 +13,18 @@ directive_slug = r'(?P<directive_slug>[-\w]+)'
 urlpatterns = patterns('secinv.apps.machines.views',
     url(r'^$', 'index', name='machines-index'),
     url(r'^search/', 'search', name='machines-search'),
+
     url(r'^filters/$', 'machine_filter', name='machine-filter'),
-    url(r'^%s/$' % machine_slug, 'detail', name='machines-detail'),
 
     url(r'^filters/httpd-conf/results/$', 'ac_filter_results', name='ac-filter-results'),
-    url(r'^filters/httpd-conf/directive/$', 'ac_filter_directives', name='ac-filter-directives'),
-    url(r'^filters/httpd-conf/$', 'ac_filter_directives_keys', name='ac-filter-directives-all'),
+    url(r'^filters/httpd-conf.json$', 'ac_filter_directives_keys', name='ac-filter-directives-keys'),  # JSON.
+    url(r'^filters/httpd-conf/directive.json$', 'ac_filter_directives', name='ac-filter-directives'), # JSON.
+
+    url(r'^filters/%s/results/$' % section_slug, 'conf_filter_results', name='conf-filter-results'),
+    url(r'^filters/%s.json$' % section_slug, 'conf_filter_parameters_keys', name='conf-filter-parameters-keys'), # JSON.
+    url(r'^filters/%s/directive.json$' % section_slug, 'conf_filter_parameters', name='conf-filter-parameters'), # JSON.
+
+    url(r'^%s/$' % machine_slug, 'detail', name='machines-detail'),
 
     url(r'^%s/httpd-conf/%s/$' % (machine_slug, ac_id), 'httpd_conf', name='httpd-conf'),
 
