@@ -1,7 +1,7 @@
 
 $(function() {
 
-    $('select#machine-hostname, select#machine-ip, select#machine-domain, select[id$=-parameter]').change(function() {
+    $('select#machine-hostname, select#machine-ip, select#machine-domain, aside#sidebar select[id$=-value]').change(function() {
         $(this).closest('form').submit();
     }).keyup(function() {
         $(this).closest('form').submit();
@@ -46,7 +46,7 @@ function doPopulate(section) {
         $.each(data, function(key, value) {
             var selected = '';
 
-            if (acParameter == data[key]) {
+            if (confParameter == data[key]) {
                 selected = ' selected';
                 foundSelected = true;
             }
@@ -71,7 +71,7 @@ function doChange(section) {
 
             $.each(data, function(key, value) {
                 var selected = '';
-                if (acValue == value)
+                if (confValue == value)
                     selected = ' selected';
 
                 newOptions += "<option" + selected + ">" + value + "</option>\n";

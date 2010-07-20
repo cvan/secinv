@@ -58,21 +58,22 @@ var urls = [];
           	<fieldset>
           	  <legend>{{ _('Filter Apache configuration files') }}</legend>
 
-              <script type="text/javascript">
-                var urlAllDirs = '{% url ac-filter-directives-keys %}';
-                var urlDirs = '{% url ac-filter-directives %}';
-
-                urls['apacheconfig'] = ['{% url ac-filter-directives-keys %}', '{% url ac-filter-directives %}'];
-              </script>
-
               <label for="apacheconfig-parameter">{{ _('Filter by <strong>parameter</strong>') }}</label>
               <select name="conf_parameter" id="apacheconfig-parameter">
+              {% if section_slug == 'apacheconfig' and conf_parameter %}
+                <option selected value="">{{ conf_parameter }}</option>
+              {% else %}
                 <option value="">*</option>
+              {% endif %}
               </select>
 
               <label for="apacheconfig-value">{{ _('Filter by <strong>value</strong>') }}</label>
               <select name="conf_value" id="apacheconfig-value">
+              {% if section_slug == 'apacheconfig' and conf_value %}
+                <option selected value="">{{ conf_value }}</option>
+              {% else %}
                 <option value="">*</option>
+              {% endif %}
               </select>
 
               <button class="button pill">{{ _('Submit') }}</button>
@@ -84,18 +85,22 @@ var urls = [];
           	<fieldset>
           	  <legend>{{ _('Filter php.ini files') }}</legend>
 
-              <script type="text/javascript">
-                urls['phpconfig'] = ['{% url conf-filter-parameters-keys section_slug='phpconfig' %}', '{% url conf-filter-parameters section_slug='phpconfig' %}'];
-              </script>
-
-              <label for="filter-parameters">{{ _('Filter by <strong>parameter</strong>') }}</label>
+              <label for="phpconfig-parameter">{{ _('Filter by <strong>parameter</strong>') }}</label>
               <select name="conf_parameter" id="phpconfig-parameter">
+              {% if section_slug == 'phpconfig' and conf_parameter %}
+                <option selected value="">{{ conf_parameter }}</option>
+              {% else %}
                 <option value="">*</option>
+              {% endif %}
               </select>
 
               <label for="phpconfig-value">{{ _('Filter by <strong>value</strong>') }}</label>
               <select name="conf_value" id="phpconfig-value">
+              {% if section_slug == 'phpconfig' and conf_value %}
+                <option selected value="">{{ conf_value }}</option>
+              {% else %}
                 <option value="">*</option>
+              {% endif %}
               </select>
 
               <button class="button pill">{{ _('Submit') }}</button>
@@ -107,30 +112,39 @@ var urls = [];
           	<fieldset>
           	  <legend>{{ _('Filter my.cnf files') }}</legend>
 
-              <script type="text/javascript">
-                urls['mysqlconfig'] = ['{% url conf-filter-parameters-keys section_slug='mysqlconfig' %}', '{% url conf-filter-parameters section_slug='mysqlconfig' %}'];
-              </script>
-
               <label for="mysqlconfig-parameter">{{ _('Filter by <strong>parameter</strong>') }}</label>
               <select name="conf_parameter" id="mysqlconfig-parameter">
+              {% if section_slug == 'mysqlconfig' and conf_parameter %}
+                <option selected value="">{{ conf_parameter }}</option>
+              {% else %}
                 <option value="">*</option>
+              {% endif %}
               </select>
 
               <label for="mysqlconfig-value">{{ _('Filter by <strong>value</strong>') }}</label>
               <select name="conf_value" id="mysqlconfig-value">
+              {% if section_slug == 'mysqlconfig' and conf_value %}
+                <option selected value="">{{ conf_value }}</option>
+              {% else %}
                 <option value="">*</option>
+              {% endif %}
               </select>
 
               <button class="button pill">{{ _('Submit') }}</button>
             </fieldset>
           </form>
 
+          <script type="text/javascript">
+            urls['apacheconfig'] = ['{% url ac-filter-directives-keys %}',
+                                    '{% url ac-filter-directives %}'];
+            urls['phpconfig'] = ['{% url conf-filter-parameters-keys section_slug='phpconfig' %}',
+                                 '{% url conf-filter-parameters section_slug='phpconfig' %}'];
+            urls['mysqlconfig'] = ['{% url conf-filter-parameters-keys section_slug='mysqlconfig' %}',
+                                   '{% url conf-filter-parameters section_slug='mysqlconfig' %}'];
 
-              <script type="text/javascript">
-                var urlAllDirs = '{% url ac-filter-directives-keys %}';
-                var urlDirs = '{% url ac-filter-directives %}';
-                var acParameter = '';
-                var acValue = '';
-              </script>
+            var confParameter = '{{ conf_parameter }}';
+            var confValue = '{{ conf_value }}';
+          </script>
+
 {% endblock %}
 

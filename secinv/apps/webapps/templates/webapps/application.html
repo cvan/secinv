@@ -21,7 +21,9 @@
           <tr>
             <th>{{ _('Machine') }}</th>
             <td>
+            {% if application.machine.hostname %}
               <a href="{% url machines-detail machine_slug=application.machine.hostname %}">{{ application.machine.hostname }}</a>
+            {% endif %}
             </td>
           </tr>
           <tr>

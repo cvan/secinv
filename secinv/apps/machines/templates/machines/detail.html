@@ -93,7 +93,6 @@ function getTabs(section) {
         </dl>
       </details>
 
-{# TODO: diff for machine #}
       <table class="view sortable">
         <caption>{{ _('Machine details') }}</caption>
         <tbody>
@@ -110,7 +109,7 @@ function getTabs(section) {
           <tr>
             <th>{{ _('External IP address') }}</th>
             <td>
-              {{ machine.ext_ip }}
+              {% if machine.ext_ip %}{{ machine.ext_ip }}{% else %}<mark class="none">{{ _('None') }}</mark>{% endif %}
             </td>
           </tr>
 {# TODO: uniform date format #}
@@ -588,12 +587,14 @@ function getTabs(section) {
           <h4 class="group">{{ _('Installed RPMs') }}</h4>
 
           {% if rpms %}
+            {% if rpms.date_added %}
           <details class="date">
             <strong>{{ _('Last Modified') }}</strong>
             <time datetime="{{ rpms.date_added|date:'c' }}">
               {{ rpms.date_added }}
             </time>
           </details>
+            {% endif %}
           <div class="clear"></div>
 
           <ul>
@@ -601,12 +602,6 @@ function getTabs(section) {
             <li>{{ rpm }}</li>
             {% endfor %}
           </ul>
-
-          <!--
-          {% with rpms.installed|join:'\n' as rpms_body %}
-            {{ rpms_body|highlight }}
-          {% endwith %}
-          -->
 
           {% else %}
           <div class="clear"></div>
@@ -673,16 +668,19 @@ function getTabs(section) {
           <h4 class="group">{{ _('iptables rule-sets') }}</h4>
 
           {% if iptables %}
+            {% if iptables.date_added %}
           <details class="date">
             <strong>{{ _('Last Modified') }}</strong>
             <time datetime="{{ iptables.date_added|date:'c' }}">
               {{ iptables.date_added }}
             </time>
           </details>
+            {% endif %}
           <div class="clear"></div>
 
           {{ iptables.body|highlight:'ini' }}
 
+          {% else %}
           <div class="clear"></div>
           {% endif %}
         </div><!-- #iptables-latest -->
@@ -738,13 +736,14 @@ function getTabs(section) {
         <div id="apacheconfig-latest" class="latest">
         {% if apacheconfig %}
           <h4 class="group">{{ apacheconfig.filename }}</h4>
-
+            {% if apacheconfig.date_added %}
           <details class="date">
             <strong>{{ _('Last Modified') }}</strong>
             <time datetime="{{ apacheconfig.date_added|date:'c' }}">
               {{ apacheconfig.date_added }}
             </time>
           </details>
+            {% endif %}
           <div class="clear"></div>
 
           {{ apacheconfig_latest_body|safe }}
@@ -833,16 +832,19 @@ function getTabs(section) {
 
           <h4 class="group">{{ phpconfig.filename }}</h4>
 
+          {% if phpconfig.date_added %}
           <details class="date">
             <strong>{{ _('Last Modified') }}</strong>
             <time datetime="{{ phpconfig.date_added|date:'c' }}">
               {{ phpconfig.date_added }}
             </time>
           </details>
+          {% endif %}
           <div class="clear"></div>
 
           {{ phpconfig.body|highlight:'ini' }}
-
+        {% else %}
+          <div class="clear"></div>
         {% endif %}
         </div><!-- #phpconfig-latest -->
         <div id="phpconfig-history" class="history">

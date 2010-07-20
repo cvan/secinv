@@ -351,7 +351,7 @@ def detail(request, machine_slug):
                         'rpms': rpms_latest,
                         'rpms_versions': rpms_versions,
                         'interfaces': interfaces_latest,
-                        'interfacess_versions': interfaces_versions,
+                        'interfaces_versions': interfaces_versions,
                         'sshconfig': sshconfig_latest,
                         'sshconfig_versions': sshconfig_versions,
                         'iptables': iptables_latest,
@@ -664,7 +664,7 @@ def conf_filter_results(request, section_slug):
         a_all = MySQLConfig.objects.filter(active=True).all()
 
     for a in a_all:
-        if a.__getattribute__(parameters_fn).iteritems():
+        if a.__getattribute__(parameters_fn):
             for param, values in a.__getattribute__(parameters_fn).iteritems():
                 if param == conf_parameter or conf_parameter == '':
                     for v in values:

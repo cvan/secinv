@@ -633,11 +633,24 @@ aside#sidebar button {
     margin-top: 0.5em;
 }
 
+aside#sidebar label,
 aside#sidebar select {
-    margin-bottom: 0.5em;
-    width: 100%;
+    display: inline-table;
 }
 
+aside#sidebar label {
+    width: 40%;
+}
+
+aside#sidebar select {
+/*    width: 100%; */
+    width: 59%;
+}
+
+
+aside#sidebar button {
+    float: right;
+}
 
 
 
@@ -961,6 +974,7 @@ position:relative;
 /* Last Modified */
 h4.group {
     float: left;
+
 }
 details.date {
     float: right;

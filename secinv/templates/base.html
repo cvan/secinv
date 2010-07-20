@@ -6,7 +6,6 @@
     <meta charset="utf-8">
 
     <script src="{{ MEDIA_URL }}js/html5.js"></script>
-    <!-- allowing html5 to run in older browsers -->
 
     <link rel="shortcut icon" type="image/x-icon"
           href="{{ MEDIA_URL }}img/favicon.ico">
@@ -49,7 +48,7 @@
     <div id="wrap" class="row">
       <header>
         <figure class="logo">
-          <h1><a href="/secinv/"><strong>Sec</strong>Inv</a></h1>
+          <h1><a href="{% url machines-index %}"><strong>Sec</strong>Inv</a></h1>
         </figure>
         <nav role="navigation">
           <ul>

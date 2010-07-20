@@ -74,10 +74,13 @@ class ServerFunctions:
             return False
 
         # Get the machine IP address as the first ethernet interface.
+        '''
         for interface in ip_dict.keys():
             if interface[0:3] == 'eth':
                 self.machine_ip = ip_dict[interface]['i_ip']
                 break
+        '''
+        self.machine_ip = system_dict['sys_ip']
 
         ## Machine.
         try:
@@ -394,7 +397,7 @@ class ServerFunctions:
         ## PHP Configuration files.
         try:
             p_object = PHPConfig.objects.get(machine__id=self.machine_id)
-            print 'PHP Config exists ...'
+            #print 'PHP Config exists ...'
             if p_object.body != phpini_dict['body'] or \
                p_object.items != phpini_dict['items'] or \
                p_object.filename != phpini_dict['filename']:
@@ -406,20 +409,20 @@ class ServerFunctions:
                 with reversion.revision:
                     p_object.save()
 
-                print 'Updating PHP Config ...'
+                #print 'Updating PHP Config ...'
         except PHPConfig.DoesNotExist:
             p_object = PHPConfig.objects.create(machine=self.machine_obj,
                 body=phpini_dict['body'], items=phpini_dict['items'],
                 filename=phpini_dict['filename'])
             with reversion.revision:
                 p_object.save()
-            print 'Adding PHP Config ...'
+            #print 'Adding PHP Config ...'
 
 
         # MySQL Configuration files.
         try:
             m_object = MySQLConfig.objects.get(machine__id=self.machine_id)
-            print 'MySQL Config exists ...'
+            #print 'MySQL Config exists ...'
             if m_object.body != mycnf_dict['body'] or \
                m_object.items != mycnf_dict['items'] or \
                m_object.filename != mycnf_dict['filename']:
@@ -430,14 +433,14 @@ class ServerFunctions:
                 with reversion.revision:
                     m_object.save()
 
-                print 'Updating MySQL Config ...'
+                #print 'Updating MySQL Config ...'
         except MySQLConfig.DoesNotExist:
             m_object = MySQLConfig.objects.create(machine=self.machine_obj,
                 body=mycnf_dict['body'], items=mycnf_dict['items'],
                 filename=mycnf_dict['filename'])
             with reversion.revision:
                 m_object.save()
-            print 'Adding MySQL Config ...'
+            #print 'Adding MySQL Config ...'
 
         return True
 

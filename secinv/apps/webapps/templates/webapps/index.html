@@ -26,7 +26,9 @@
           <tr>
             <td><a href="{% url application application_id=application.id %}">{{ application.name }}</a></td>
             <td>
+            {% if application.machine.hostname %}
               <a href="{% url machines-detail machine_slug=application.machine.hostname %}">{{ application.machine.hostname }}</a>
+            {% endif %}
             </td>
             <td>
             {% if application.assessments %}
