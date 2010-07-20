@@ -39,6 +39,7 @@ class BaseSearchForm(forms.Form):
             else:
                 return "%s__icontains" % field_name
 
+
         for bit in smart_split(query_string):
             or_queries = [Q(**{construct_search(str(field_name)): bit}) for field_name in self.Meta.search_fields]
             filters.append(reduce(Q.__or__, or_queries))

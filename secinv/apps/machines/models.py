@@ -33,6 +33,7 @@ class Machine(models.Model):
                      'iptables__body',
                      'phpconfig__body', 'phpconfig__filename',
                      'mysqlconfig__body', 'mysqlconfig__filename']
+
     def __unicode__(self):
         return u'%s - %s' % (self.sys_ip, self.hostname)
 

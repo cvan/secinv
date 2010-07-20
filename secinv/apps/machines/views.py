@@ -84,11 +84,12 @@ def get_all_items(section_slug):
         a_all = MySQLConfig.objects.filter(active=True).all()
 
     for a in a_all:
-        for k, v in a.items.iteritems():
-            if k in all_items_dict:
-                all_items_dict[k] += v
-            else:
-                all_items_dict[k] = v
+        if a.items:
+            for k, v in a.items.iteritems():
+                if k in all_items_dict:
+                    all_items_dict[k] += v
+                else:
+                    all_items_dict[k] = v
 
     all_items = []
 
@@ -663,11 +664,12 @@ def conf_filter_results(request, section_slug):
         a_all = MySQLConfig.objects.filter(active=True).all()
 
     for a in a_all:
-        for param, values in a.__getattribute__(parameters_fn).iteritems():
-            if param == conf_parameter or conf_parameter == '':
-                for v in values:
-                    if conf_value == v or conf_value == '':
-                        results.append([param, v, a])
+        if a.__getattribute__(parameters_fn).iteritems():
+            for param, values in a.__getattribute__(parameters_fn).iteritems():
+                if param == conf_parameter or conf_parameter == '':
+                    for v in values:
+                        if conf_value == v or conf_value == '':
+                            results.append([param, v, a])
 
     results.sort()
 
