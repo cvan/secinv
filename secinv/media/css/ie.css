@@ -1,0 +1,14 @@
+header nav ul li,
+nav form,
+h3 em,
+.button, input[type=button], input[type=submit], button,
+.submit, .submit:visited,
+hgroup#masthead h3,
+details.differences summary,
+details.differences dl,
+details.differences dt,
+details.differences dd {
+	zoom: 1;  /* IE7 hack for display:inline-block */
+	*display: inline;
+}
+

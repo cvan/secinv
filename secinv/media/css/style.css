@@ -19,20 +19,14 @@ ul {
 }
 
 ul.hierarchy {
-/*    list-style-type: inherit; */
     margin: 1em 0;
-/*    margin-left: 1em; */
 }
 ul.hierarchy ul {
     margin: 8px 0;
 }
 ul.hierarchy ul li {
-/*    list-style-type: disc; */
     color: #333;
     margin-left: 1.5em;
-}
-ul.hierarchy li li {
-/*    list-style-type: circle; */
 }
 
 ul.hierarchy h6 a {
@@ -48,48 +42,18 @@ ul.hierarchy a:hover {
 }
 
 .none {
-/*
-    background: #eee;
-    border: #ccc 1px solid;
-*/
     color: #999;
     font-style: italic;
     font-weight: bold;
-/*    padding: 0.5em 1em; */
 }
 
 /* @group Header */
-header figure {
-/*
-    -moz-border-radius-topleft: 10px;
-    -moz-border-radius-topright: 10px;
-    -webkit-border-top-left-radius: 10px;
-    -webkit-border-top-right-radius: 10px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-
-    background: #008cc2;
-    background: -webkit-gradient(linear, left top, left bottom, from(#4dcce7), to(#3acf2a));
-*/
-/*    background: -moz-linear-gradient(top, #e0f5fc, #73d2f3); */
-/*    background: -moz-linear-gradient(top, #fff 10%, #ededed 50%, #73d2f3); */
-/*    background: -moz-linear-gradient(top, #fff 10%, #ededed 50%, #73d2f3); */
-/*
-    background: linear-gradient(top, #eee, #008cc2);
-*/
-
-/*    padding: 20px 0; */
-}
-
 h1 {
     line-height: 1.3;
 }
 header .logo {
-    font-size: 1.5em;
-/*    font-weight: 700; */
-    font-family: "American Typewriter", Georgia, serif;
+    font: 1.5em "American Typewriter", Georgia, serif;
     text-shadow: 0 2px 1px #999;
-    /*filter: Shadow(Color=#666666, Direction=135, Strength=3);*/
 }
 header .logo a {
     display: block;
@@ -145,30 +109,6 @@ header nav ul li {
     display: inline-block;
     margin-left: 0.5em;
 }
-/*
-nav ul li a,
-nav ul li a:link,
-nav ul li a:visited {
-    background-color: #9dd1e6;
-    border: #75cae9 1px solid;
-    margin-bottom: -2px;
-    display: block;
-    color: #fff;
-    font-weight: bold;
-    font-size: 1.2em;
-    text-decoration: none;
-	text-shadow: 0 1px 0 #0da8d5;
-    padding: 8px 16px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    box-shadow: inset 0 1px 3px #fff, inset 0 -2px #cbe6f2, 0 0 3px #8ec1da;
-    -o-box-shadow: inset 0 1px 3px #fff, inset 0 -2px #cbe6f2, 0 0 3px #8ec1da;
-    -webkit-box-shadow: inset 0 1px 3px #fff, inset 0 -1px #cbe6f2, 0 0 3px #8ec1da;
-    -moz-box-shadow: inset 0 1px 3px #fff, inset 0 -1px #cbe6f2, 0 0 3px #8ec1da;
-}
-*/
-
 
 body.machines header nav ul li.machines a,
 body.machines header nav ul li.machines a:hover,
@@ -306,6 +246,7 @@ footer a:hover {
 
 /* @group Headings */
 
+/* (Adapted from AMO) */
 /* size headings using classic scale of 16, 18, 24, 36 */
 
 h1 {
@@ -526,23 +467,6 @@ table.view th {
 
 
 /* @group Forms */
-
-/*
-input[type=search] {
-    border: #000 1px solid;
-    border-radius: 1.5em;
-    padding: 0.5em 1em;
-    -moz-border-radius: 1.5em;
-    -webkit-border-radius: 1.5em;
-
-    background-color: #ddeef6;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
-    -o-box-shadow: inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
-    -webkit-box-shadow: inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
-    -moz-box-shadow: inset 0 1px 3px #fff, inset 0 -15px #cbe6f2, 0 0 3px #8ec1da;
-}
-*/
 header nav form {
     position: absolute;
     right: 10px;
@@ -568,8 +492,6 @@ fieldset label {
 
 nav form {
 	display: inline-block;
-	zoom: 1;  /* ie7 hack for display:inline-block */
-	*display: inline;
 }
 header form label {
     display: block;
@@ -911,7 +833,7 @@ h4 span {
     margin-left: 0;
     margin-right: -2px;
 /*    min-height: 425px; */
-    min-height: 775px;
+    min-height: 550px;
     overflow: visible;
 }
 

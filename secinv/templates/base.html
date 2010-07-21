@@ -5,7 +5,7 @@
     <title>{% block head_title %}{{ _('SecInv') }}{% endblock %}</title>
     <meta charset="utf-8">
 
-    <script src="{{ MEDIA_URL }}js/html5.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/html5.js"></script>
 
     <link rel="shortcut icon" type="image/x-icon"
           href="{{ MEDIA_URL }}img/favicon.ico">
@@ -19,30 +19,22 @@
     <link rel="stylesheet" type="text/css"
           href="{{ MEDIA_URL }}css/style.css" media="screen">
     <link rel="stylesheet" type="text/css"
-          href="{{ MEDIA_URL }}css/smoothness/jquery-ui-1.8.1.custom.css">
+          href="{{ MEDIA_URL }}css/smoothness/jquery-ui-1.8.1.custom.css"
+          media="screen">
+    <link rel="stylesheet" type="text/css"
+          href="{{ MEDIA_URL }}css/ui.tabs.css" media="screen">
 
-	<link rel="stylesheet" type="text/css"
-	      href="{{ MEDIA_URL }}css/jquery.tablescroll.css">
-	<link rel="stylesheet" type="text/css"
-	      href="{{ MEDIA_URL }}css/ui.selectmenu.css">
-	<link rel="stylesheet" type="text/css"
-	      href="{{ MEDIA_URL }}css/ui.tabs.css">
-
-	<link rel="stylesheet" type="text/css"
-	      href="{{ MEDIA_URL }}css/tables.css">
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" type="text/css"
+          href="{{ MEDIA_URL }}css/ie.css" media="screen">
+    <![endif]-->
 
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/jquery-1.4.2.min.js"></script>
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/jquery-ui-1.8.1.custom.min.js"></script>
-
-    <script type="text/javascript"
-            src="{{ MEDIA_URL }}js/jquery.tablescroll.js"></script>
-    <script type="text/javascript"
-            src="{{ MEDIA_URL }}js/ui.selectmenu.js"></script>
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/main.js"></script>
-
   </head>
   <body class="{% block body_class %}{% endblock %}">
     <div id="wrap" class="row">
@@ -55,22 +47,12 @@
             <li class="machines">
               <a href="{% url machines-index %}" class="button black pill">{{ _('Machines') }}</a>
             </li>
-            <!--
-            <li class="devices">
-              <a href="{% url machines-index %}" class="button black pill">{{ _('Devices') }}</a>
-            </li>
-            -->
             <li class="webapps">
               <a href="{% url webapps-index %}" class="button black pill">{{ _('Web Applications') }}</a>
             </li>
             <li class="profiles">
               <a href="{% url machines-index %}" class="button black pill">{{ _('Vector Profiles') }}</a>
             </li>
-            <!--
-            <li class="config">
-              <a href="{% url machines-index %}" class="button black pill">{{ _('Configuration Files') }}</a>
-            </li>
-            -->
           </ul>
           <form action="{% url machines-search %}" method="get">
             <label for="q">{{ _('Search') }}</label>
@@ -97,10 +79,10 @@
 
     <footer class="row">
       <section class="col_10 col align_left"> <!-- col_8 -->
-        &nbsp;&copy; Copyright 2010, Mozilla Corporation. All rights reserved.
+        &copy; {{ _('Copyright 2010, Mozilla Corporation. All rights reserved.') }}
       </section>
       <section class="col_10 col align_right"> <!-- col_8 -->
-        <a href="">Licensed under MPL 1.1 / GPL 2.0 / LGPL 2.1</a>
+        <a href="">{{ _('Licensed under MPL 1.1 / GPL 2.0 / LGPL 2.1') }}</a>
       </section>
     </footer>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/actions.js"></script>
