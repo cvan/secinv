@@ -1,1 +1,21 @@
-README.
+SecInv
+======
+
+
+Dependencies
+------------
+
+* Apache 2 w/ mod_python (or similar)
+* MySQLdb-1.2.1p2 or newer
+* Python 2.6
+* django-reversion
+* pygments
+* google-diff-match-patch
+
+
+Notes
+-----
+Create soft link for admin media.
+
+ln -s /usr/lib/python2.6/site-packages/django/contrib/admin/media admin-media
+
