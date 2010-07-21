@@ -12,10 +12,3 @@ Dependencies
 * pygments
 * google-diff-match-patch
 
-
-Notes
------
-Create soft link for admin media.
-
-ln -s /usr/lib/python2.6/site-packages/django/contrib/admin/media admin-media
-

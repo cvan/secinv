@@ -394,28 +394,29 @@ class ServerFunctions:
 
 
         ## PHP Configuration files.
-        try:
-            p_object = PHPConfig.objects.get(machine__id=self.machine_id)
-            #print 'PHP Config exists ...'
-            if p_object.body != phpini_dict['body'] or \
-               p_object.items != phpini_dict['items'] or \
-               p_object.filename != phpini_dict['filename']:
-
-                p_object.body = phpini_dict['body']
-                p_object.items = phpini_dict['items']
-                p_object.filename = phpini_dict['filename']
-                p_object.date_added = datetime.datetime.now()
+        if phpini_dict['filename']:
+            try:
+                p_object = PHPConfig.objects.get(machine__id=self.machine_id)
+                #print 'PHP Config exists ...'
+                if p_object.body != phpini_dict['body'] or \
+                   p_object.items != phpini_dict['items'] or \
+                   p_object.filename != phpini_dict['filename']:
+    
+                    p_object.body = phpini_dict['body']
+                    p_object.items = phpini_dict['items']
+                    p_object.filename = phpini_dict['filename']
+                    p_object.date_added = datetime.datetime.now()
+                    with reversion.revision:
+                        p_object.save()
+    
+                    #print 'Updating PHP Config ...'
+            except PHPConfig.DoesNotExist:
+                p_object = PHPConfig.objects.create(machine=self.machine_obj,
+                    body=phpini_dict['body'], items=phpini_dict['items'],
+                    filename=phpini_dict['filename'])
                 with reversion.revision:
                     p_object.save()
-
-                #print 'Updating PHP Config ...'
-        except PHPConfig.DoesNotExist:
-            p_object = PHPConfig.objects.create(machine=self.machine_obj,
-                body=phpini_dict['body'], items=phpini_dict['items'],
-                filename=phpini_dict['filename'])
-            with reversion.revision:
-                p_object.save()
-            #print 'Adding PHP Config ...'
+                #print 'Adding PHP Config ...'
 
 
         # MySQL Configuration files.

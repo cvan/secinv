@@ -1,4 +1,4 @@
-from ..fulltext.search import BaseSearchForm
+from ..search.search import BaseSearchForm
 from django.db.models import Q
 from django import forms
 from .models import Machine

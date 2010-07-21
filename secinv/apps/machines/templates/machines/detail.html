@@ -828,7 +828,7 @@ function getTabs(section) {
           <li><a href="#phpconfig-history" class="history">{{ _('History') }}</a></li>
         </ul>
         <div id="phpconfig-latest" class="latest">
-        {% if phpconfig %}
+        {% if phpconfig and phpconfig.filename %}
 
           <h4 class="group">{{ phpconfig.filename }}</h4>
 
@@ -898,7 +898,7 @@ function getTabs(section) {
           <li><a href="#mysqlconfig-history" class="history">{{ _('History') }}</a></li>
         </ul>
         <div id="mysqlconfig-latest" class="latest">
-        {% if mysqlconfig %}
+        {% if mysqlconfig and mysqlconfig.filename %}
 
           <h4 class="group">{{ mysqlconfig.filename }}</h4>
 
