@@ -1,4 +1,7 @@
 #from django.db import models
+"""
+Adapted from django-simplesearch (http://gist.github.com/291442)
+"""
 
 from django.db.models import Q
 from django import forms
