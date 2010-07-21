@@ -6,6 +6,12 @@ import datetime
 import os
 import sys
 
+def all_zeros(txt):
+    if not type(txt) is str:
+        raise ValueError
+    if not txt:
+        return False
+    return txt and not int(float.fromhex(txt.strip().replace(':', '').replace('-', '')))
 
 def diff_list(l_old, l_new):
     """Creates a new dictionary representing a difference between two lists."""
@@ -31,9 +37,9 @@ try:
 except ImportError:
     sys.exit('Error: Could not import Django settings')
 
-# To suppress MySQLdb warning.
+# To suppress MySQLdb warnings.
 import warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings('ignore')
 
 from django.core.management import setup_environ
 setup_environ(settings)
@@ -61,8 +67,7 @@ class ServerFunctions:
         Check if client's authorization token is valid.
         """
         try:
-            a = AuthToken.objects.get(token=auth_token, active=True)
-            if a:
+            if AuthToken.objects.get(token=auth_token, active=True):
                 self.is_authenticated = True
                 return True
         except AuthToken.DoesNotExist:
@@ -77,7 +82,7 @@ class ServerFunctions:
         '''
         for interface in ip_dict.keys():
             if interface[0:3] == 'eth':
-                self.machine_ip = ip_dict[interface]['i_ip']
+                self.machine_ip = i_dict['i_ip']
                 break
         '''
         self.machine_ip = system_dict['sys_ip']
@@ -130,16 +135,16 @@ class ServerFunctions:
 
 
         ## Interfaces.
-        for interface in ip_dict.keys():
-            if ip_dict[interface]['i_mac'] in ('00:00:00:00',
-                                               '00:00:00:00:00:00'):
-                ip_dict[interface]['i_mac'] = ''
+        for interface, i_dict in ip_dict.iteritems():
+            # Clean up a null MAC address.
+            if all_zeros(i_dict['i_mac']):
+                i_dict['i_mac'] = ''
 
             # If all fields are empty, then device is inactive -- so do not
             # insert a row.
-            if ip_dict[interface]['i_ip'] == '' and \
-               ip_dict[interface]['i_mac'] == '' and \
-               ip_dict[interface]['i_mask'] == '':
+            if i_dict['i_ip'] == '' and \
+               i_dict['i_mac'] == '' and \
+               i_dict['i_mask'] == '':
                 continue
 
             # If interface already exists in table, update accordingly.
@@ -147,29 +152,32 @@ class ServerFunctions:
                 i_object = Interface.objects.filter(machine__id=self.machine_id,
                                                     i_name=interface).latest()
 
-                if i_object.i_ip != ip_dict[interface]['i_ip'] or \
-                   i_object.i_mac != ip_dict[interface]['i_mac'] or \
-                   i_object.i_mask != ip_dict[interface]['i_mask'] or \
+                if i_object.i_ip != i_dict['i_ip'] or \
+                   i_object.i_mac != i_dict['i_mac'] or \
+                   i_object.i_mask != i_dict['i_mask'] or \
                    not i_object.active:
 
                     i_object.machine = self.machine_obj
                     i_object.i_name = interface
-                    i_object.i_ip = ip_dict[interface]['i_ip']
-                    i_object.i_mac = ip_dict[interface]['i_mac']
-                    i_object.i_mask = ip_dict[interface]['i_mask']
+                    i_object.i_ip = i_dict['i_ip']
+                    i_object.i_mac = i_dict['i_mac']
+                    i_object.i_mask = i_dict['i_mask']
                     i_object.active = True
                     i_object.date_added = datetime.datetime.now()
                     with reversion.revision:
                         i_object.save()
 
             except Interface.DoesNotExist:
+                pass
+                '''
                 i_new = Interface.objects.create(machine=self.machine_obj,
                     i_name=interface,
-                    i_ip=ip_dict[interface]['i_ip'],
-                    i_mac=ip_dict[interface]['i_mac'],
-                    i_mask=ip_dict[interface]['i_mask'])
+                    i_ip=i_dict['i_ip'],
+                    i_mac=i_dict['i_mac'],
+                    i_mask=i_dict['i_mask'])
                 with reversion.revision:
                     i_new.save()
+                '''
 
         # Get latest interfaces (select by distinct interface name).
         distinct_interfaces = Interface.objects.filter(
@@ -242,17 +250,8 @@ class ServerFunctions:
                 s_object.date_added = datetime.datetime.now()
                 with reversion.revision:
                     s_object.save()
-
-                #s_dict = {'machine': self.machine_obj,
-                #          'processes': csv_procs,
-                #          'ports': csv_ports}
-                #s_object = Services.objects.create(**s_dict)
-
+ 
         except Services.DoesNotExist:
-            #s_dict = {'machine': self.machine_obj,
-            #          'k_processes': csv_procs,
-            #          'v_ports': csv_ports}
-            #s_object = Services.objects.create(**s_dict)
             sys_object = Services.objects.create(machine=self.machine_obj,
                                                  k_processes=csv_procs,
                                                  v_ports=csv_ports)

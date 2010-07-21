@@ -193,7 +193,8 @@ class Interface(models.Model):
     machine = models.ForeignKey('Machine')
     i_name = models.CharField(_('interface name'), max_length=50)
     i_ip = models.IPAddressField(_('IP address'), blank=True, null=True)
-    i_mac = models.CharField(_('MAC address'), max_length=17, blank=True, null=True)
+    #i_mac = models.CharField(_('MAC address'), max_length=17, blank=True, null=True)
+    i_mac = models.CharField(_('MAC address'), max_length=255, blank=True, null=True)
     i_mask = models.IPAddressField(_('netmask'), blank=True, null=True)
     active = models.BooleanField(_('active'), default=1)
     date_added = models.DateTimeField(_('date added'),
