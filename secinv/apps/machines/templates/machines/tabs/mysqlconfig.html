@@ -21,6 +21,8 @@
 
           {{ mysqlconfig.body|highlight:'ini' }}
 
+        {% else %}
+          <p class="none">{{ _('Not available') }}</p>
         {% endif %}
         </div><!-- #mysqlconfig-latest -->
         <div id="mysqlconfig-history" class="history">

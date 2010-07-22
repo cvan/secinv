@@ -23,7 +23,7 @@
 
           {{ phpconfig.body|highlight:'ini' }}
         {% else %}
-          <div class="clear"></div>
+          <p class="none">{{ _('Not available') }}</p>
         {% endif %}
         </div><!-- #phpconfig-latest -->
         <div id="phpconfig-history" class="history">

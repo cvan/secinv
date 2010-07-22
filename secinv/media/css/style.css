@@ -46,6 +46,10 @@ ul.hierarchy a:hover {
     font-style: italic;
     font-weight: bold;
 }
+p.none {
+    margin: 1em 0;
+    text-align: center;
+}
 
 /* @group Header */
 h1 {
