@@ -1,0 +1,68 @@
+{% load i18n %}
+{% load machine_extras %}
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#iptables-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#iptables-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="iptables-latest" class="latest">
+          <h4 class="group">{{ _('iptables rule-sets') }}</h4>
+
+          {% if iptables %}
+            {% if iptables.date_added %}
+          <details class="date">
+            <strong>{{ _('Last Modified') }}</strong>
+            <time datetime="{{ iptables.date_added|date:'c' }}">
+              {{ iptables.date_added }}
+            </time>
+          </details>
+            {% endif %}
+          <div class="clear"></div>
+
+          {{ iptables.body|highlight:'ini' }}
+
+          {% else %}
+          <div class="clear"></div>
+          {% endif %}
+        </div><!-- #iptables-latest -->
+        <div id="iptables-history" class="history">
+
+          <table>
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th class="cmp">{{ _('Compare against') }}</th>
+                <th>{{ _('Revision') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for ipt_ver in iptables_versions %}
+              <tr>
+                <td class="cmp">
+                  {% if ipt_ver.is_newest %}{{ _('(current)') }}{% else %}
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='iptables', version_number=ipt_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
+                  {% endif %}
+
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='iptables', version_number=ipt_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
+                </td>
+                <td>
+                  <!--{{ _('Version') }} #-->{{ ipt_ver.version }}
+                </td>
+                <td class="timestamp">
+                  <time datetime="{{ ipt_ver.fields.date_added|date:'c' }}">
+                    {{ ipt_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #iptables-history -->
+      </section>

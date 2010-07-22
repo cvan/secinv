@@ -1,0 +1,80 @@
+{% load i18n %}
+{% load machine_extras %}
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#rpms-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#rpms-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="rpms-latest" class="latest">
+          <h4 class="group">{{ _('Installed RPMs') }}</h4>
+
+          {% if rpms %}
+            {% if rpms.date_added %}
+          <details class="date">
+            <strong>{{ _('Last Modified') }}</strong>
+            <time datetime="{{ rpms.date_added|date:'c' }}">
+              {{ rpms.date_added }}
+            </time>
+          </details>
+            {% endif %}
+          <div class="clear"></div>
+
+          <ul>
+            {% for rpm in rpms.installed %}
+            <li>{{ rpm }}</li>
+            {% endfor %}
+          </ul>
+
+          {% else %}
+          <div class="clear"></div>
+          {% endif %}
+        </div><!-- #rpms-latest -->
+        <div id="rpms-history" class="history">
+
+          <table>
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th>{{ _('Installed') }}</th>
+                <th>{{ _('Removed') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for rpms_ver in rpms_versions %}
+              <tr>
+                <td>
+                {% if rpms_ver.diff.pair.diff.added %}
+                  <ul>
+                  {% for rpm in rpms_ver.diff.pair.diff.added %}
+                    <li><ins>{{ rpm }}</ins></li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+                </td>
+                <td>
+                {% if rpms_ver.diff.pair.diff.removed %}
+                  <ul>
+                  {% for rpm in rpms_ver.diff.pair.diff.removed %}
+                    <li><del class="visible">{{ rpm }}</del></li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+                </td>
+                <td class="timestamp">
+                  <time datetime="{{ rpms_ver.fields.date_added|date:'c' }}">
+                    {{ rpms_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #rpms-history -->
+      </section>

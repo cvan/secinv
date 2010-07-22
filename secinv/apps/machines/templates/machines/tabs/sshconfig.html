@@ -1,0 +1,95 @@
+{% load i18n %}
+{% load machine_extras %}
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#sshconfig-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#sshconfig-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="sshconfig-latest" class="latest">
+
+          <table class="nested">
+            <caption>{{ _('Current') }}</caption>
+            <thead>
+              <tr>
+                <th class="pair_name">{{ _('Parameter') }}</th>
+                <th class="pair_value">{{ _('Value') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% if sshconfig %}
+              <tr>
+                <td colspan="2">
+                  <table>
+                  {% for process, port in sshconfig.version_changes.diff.pair.merged.items %}
+                    <tr>
+                      <td class="pair_name">
+                        {% differ sshconfig.version_changes.diff.pair.diff process %}{{ process }}{% enddiffer %}
+                      </td>
+                      <td class="pair_port">
+                        {% differ sshconfig.version_changes.diff.pair.diff process %}{{ port }}{% enddiffer %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  </table>
+                </td>
+                <td class="timestamp">
+                  <time datetime="{{ sshconfig.date_added|date:'c' }}">
+                    {{ sshconfig.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endif %}
+            </tbody>
+          </table>
+
+        </div><!-- #sshconfig-latest -->
+        <div id="sshconfig-history" class="history">
+
+          <table class="nested">
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th class="pair_name">{{ _('Parameter') }}</th>
+                <th class="pair_value">{{ _('Value') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for sshconfig_ver in sshconfig_versions %}
+              <tr>
+                <td colspan="2">
+                  <table>
+                  {% for process, port in sshconfig_ver.diff.pair.merged.items %}
+                    <tr>
+                      <td class="pair_name">
+                        {% differ sshconfig_ver.diff.pair.diff process %}{{ process }}{% enddiffer %}
+                      </td>
+                      <td class="pair_port">
+                        {% differ sshconfig_ver.diff.pair.diff process %}{{ port }}{% enddiffer %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  </table>
+                </td>
+                <td class="timestamp">
+                  <time datetime="{{ sshconfig_ver.fields.date_added|date:'c' }}">
+                    {{ sshconfig_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #sshconfig-history -->
+      </section>

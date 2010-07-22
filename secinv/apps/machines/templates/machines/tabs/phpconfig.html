@@ -1,0 +1,68 @@
+{% load i18n %}
+{% load machine_extras %}
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#phpconfig-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#phpconfig-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="phpconfig-latest" class="latest">
+        {% if phpconfig and phpconfig.filename %}
+
+          <h4 class="group">{{ phpconfig.filename }}</h4>
+
+          {% if phpconfig.date_added %}
+          <details class="date">
+            <strong>{{ _('Last Modified') }}</strong>
+            <time datetime="{{ phpconfig.date_added|date:'c' }}">
+              {{ phpconfig.date_added }}
+            </time>
+          </details>
+          {% endif %}
+          <div class="clear"></div>
+
+          {{ phpconfig.body|highlight:'ini' }}
+        {% else %}
+          <div class="clear"></div>
+        {% endif %}
+        </div><!-- #phpconfig-latest -->
+        <div id="phpconfig-history" class="history">
+
+          <table>
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th class="cmp">{{ _('Compare against') }}</th>
+                <!--<th>{{ _('Filename') }}</th>-->
+                <th>{{ _('Revision') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for pc_ver in phpconfig_versions %}
+              <tr>
+                <td class="cmp">
+                  {% if pc_ver.is_newest %}{{ _('(current)') }}{% else %}
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='phpconfig', version_number=pc_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
+                  {% endif %}
+
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='phpconfig', version_number=pc_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
+                </td>
+                <!--<td>{{ pc_ver.fields.filename }}</td>-->
+                <td>{{ pc_ver.version }}</td>
+                <td class="timestamp">
+                  <time datetime="{{ pc_ver.fields.date_added|date:'c' }}">
+                    {{ pc_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #phpconfig-history -->
+      </section>

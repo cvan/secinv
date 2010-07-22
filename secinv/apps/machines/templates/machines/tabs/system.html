@@ -1,0 +1,97 @@
+{% load i18n %}
+{% load machine_extras %}
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#system-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#system-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="system-latest" class="latest">
+
+          <table>
+            <caption>{{ _('Current') }}</caption>
+            <thead>
+              <tr>
+                <th>{{ _('Kernel release') }}</th>
+                <th>{{ _('RedHat release') }}</th>
+                <th>{{ _('NFS') }}</th>
+                <th>{{ _('IP forwarding') }}</th>
+                <th>{{ _('iptables') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  {% differ system.version_changes.diff 'kernel_rel' %}{{ system.kernel_rel }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ system.version_changes.diff 'rh_rel' %}{{ system.rh_rel }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ system.version_changes.diff 'nfs' %}{{ system.nfs|enum:'Yes,No' }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ system.version_changes.diff 'ip_fwd' %}{{ system.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ system.version_changes.diff 'iptables' %}{{ system.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
+                </td>
+                <td class="timestamp">
+                  <time datetime="{{ system.date_added|date:'c' }}">
+                    {{ system.date_added }}
+                  </time>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div><!-- #system-latest -->
+        <div id="system-history" class="history">
+
+          <table>
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th>{{ _('Kernel release') }}</th>
+                <th>{{ _('RedHat release') }}</th>
+                <th>{{ _('NFS') }}</th>
+                <th>{{ _('IP forwarding') }}</th>
+                <th>{{ _('iptables') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for sys_ver in system_versions %}
+              <tr>
+                <td>
+                  {% differ sys_ver.diff 'kernel_rel' %}{{ sys_ver.fields.kernel_rel }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ sys_ver.diff 'rh_rel' %}{{ sys_ver.fields.rh_rel }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ sys_ver.diff 'nfs' %}{{ sys_ver.fields.nfs|enum:'Yes,No' }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ sys_ver.diff 'ip_fwd' %}{{ sys_ver.fields.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
+                </td>
+                <td>
+                  {% differ sys_ver.diff 'iptables' %}{{ sys_ver.fields.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
+                </td>
+                <td class="timestamp">
+                  <time datetime="{{ sys_ver.fields.date_added|date:'c' }}">
+                    {{ sys_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #system-history -->
+      </section>

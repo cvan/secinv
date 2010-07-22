@@ -1,0 +1,79 @@
+{% load i18n %}
+{% load machine_extras %}
+
+      <section class="tabs">
+        <ul>
+          <li><a href="#interfaces-latest" class="latest">{{ _('Current') }}</a></li>
+          <li><a href="#interfaces-history" class="history">{{ _('History') }}</a></li>
+        </ul>
+        <div id="interfaces-latest" class="latest">
+
+          <table>
+            <caption>{{ _('Current') }}</caption>
+            <thead>
+              <tr>
+                <th>{{ _('Interface name') }}</th>
+                <th>{{ _('IP address') }}</th>
+                <th>{{ _('MAC address') }}</th>
+                <th>{{ _('Netmask') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+          {% for interface in interfaces %}
+              <tr>
+                <td>{% differ interface.version_changes.diff 'i_name' %}{{ interface.i_name }}{% enddiffer %}</td>
+                <td>{% differ interface.version_changes.diff 'i_ip' %}{{ interface.i_ip }}{% enddiffer %}</td>
+                <td>{% differ interface.version_changes.diff 'i_mac' %}{{ interface.i_mac }}{% enddiffer %}</td>
+                <td>{% differ interface.version_changes.diff 'i_mask' %}{{ interface.i_mask }}{% enddiffer %}</td>
+                <td class="timestamp">
+                  <time datetime="{{ interface.date_added|date:'c' }}">
+                    {{ interface.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #interfaces-latest -->
+        <div id="interfaces-history" class="history">
+
+          <table>
+            <caption>{{ _('History') }}</caption>
+            <thead>
+              <tr>
+                <th>{{ _('Interface name') }}</th>
+                <th>{{ _('IP address') }}</th>
+                <th>{{ _('MAC address') }}</th>
+                <th>{{ _('Netmask') }}</th>
+                <th class="timestamp">{{ _('Modified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for interface_ver in interfaces_versions %}
+              <tr>
+                <td>{% differ interface_ver.diff 'i_name' %}{{ interface_ver.fields.i_name }}{% enddiffer %}</td>
+                <td>{% differ interface_ver.diff 'i_ip' %}{{ interface_ver.fields.i_ip }}{% enddiffer %}</td>
+                <td>{% differ interface_ver.diff 'i_mac' %}{{ interface_ver.fields.i_mac }}{% enddiffer %}</td>
+                <td>{% differ interface_ver.diff 'i_mask' %}{{ interface_ver.fields.i_mask }}{% enddiffer %}</td>
+                <td class="timestamp">
+                  <time datetime="{{ interface_ver.fields.date_added|date:'c' }}">
+                    {{ interface_ver.fields.date_added }}
+                  </time>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+        </div><!-- #interfaces-history -->
+      </section>
