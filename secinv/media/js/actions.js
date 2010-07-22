@@ -40,7 +40,7 @@ $(function() {
 
 
 function doPopulate(section) {
-    $.getJSON(urls[section][0], function(data) {
+    $.getJSON(filterURLs[section][0], function(data) {
         var foundSelected = false;
 
         $.each(data, function(key, value) {
@@ -54,6 +54,12 @@ function doPopulate(section) {
             $('select#' + section + '-parameter').append("<option" + selected + ">" + value + "</option>\n");
         });
 
+        // Remove currently selected option
+        if ($('select#' + section + '-parameter option[selected]:first-child').length) {
+            $('select#' + section + '-parameter option:first-child').remove();
+            $('select#' + section + '-parameter').prepend('<option value="">*</option>\n');
+        }
+
         if (foundSelected)
             doChange(section);
     });
@@ -65,7 +71,7 @@ function doChange(section) {
     if (paramVal == '')
         $('select#' + section + '-value').html('<option value="">*</option>\n');
     else {
-        $.post(urls[section][1], { parameter: paramVal }, function(data) {
+        $.post(filterURLs[section][1], { parameter: paramVal }, function(data) {
 
             var newOptions = '<option value="">*</option>\n';
 

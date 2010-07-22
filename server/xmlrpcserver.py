@@ -52,6 +52,7 @@ class SecureXMLRPCServer(BaseHTTPServer.HTTPServer,
         self.server_bind()
         self.server_activate()
 
+
 class RequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
     """Secure XML-RPC request handler class."""
     def __init__(self, request, client_address, server):

@@ -320,11 +320,14 @@ if not reversion.is_registered(Services):
 
 class SSHConfig(models.Model):
     machine = models.ForeignKey('Machine')
-    k_parameters = models.TextField(_('parameters'), blank=True, null=True)
-    v_values = models.TextField(_('values'), blank=True, null=True)
+    body = CompressedTextField(_('contents'), blank=True, null=True)
+    filename = models.CharField(_('filename'), max_length=255, blank=True,
+                                null=True)
+    items = SerializedTextField(_('items'), blank=True, null=True)
+    active = models.BooleanField(_('status'), default=1)
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
-
+    '''
     def version_changes(self):
         """
         Create a dictionary of the differences between the current and previous
@@ -337,15 +340,17 @@ class SSHConfig(models.Model):
             s_v = get_version_diff(s_latest, '\n')
             if s_v:
                 s_diff = s_v[0]
-            else:
-                s_diff = {'empty': 'itis'}
         except SSHConfig.DoesNotExist:
             pass
 
         return s_diff
+    '''
 
     def __unicode__(self):
-        return u'%s - %s' % (self.k_parameters, self.v_values)
+        return u'%s - %s' % (self.machine.hostname, self.filename)
+
+    #def __unicode__(self):
+    #    return u'%s - %s' % (self.k_parameters, self.v_values)
 
     class Meta:
         verbose_name = _('SSH Configuration')
@@ -487,7 +492,7 @@ class PHPConfig(models.Model):
     body = CompressedTextField(_('contents'), blank=True, null=True)
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
-    items = SerializedTextField()
+    items = SerializedTextField(_('items'), blank=True, null=True)
     active = models.BooleanField(_('status'), default=1)
 
     date_added = models.DateTimeField(_('date added'),
@@ -515,7 +520,7 @@ class MySQLConfig(models.Model):
     body = CompressedTextField(_('contents'), blank=True, null=True)
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
-    items = SerializedTextField()
+    items = SerializedTextField(_('items'), blank=True, null=True)
     active = models.BooleanField(_('status'), default=1)
 
     date_added = models.DateTimeField(_('date added'),

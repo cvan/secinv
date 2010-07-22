@@ -21,8 +21,8 @@ from reversion.models import Version
 import re
 import json
 
-DIFF_SECTION_SLUGS = ('iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig')
-CONFIG_SECTIONS = ('apacheconfig', 'phpconfig', 'mysqlconfig')
+DIFF_SECTION_SLUGS = ('iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig', 'sshconfig')
+CONFIG_SECTIONS = ('apacheconfig', 'phpconfig', 'mysqlconfig', 'sshconfig')
 
 def get_all_domains():
     all_domains = []
@@ -82,6 +82,8 @@ def get_all_items(section_slug):
         a_all = PHPConfig.objects.filter(active=True).all()
     elif section_slug == 'mysqlconfig':
         a_all = MySQLConfig.objects.filter(active=True).all()
+    elif section_slug == 'sshconfig':
+        a_all = SSHConfig.objects.filter(active=True).all()
 
     for a in a_all:
         if a.items:
@@ -112,7 +114,8 @@ def index(request):
                         'all_domains': get_all_domains(),
                         'all_directives': get_all_directives(),
                         'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),}
+                        'all_mysql_items': get_all_items('mysqlconfig'),
+                        'all_ssh_items': get_all_items('sshconfig'),}
     return render_to_response('machines/index.html', template_context,
                               context_instance=RequestContext(request))
 
@@ -182,7 +185,7 @@ def detail(request, machine_slug):
 
         # Get historical versions of Services objects.
         services_versions = get_version_diff(services_history[0], ',')
-    
+
 
 
     ## Interfaces.
@@ -208,7 +211,7 @@ def detail(request, machine_slug):
                                      reverse=True)
 
 
-    ## SSHConfig.
+    '''
     sshconfig_latest = []
     sshconfig_versions = []
     sshconfig_history = SSHConfig.objects.filter(machine__id=m.id).order_by(
@@ -218,6 +221,18 @@ def detail(request, machine_slug):
         sshconfig_latest = sshconfig_history[0]
 
         sshconfig_versions = get_version_diff(sshconfig_history[0], '\n')
+    '''
+
+    ## SSH configuration file.
+    sshconfig_latest = []
+    sshconfig_versions = []
+    sshconfig_history = SSHConfig.objects.filter(machine__id=m.id, active=True
+        ).order_by('-date_added').all()
+
+    if sshconfig_history.exists():
+        sshconfig_latest = sshconfig_history[0]
+
+        sshconfig_versions = get_version_diff_field(sshconfig_history[0], 'body')
 
 
     # RPMs.
@@ -232,7 +247,7 @@ def detail(request, machine_slug):
         rpms_date_added = rpms_history[0].date_added
 
         rpms_versions = get_version_diff(rpms_history[0], '\n')
-    
+
 
     rpms_latest = {'installed': rpms_list, 'date_added': rpms_date_added}
 
@@ -288,7 +303,7 @@ def detail(request, machine_slug):
                 ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
                 if len(ls) == 2 and ls[0].lower() == 'include':
                     # TODO: in Apache Config Parser, handle ``quoted`` Include filenames.
-    
+
                     try:
                         a = ApacheConfig.objects.get(machine__id=m.id,
                                                      filename__endswith=ls[1],
@@ -297,7 +312,7 @@ def detail(request, machine_slug):
                     except (ApacheConfig.DoesNotExist,
                             ApacheConfig.MultipleObjectsReturned):
                         i_fn = '%s' % ls[1]
-    
+
                     line = '<span class="nb">%s</span> %s' % (ls[0], i_fn)
                 body += '%s\n' % line
             apacheconfig_latest_body = body
@@ -370,7 +385,8 @@ def detail(request, machine_slug):
                         'all_domains': get_all_domains(),
                         'all_directives': get_all_directives(),
                         'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),}
+                        'all_mysql_items': get_all_items('mysqlconfig'),
+                        'all_ssh_items': get_all_items('sshconfig'),}
     return render_to_response('machines/detail.html', template_context,
                               context_instance=RequestContext(request))
 
@@ -397,7 +413,8 @@ def search(request):
                         'all_domains': get_all_domains(),
                         'all_directives': get_all_directives(),
                         'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),}
+                        'all_mysql_items': get_all_items('mysqlconfig'),
+                        'all_ssh_items': get_all_items('sshconfig'),}
     return render_to_response('machines/search.html', template_context,
         context_instance=RequestContext(request))
 
@@ -543,7 +560,8 @@ def diff(request, machine_slug, section_slug, version_number,
                         'all_domains': get_all_domains(),
                         'all_directives': get_all_directives(),
                         'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),}
+                        'all_mysql_items': get_all_items('mysqlconfig'),
+                        'all_ssh_items': get_all_items('sshconfig'),}
     return render_to_response('machines/diff.html', template_context,
                               context_instance=RequestContext(request))
 
@@ -583,7 +601,7 @@ def conf_filter_parameters_keys(request, section_slug):
 
     if section_slug == 'apacheconfig':
         all_params = get_all_directives()
-    elif section_slug in ('phpconfig', 'mysqlconfig'):
+    elif section_slug in ('phpconfig', 'mysqlconfig', 'sshconfig'):
         all_params = get_all_items(section_slug)
 
     result = [f[0] for f in all_params]
@@ -604,7 +622,7 @@ def conf_filter_parameters(request, section_slug):
         if parameter:
             if section_slug == 'apacheconfig':
                 all_params = get_all_directives()
-            elif section_slug in ('phpconfig', 'mysqlconfig'):
+            elif section_slug in ('phpconfig', 'mysqlconfig', 'sshconfig'):
                 all_params = get_all_items(section_slug)
 
             for v in all_params:
@@ -650,26 +668,39 @@ def conf_filter_results(request, section_slug):
     conf_parameter = request.GET.get('conf_parameter', '')
     conf_value = request.GET.get('conf_value', '')
 
-    results = []
+    a_all = results = []
 
     # Store matching objects in results list.
 
-    parameters_fn = 'items'
+    # Field name for dictionary of parameters/values.
+    params_field = 'items'
+
     if section_slug == 'apacheconfig':
         a_all = ApacheConfig.objects.filter(active=True).all()
-        parameters_fn = 'directives'
+        params_field = 'directives'
     elif section_slug == 'phpconfig':
         a_all = PHPConfig.objects.filter(active=True).all()
     elif section_slug == 'mysqlconfig':
         a_all = MySQLConfig.objects.filter(active=True).all()
+    elif section_slug == 'sshconfig':
+        a_all = SSHConfig.objects.filter(active=True).all()
 
     for a in a_all:
-        if a.__getattribute__(parameters_fn):
-            for param, values in a.__getattribute__(parameters_fn).iteritems():
+        if a.__getattribute__(params_field):
+            for param, values in a.__getattribute__(params_field).iteritems():
                 if param == conf_parameter or conf_parameter == '':
                     for v in values:
                         if conf_value == v or conf_value == '':
                             results.append([param, v, a])
+                    '''
+                    try:
+                        v = values.index(conf_value)
+                        results.append([param, v, a])
+                    except IndexError:
+                        pass
+                    if conf_value == '':
+                        results = [[param, v, a] for v in values]
+                    '''
 
     results.sort()
 
@@ -684,7 +715,8 @@ def conf_filter_results(request, section_slug):
                         'all_domains': get_all_domains(),
                         'all_directives': get_all_directives(),
                         'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),}
+                        'all_mysql_items': get_all_items('mysqlconfig'),
+                        'all_ssh_items': get_all_items('sshconfig'),}
     return render_to_response('machines/conf_results.html', template_context,
                               context_instance=RequestContext(request))
 

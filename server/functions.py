@@ -280,6 +280,7 @@ class ServerFunctions:
 
 
         ## SSH Configuration file.
+        '''
         params = sshconfig_dict.keys()
         csv_params = '\n'.join(params)
         values = sshconfig_dict.values()
@@ -305,6 +306,29 @@ class ServerFunctions:
                                                 v_values=csv_values)
             with reversion.revision:
                 s_object.save()
+        '''
+        ## SSH Configuration file.
+        try:
+            s_object = SSHConfig.objects.get(machine__id=self.machine_id)
+            print 'SSH Config exists ...'
+            if s_object.body != sshconfig_dict['body'] or \
+               s_object.items != sshconfig_dict['items'] or \
+               s_object.filename != sshconfig_dict['filename']:
+
+                s_object.body = sshconfig_dict['body']
+                s_object.items = sshconfig_dict['items']
+                s_object.filename = sshconfig_dict['filename']
+                with reversion.revision:
+                    s_object.save()
+
+                print 'Updating SSH Config ...'
+        except SSHConfig.DoesNotExist:
+            s_object = SSHConfig.objects.create(machine=self.machine_obj,
+                body=sshconfig_dict['body'], items=sshconfig_dict['items'],
+                filename=sshconfig_dict['filename'])
+            with reversion.revision:
+                s_object.save()
+            print 'Adding SSH Config ...'
 
 
         ## iptables.
@@ -419,7 +443,7 @@ class ServerFunctions:
                 #print 'Adding PHP Config ...'
 
 
-        # MySQL Configuration files.
+        ## MySQL Configuration files.
         try:
             m_object = MySQLConfig.objects.get(machine__id=self.machine_id)
             #print 'MySQL Config exists ...'

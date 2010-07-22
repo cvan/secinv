@@ -7,79 +7,50 @@
           <li><a href="#sshconfig-history" class="history">{{ _('History') }}</a></li>
         </ul>
         <div id="sshconfig-latest" class="latest">
+        {% if sshconfig and sshconfig.filename %}
+          <h4 class="group">{{ sshconfig.filename }}</h4>
 
-          <table class="nested">
-            <caption>{{ _('Current') }}</caption>
-            <thead>
-              <tr>
-                <th class="pair_name">{{ _('Parameter') }}</th>
-                <th class="pair_value">{{ _('Value') }}</th>
-                <th class="timestamp">{{ _('Modified') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% if sshconfig %}
-              <tr>
-                <td colspan="2">
-                  <table>
-                  {% for process, port in sshconfig.version_changes.diff.pair.merged.items %}
-                    <tr>
-                      <td class="pair_name">
-                        {% differ sshconfig.version_changes.diff.pair.diff process %}{{ process }}{% enddiffer %}
-                      </td>
-                      <td class="pair_port">
-                        {% differ sshconfig.version_changes.diff.pair.diff process %}{{ port }}{% enddiffer %}
-                      </td>
-                    </tr>
-                  {% endfor %}
-                  </table>
-                </td>
-                <td class="timestamp">
-                  <time datetime="{{ sshconfig.date_added|date:'c' }}">
-                    {{ sshconfig.date_added }}
-                  </time>
-                </td>
-              </tr>
-            {% else %}
-              <tr>
-                <td></td>
-              </tr>
-            {% endif %}
-            </tbody>
-          </table>
+          <details class="date">
+            <strong>{{ _('Last Modified') }}</strong>
+            <time datetime="{{ sshconfig.date_added|date:'c' }}">
+              {{ sshconfig.date_added }}
+            </time>
+          </details>
+          <div class="clear"></div>
 
+          {{ sshconfig.body|highlight:'apacheconf' }}
+
+        {% else %}
+          <p class="none">{{ _('Not available') }}</p>
+        {% endif %}
         </div><!-- #sshconfig-latest -->
         <div id="sshconfig-history" class="history">
 
-          <table class="nested">
+          <table>
             <caption>{{ _('History') }}</caption>
             <thead>
               <tr>
-                <th class="pair_name">{{ _('Parameter') }}</th>
-                <th class="pair_value">{{ _('Value') }}</th>
+                <th class="cmp">{{ _('Compare against') }}</th>
+                <!--<th>{{ _('Filename') }}</th>-->
+                <th>{{ _('Revision') }}</th>
                 <th class="timestamp">{{ _('Modified') }}</th>
               </tr>
             </thead>
             <tbody>
-            {% for sshconfig_ver in sshconfig_versions %}
+            {% for sc_ver in sshconfig_versions %}
               <tr>
-                <td colspan="2">
-                  <table>
-                  {% for process, port in sshconfig_ver.diff.pair.merged.items %}
-                    <tr>
-                      <td class="pair_name">
-                        {% differ sshconfig_ver.diff.pair.diff process %}{{ process }}{% enddiffer %}
-                      </td>
-                      <td class="pair_port">
-                        {% differ sshconfig_ver.diff.pair.diff process %}{{ port }}{% enddiffer %}
-                      </td>
-                    </tr>
-                  {% endfor %}
-                  </table>
+                <td class="cmp">
+                  {% if sc_ver.is_newest %}{{ _('(current)') }}{% else %}
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='sshconfig', version_number=sc_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
+                  {% endif %}
+
+                  <a href="{% url diff machine_slug=machine.hostname, section_slug='sshconfig', version_number=sc_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
                 </td>
+                <!--<td>{{ sc_ver.fields.filename }}</td>-->
+                <td>{{ sc_ver.version }}</td>
                 <td class="timestamp">
-                  <time datetime="{{ sshconfig_ver.fields.date_added|date:'c' }}">
-                    {{ sshconfig_ver.fields.date_added }}
+                  <time datetime="{{ sc_ver.fields.date_added|date:'c' }}">
+                    {{ sc_ver.fields.date_added }}
                   </time>
                 </td>
               </tr>

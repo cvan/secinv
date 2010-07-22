@@ -2,13 +2,13 @@
 {% load i18n %}
 {% load machine_extras %}
 
-{% block head_title %}{% if section_slug == 'apacheconfig' %}{{ _('Filtered Apache configuration files') }}{% endif %}{% if section_slug == 'phpconfig' %}{{ _('Filtered PHP configuration files') }}{% endif %}{% if section_slug == 'mysqlconfig' %}{{ _('Filtered MySQL configuration files') }}{% endif %} | {{ _('Machines') }} | {{ block.super }}{% endblock %}
+{% block head_title %}{% if section_slug == 'apacheconfig' %}{{ _('Filtered Apache configuration files') }}{% endif %}{% if section_slug == 'phpconfig' %}{{ _('Filtered PHP configuration files') }}{% endif %}{% if section_slug == 'mysqlconfig' %}{{ _('Filtered MySQL configuration files') }}{% endif %}{% if section_slug == 'sshconfig' %}{{ _('Filtered SSH configuration files') }}{% endif %} | {{ _('Machines') }} | {{ block.super }}{% endblock %}
 
 {% block content %}
 
       <hgroup id="masthead">
         <h2 class="sub">{{ _('Machines') }}</h2>
-        <h3 class="sub">{% if section_slug == 'apacheconfig' %}{{ _('Filtered Apache configuration files') }}{% endif %}{% if section_slug == 'phpconfig' %}{{ _('Filtered PHP configuration files') }}{% endif %}{% if section_slug == 'mysqlconfig' %}{{ _('Filtered MySQL configuration files') }}{% endif %}</h3>
+        <h3 class="sub">{% if section_slug == 'apacheconfig' %}{{ _('Filtered Apache configuration files') }}{% endif %}{% if section_slug == 'phpconfig' %}{{ _('Filtered PHP configuration files') }}{% endif %}{% if section_slug == 'mysqlconfig' %}{{ _('Filtered MySQL configuration files') }}{% endif %}{% if section_slug == 'sshconfig' %}{{ _('Filtered SSH configuration files') }}{% endif %}</h3>
         <h4>
           <span>{{ _('Parameter:') }}</span> {% if conf_parameter %}{{ conf_parameter }}{% else %}{{ _('(All)') }}{% endif %}
           <em><span>{{ _('Value:') }}</span> {% if conf_value %}{{ conf_value }}{% else %}{{ _('(All)') }}{% endif %}</em>

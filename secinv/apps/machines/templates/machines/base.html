@@ -4,9 +4,6 @@
 {% block body_class %}machines{% endblock %}
 
 {% block sidebar %}
-<script type="text/javascript">
-var urls = [];
-</script>
           <h2>{{ _('Machines') }}</h2>
 
           	<fieldset>
@@ -107,7 +104,6 @@ var urls = [];
             </fieldset>
           </form>
 
-
           <form action="{% url conf-filter-results section_slug='mysqlconfig' %}" method="get">
           	<fieldset>
           	  <legend>{{ _('Filter my.cnf files') }}</legend>
@@ -134,13 +130,43 @@ var urls = [];
             </fieldset>
           </form>
 
+
+          <form action="{% url conf-filter-results section_slug='sshconfig' %}" method="get">
+          	<fieldset>
+          	  <legend>{{ _('Filter sshd_config files') }}</legend>
+
+              <label for="sshconfig-parameter">{{ _('Filter by <strong>parameter</strong>') }}</label>
+              <select name="conf_parameter" id="sshconfig-parameter">
+              {% if section_slug == 'sshconfig' and conf_parameter %}
+                <option selected value="">{{ conf_parameter }}</option>
+              {% else %}
+                <option value="">*</option>
+              {% endif %}
+              </select>
+
+              <label for="sshconfig-value">{{ _('Filter by <strong>value</strong>') }}</label>
+              <select name="conf_value" id="sshconfig-value">
+              {% if section_slug == 'sshconfig' and conf_value %}
+                <option selected value="">{{ conf_value }}</option>
+              {% else %}
+                <option value="">*</option>
+              {% endif %}
+              </select>
+
+              <button class="button pill">{{ _('Submit') }}</button>
+            </fieldset>
+          </form>
+
+
           <script type="text/javascript">
-            urls['apacheconfig'] = ['{% url ac-filter-directives-keys %}',
+            filterURLs['apacheconfig'] = ['{% url ac-filter-directives-keys %}',
                                     '{% url ac-filter-directives %}'];
-            urls['phpconfig'] = ['{% url conf-filter-parameters-keys section_slug='phpconfig' %}',
+            filterURLs['phpconfig'] = ['{% url conf-filter-parameters-keys section_slug='phpconfig' %}',
                                  '{% url conf-filter-parameters section_slug='phpconfig' %}'];
-            urls['mysqlconfig'] = ['{% url conf-filter-parameters-keys section_slug='mysqlconfig' %}',
+            filterURLs['mysqlconfig'] = ['{% url conf-filter-parameters-keys section_slug='mysqlconfig' %}',
                                    '{% url conf-filter-parameters section_slug='mysqlconfig' %}'];
+            filterURLs['sshconfig'] = ['{% url conf-filter-parameters-keys section_slug='sshconfig' %}',
+                                   '{% url conf-filter-parameters section_slug='sshconfig' %}'];
 
             var confParameter = '{{ conf_parameter }}';
             var confValue = '{{ conf_value }}';
