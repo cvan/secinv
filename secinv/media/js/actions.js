@@ -1,3 +1,4 @@
+var selectedSection = '';
 
 $(function() {
 
@@ -9,19 +10,12 @@ $(function() {
         $(this).closest('form').submit();
     });
 
+    // Get section name of `selected` `option`'s parent `select` field.
+    if ($("select[id$='-parameter'] option[selected]").length)
+        selectedSection = $("select[id$='-parameter'] option[selected]").parent().attr('id').split('-')[0];
+
     $("select[id$='-parameter']").each(function(index) {
         var section = $(this).attr('id').split('-')[0];
-
-        /*
-        $('select#' + section + '-value').change(function() {
-            $(this).closest('form').submit();
-        }).keyup(function() {
-            $(this).closest('form').submit();
-        }).keydown(function() {
-            $(this).closest('form').submit();
-        });
-        */
-
 
         if ($('select#' + section + '-parameter').val() == '' &&
             $('select#' + section + '-parameter').find('option').length == 1)
@@ -54,7 +48,7 @@ function doPopulate(section) {
             $('select#' + section + '-parameter').append("<option" + selected + ">" + value + "</option>\n");
         });
 
-        // Remove currently selected option
+        // Remove currently selected option.
         if ($('select#' + section + '-parameter option[selected]:first-child').length) {
             $('select#' + section + '-parameter option:first-child').remove();
             $('select#' + section + '-parameter').prepend('<option value="">*</option>\n');
@@ -67,6 +61,10 @@ function doPopulate(section) {
 
 function doChange(section) {
     var paramVal = $('select#' + section + '-parameter').val();
+
+    // Clear currently selected fields.
+    if (typeof selectedSection !== 'undefined' && section != selectedSection)
+        $('select#' + selectedSection + '-parameter, select#' + selectedSection + '-value').val('');
 
     if (paramVal == '')
         $('select#' + section + '-value').html('<option value="">*</option>\n');

@@ -74,7 +74,6 @@ def get_all_directives():
 def get_all_items(section_slug):
     if not section_slug in CONFIG_SECTIONS:
         raise ValueError
-        #return []
 
     all_items_dict = {}
 
@@ -131,8 +130,6 @@ def history(request, machine_slug):
     system_history = System.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
-    # Serialize the result of the database retrieval to JSON and send an
-    # application/json response.
     return HttpResponse(serializers.serialize('json', system_history),
                         mimetype='application/json')
 
@@ -141,7 +138,8 @@ def recurse_ac_includes(ac, field_name='filename'):
     ac_includes = []
     for fn in ac.included:
         try:
-            i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id, filename=fn,
+            i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id,
+                                            filename=fn,
                                             active=True)
 
             l = i_ac.__getattribute__(field_name)
@@ -150,7 +148,6 @@ def recurse_ac_includes(ac, field_name='filename'):
                 l = [i_ac.__getattribute__(field_name), recurse_ac_includes(i_ac)]
 
             ac_includes.append(l)
-
         except ApacheConfig.DoesNotExist:
             pass
 
@@ -210,18 +207,6 @@ def detail(request, machine_slug):
                                      key=lambda k: k['timestamp'],
                                      reverse=True)
 
-
-    '''
-    sshconfig_latest = []
-    sshconfig_versions = []
-    sshconfig_history = SSHConfig.objects.filter(machine__id=m.id).order_by(
-        '-date_added').all()
-
-    if sshconfig_history.exists():
-        sshconfig_latest = sshconfig_history[0]
-
-        sshconfig_versions = get_version_diff(sshconfig_history[0], '\n')
-    '''
 
     ## SSH configuration file.
     sshconfig_latest = []
@@ -302,7 +287,9 @@ def detail(request, machine_slug):
             for line in lines:
                 ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
                 if len(ls) == 2 and ls[0].lower() == 'include':
-                    # TODO: in Apache Config Parser, handle ``quoted`` Include filenames.
+                    # Strip quotation marks, if available, for filenames.
+                    if ls[1][0] == ls[1][-1] and ls[1][0] in ('"', "'"):
+                        ls[1] = ls[1:-1]
 
                     try:
                         a = ApacheConfig.objects.get(machine__id=m.id,
@@ -688,19 +675,14 @@ def conf_filter_results(request, section_slug):
     for a in a_all:
         if a.__getattribute__(params_field):
             for param, values in a.__getattribute__(params_field).iteritems():
-                if param == conf_parameter or conf_parameter == '':
-                    for v in values:
-                        if conf_value == v or conf_value == '':
-                            results.append([param, v, a])
-                    '''
+                if param == conf_parameter or not conf_parameter:
                     try:
                         v = values.index(conf_value)
                         results.append([param, v, a])
-                    except IndexError:
+                    except ValueError:
                         pass
-                    if conf_value == '':
+                    if not conf_value:
                         results = [[param, v, a] for v in values]
-                    '''
 
     results.sort()
 
