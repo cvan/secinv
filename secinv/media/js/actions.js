@@ -62,6 +62,19 @@ function doPopulate(section) {
 function doChange(section) {
     var paramVal = $('select#' + section + '-parameter').val();
 
+/*
+    if ($("select[id$='-parameter']").length) {
+        //selectedSection = $("select[id$='-parameter'] option[selected]").parent().attr('id').split('-')[0];
+        $("select[id$='-parameter']:not(#" + section + "-parameter").each(function() {
+            //if ($(this).attr('id') != section + '-parameter')
+            $(this).val('');
+        });
+    }
+
+*/
+
+    $("select[id$='-parameter']:not(#" + section + "-parameter").val('');
+
     // Clear currently selected fields.
     if (typeof selectedSection !== 'undefined' && section != selectedSection)
         $('select#' + selectedSection + '-parameter, select#' + selectedSection + '-value').val('');

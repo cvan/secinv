@@ -153,12 +153,12 @@ function getTabs(section) {
           <li><a href="#system">{{ _('System') }}</a></li>
           <li><a href="#interfaces">{{ _('Interfaces') }}</a></li>
           <li><a href="#services">{{ _('Services') }}</a></li>
-          <li><a href="#sshconfig">{{ _('SSH config') }}</a></li>
           <li><a href="#rpms">{{ _('RPMs') }}</a></li>
           <li><a href="#iptables">{{ _('iptables') }}</a></li>
           <li><a href="#apacheconfig">{{ _('Apache') }}</a></li>
           <li><a href="#phpconfig">{{ _('php.ini') }}</a></li>
           <li><a href="#mysqlconfig">{{ _('my.cnf') }}</a></li>
+          <li><a href="#sshconfig">{{ _('SSH config') }}</a></li>
         </ul>
         <div id="system">
           {% include "machines/tabs/system.html" %}
@@ -169,9 +169,6 @@ function getTabs(section) {
         <div id="services">
           {% include "machines/tabs/services.html" %}
         </div><!-- #services -->
-        <div id="sshconfig">
-          {% include "machines/tabs/sshconfig.html" %}
-        </div><!-- #sshconfig -->
         <div id="rpms">
           {% include "machines/tabs/rpms.html" %}
         </div><!-- #rpms -->
@@ -187,6 +184,9 @@ function getTabs(section) {
         <div id="mysqlconfig">
           {% include "machines/tabs/mysqlconfig.html" %}
         </div><!-- #mysqlconfig -->
+        <div id="sshconfig">
+          {% include "machines/tabs/sshconfig.html" %}
+        </div><!-- #sshconfig -->
       </section>
 
 {% endblock %}

@@ -9,7 +9,7 @@
         <div id="iptables-latest" class="latest">
           <h4 class="group">{{ _('iptables rule-sets') }}</h4>
 
-          {% if iptables %}
+          {% if iptables and iptables.body %}
             {% if iptables.date_added %}
           <details class="date">
             <strong>{{ _('Last Modified') }}</strong>
@@ -24,6 +24,7 @@
 
           {% else %}
           <div class="clear"></div>
+          <p class="none">{{ _('Not available') }}</p>
           {% endif %}
         </div><!-- #iptables-latest -->
         <div id="iptables-history" class="history">

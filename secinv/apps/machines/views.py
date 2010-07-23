@@ -676,13 +676,9 @@ def conf_filter_results(request, section_slug):
         if a.__getattribute__(params_field):
             for param, values in a.__getattribute__(params_field).iteritems():
                 if param == conf_parameter or not conf_parameter:
-                    try:
-                        v = values.index(conf_value)
-                        results.append([param, v, a])
-                    except ValueError:
-                        pass
-                    if not conf_value:
-                        results = [[param, v, a] for v in values]
+                    for v in values:
+                        if conf_value == v or not conf_value:
+                            results.append([param, v, a])
 
     results.sort()
 
