@@ -67,7 +67,8 @@ class ServerFunctions:
         Check if client's authorization token is valid.
         """
         try:
-            if AuthToken.objects.get(token=auth_token, active=True):
+            s = AuthToken.objects.get(token=auth_token, active=True)
+            if s:
                 self.is_authenticated = True
                 return True
         except AuthToken.DoesNotExist:
@@ -77,7 +78,6 @@ class ServerFunctions:
                 sshconfig_dict, ipt_dict, acl_list, phpini_dict, mycnf_dict):
         if not self.is_authenticated:
             return False
-
         # Get the machine IP address as the first ethernet interface.
         '''
         for interface in ip_dict.keys():
@@ -168,16 +168,13 @@ class ServerFunctions:
                         i_object.save()
 
             except Interface.DoesNotExist:
-                pass
-                '''
-                i_new = Interface.objects.create(machine=self.machine_obj,
+                i_object = Interface.objects.create(machine=self.machine_obj,
                     i_name=interface,
                     i_ip=i_dict['i_ip'],
                     i_mac=i_dict['i_mac'],
                     i_mask=i_dict['i_mask'])
                 with reversion.revision:
-                    i_new.save()
-                '''
+                    i_object.save()
 
         # Get latest interfaces (select by distinct interface name).
         distinct_interfaces = Interface.objects.filter(
@@ -310,7 +307,7 @@ class ServerFunctions:
         ## SSH Configuration file.
         try:
             s_object = SSHConfig.objects.get(machine__id=self.machine_id)
-            print 'SSH Config exists ...'
+            #print 'SSH Config exists ...'
             if s_object.body != sshconfig_dict['body'] or \
                s_object.items != sshconfig_dict['items'] or \
                s_object.filename != sshconfig_dict['filename']:
@@ -321,14 +318,14 @@ class ServerFunctions:
                 with reversion.revision:
                     s_object.save()
 
-                print 'Updating SSH Config ...'
+                #print 'Updating SSH Config ...'
         except SSHConfig.DoesNotExist:
             s_object = SSHConfig.objects.create(machine=self.machine_obj,
                 body=sshconfig_dict['body'], items=sshconfig_dict['items'],
                 filename=sshconfig_dict['filename'])
             with reversion.revision:
                 s_object.save()
-            print 'Adding SSH Config ...'
+            #print 'Adding SSH Config ...'
 
 
         ## iptables.
