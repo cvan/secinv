@@ -43,12 +43,18 @@ class MachineAdmin(admin.ModelAdmin):
     list_filter = ['hostname']
     search_fields = ['sys_ip', 'hostname', 'ext_ip',
                      'system__kernel_rel', 'system__rh_rel', 'system__nfs',
+                     'system__ip_fwd', 'system__iptables',
+                     'services__k_processes', 'services__v_ports',
+                     'rpms__v_rpms',
                      'interface__i_name', 'interface__i_ip',
                      'interface__i_mac', 'interface__i_mask',
-                     'services__k_processes', 'services__v_ports',
-                     'sshconfig__k_parameters', 'sshconfig__v_values',
-                     'rpms__v_rpms', 'iptables__body',
-                     'apacheconfig__body']
+                     'sshconfig__body', 'sshconfig__filename',
+                     'apacheconfig__body', 'apacheconfig__filename',
+                     'iptables__body',
+                     'phpconfig__body', 'phpconfig__filename',
+                     'mysqlconfig__body', 'mysqlconfig__filename']
+
+
     date_hierarchy = 'date_added'
 
 admin.site.register(Machine, MachineAdmin)

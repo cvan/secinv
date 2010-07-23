@@ -28,7 +28,7 @@ class Machine(models.Model):
                      'rpms__v_rpms',
                      'interface__i_name', 'interface__i_ip',
                      'interface__i_mac', 'interface__i_mask',
-                     'sshconfig__k_parameters', 'sshconfig__v_values',
+                     'sshconfig__body', 'sshconfig__filename',
                      'apacheconfig__body', 'apacheconfig__filename',
                      'iptables__body',
                      'phpconfig__body', 'phpconfig__filename',
