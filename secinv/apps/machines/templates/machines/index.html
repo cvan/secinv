@@ -57,7 +57,7 @@
             <td>
               {% if machine.date_added %}
               <time datetime="{{ machine.date_added|date:'c' }}">
-                {{ machine.date_added|date:'m/d/Y g:s a' }}
+                {{ machine.date_added|date:'m/d/Y g:i a' }}
               </time>
               {% endif %}
             </td>
@@ -73,7 +73,7 @@
             <td>
               {% if machine.date_scanned %}
               <time datetime="{{ machine.date_scanned|date:'c' }}">
-                {{ machine.date_scanned|date:'m/d/Y g:s a' }}
+                {{ machine.date_scanned|date:'m/d/Y g:i a' }}
               </time>
               {% endif %}
             </td>
