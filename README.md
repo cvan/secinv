@@ -8,7 +8,7 @@ an XML-RPC client.
 * Apache 2 w/ mod_python (or similar)
 * MySQL 5 (or similar)
 
-# Dependencies installed via pip
+# Dependencies Installed via pip
 
 * MySQLdb-1.2.3c1 (must be 1.2.1p2 or newer)
 * Django 1.2
@@ -16,10 +16,20 @@ an XML-RPC client.
 * pygments 1.3.1
 
 
+# Installing Packages on Ubuntu
+If you're running a recent version of Ubuntu, you can [install the required
+dependencies automatically](apt:python-dev,python-virtualenv,libmysqlclient-dev).
+Otherwise, the following command will install the required dependencies:
+
+<pre>
+sudo aptitude install python-dev python-virtualenv libmysqlclient-dev
+</pre>
+
 # Installing Packages on Mac OS X
 
-Download and install [Homebrew](http://github.com/mxcl/homebrew).
-Next, install Xcode. Finally, you should install these following packages:
+First, download and install [Homebrew](http://github.com/mxcl/homebrew), then
+[Xcode](http://developer.apple.com/technologies/xcode.html).
+Finally, you should install these following packages:
 
 <pre>
 brew install python mysql git
@@ -57,8 +67,7 @@ Get `virtualenvwrapper` so we can easily activate and deactivate virtual
 environments from the shell.
 
 <pre>
-curl http://bitbucket.org/dhellmann/virtualenvwrapper/raw/f31869779141/virtualenvwrapper_bashrc
--o ~/.virtualenvwrapper
+curl http://bitbucket.org/dhellmann/virtualenvwrapper/raw/f31869779141/virtualenvwrapper_bashrc -o ~/.virtualenvwrapper
 mkdir ~/.virtualenvs
 </pre>
 
@@ -73,7 +82,7 @@ Finally, `exec bash`.
 
 # Mac OS X Virtualenv
 
-Designate a directory to keep your projects. I use ``~/Sites/virtualenvs`.
+Designate a directory to keep your projects. I prefer `~/Sites/virtualenvs`.
 
 <pre>
 mkdir ~/Sites/virtualenvs
@@ -88,14 +97,14 @@ git clone git://github.com/cvan/secinv.git --branch server_side
 cd secinv/
 </pre>
 
-Using `pip`, we can automatically download and install all the remaining
+Now let's use `pip` to conveniently download and install all the remaining
 dependencies:
 
 <pre>
 pip install -r requirements.txt
 </pre>
 
-# Django Settings
+# Django
 
 Change directories to the Django root project directory.
 
@@ -103,25 +112,17 @@ Change directories to the Django root project directory.
 cd secinv/
 </pre>
 
-Modify the settings as you wish.
+Modify the `settings.py` file as you see fit (namely, the `BASE_PATH` and
+database credentials).
 
-<pre>
-vi settings.py
-</pre>
-
-Update the `BASE_PATH` and database credentials as needed.
-
-Sync the Django database models and initialize the Django authentication.
+Sync the Django database models (and set up the Django admin authentication):
 
 <pre>
 python manage.py syncdb
 </pre>
 
-Now, run the server!
+Any time you want to run the development server:
 
 <pre>
-python manage.py runserver 8080
+python manage.py runserver
 </pre>
-
-
-

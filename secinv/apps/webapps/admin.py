@@ -14,11 +14,11 @@ class ClassificationForm(forms.ModelForm):
 
     classification = forms.MultipleChoiceField(choices=CLASSIFICATION_CHOICES,
         widget=forms.CheckboxSelectMultiple(), required=False)
-        
+
     def clean_classification(self):
         classification = self.data.getlist('classification')
         return classification
-        
+
 
 class ApplicationAdmin(admin.ModelAdmin):
     list_display = ('name', 'url', 'date_added', 'date_modified')
@@ -41,6 +41,6 @@ class AssessmentAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_added'
     form = ClassificationForm
     model = Assessment
-    
+
 admin.site.register(Assessment, AssessmentAdmin)
 
