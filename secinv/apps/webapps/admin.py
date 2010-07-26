@@ -14,19 +14,9 @@ class ClassificationForm(forms.ModelForm):
 
     classification = forms.MultipleChoiceField(choices=CLASSIFICATION_CHOICES,
         widget=forms.CheckboxSelectMultiple(), required=False)
-    '''
-    def clean_classification(self):
-        return self.cleaned_data['classification']
-    '''
 
     def clean(self):
         return self.cleaned_data
-
-    #def clean_classification(self):
-    #    return self.cleaned_data['classification']
-
-    #def clean(self):
-    #    return self
 
 
 class ApplicationAdmin(admin.ModelAdmin):
@@ -47,11 +37,8 @@ class AssessmentAdmin(admin.ModelAdmin):
     list_filter = ['application']
     search_fields = ['application', 'reviewer', 'notes', 'bugs', 'classification']
     date_hierarchy = 'date_added'
-    #form = ClassificationForm
+    form = ClassificationForm
     model = Assessment
-
-    #def save_model(self, request, model, form, change):
-    #    model.save()
 
 admin.site.register(Assessment, AssessmentAdmin)
 

@@ -105,10 +105,12 @@ class Assessment(models.Model):
     bugs = models.TextField(_('Bugzilla links'), blank=True, null=True)
 
     # TODO: Multiple Checkbox Field.
-    classification = models.CharField(_('assessment type (code review, app penetration, risk assessment)'),
+    #classification = models.CharField(_('assessment type (code review, app penetration, risk assessment)'),
+                                      #max_length=255,
+    classification = models.CharField(_('assessment type'),
                                       max_length=255,
-                                      blank=True, null=True)
-                                      #choices=CLASSIFICATION_CHOICES)
+                                      blank=True, null=True,
+                                      choices=CLASSIFICATION_CHOICES)
 
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
