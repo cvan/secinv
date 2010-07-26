@@ -92,7 +92,7 @@ Using `pip`, we can automatically download and install all the remaining
 dependencies:
 
 <pre>
-pip install -r requirements/dev.txt -r requirements/compiled.txt
+pip install -r requirements.txt
 </pre>
 
 # Django Settings
