@@ -93,7 +93,7 @@ Use `git` to grab the latest copy of the development branch:
 
 <pre>
 mkvirtualenv --no-site-packages secinv
-git clone git://github.com/cvan/secinv.git --branch server_side
+git clone git://github.com/cvan/secinv.git
 cd secinv/
 </pre>
 
