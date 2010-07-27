@@ -140,9 +140,6 @@ def get_version_diff_field(obj_item, field_name):
     from pygments.lexers import guess_lexer
     from pygments.filters import VisibleWhitespaceFilter
 
-    from reversion.helpers import generate_patch
-    from diff_match_patch import diff_match_patch
-
     obj_version = Version.objects.get_for_object(obj_item).order_by('revision')
     versions = []
     is_newest = False
@@ -158,23 +155,10 @@ def get_version_diff_field(obj_item, field_name):
 
                 l = guess_lexer(patch_txt)
                 l.add_filter(VisibleWhitespaceFilter(newlines=True))
-                #diff_highlighted = highlight(code, PythonLexer(), HtmlFormatter())
                 diff_highlighted = highlight(code, l, HtmlFormatter())
             except:
                 diff_highlighted = old_v
         except AssertionError:
-            '''
-            dmp = diff_match_patch()
-            diffs = dmp.diff_main('', ver.field_dict[field_name].replace('\r',''))
-            patch = dmp.patch_make(diffs)
-            patch_txt = dmp.patch_toText(patch)
-
-            #diff_highlighted = highlight(patch_txt, PythonLexer(), HtmlFormatter())
-            l = guess_lexer(patch_txt)
-            l.add_filter(VisibleWhitespaceFilter(newlines=True))
-            diff_highlighted = highlight(patch_txt, l, HtmlFormatter())
-            '''
-
             patch_txt = ver.field_dict[field_name]
             try:
                 # Guess a lexer by the contents of the block.
@@ -184,7 +168,6 @@ def get_version_diff_field(obj_item, field_name):
                 diff_highlighted = highlight(patch_txt, l, HtmlFormatter())
             except:
                 diff_highlighted = patch_txt
-
 
         versions.append({'fields': ver.field_dict, 'diff': diff_highlighted,
                          'timestamp': ver.field_dict['date_added'],
