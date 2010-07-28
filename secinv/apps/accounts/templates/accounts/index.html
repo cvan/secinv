@@ -1,0 +1,25 @@
+{% extends "accounts/base.html" %}
+{% load i18n %}
+
+{% block head_title %}{{ _('Login') }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<form method="post" action="{% url django.contrib.auth.views.login %}">
+  <fieldset>
+    <legend>{{ _('SecInv Login') }}</legend>
+  {% csrf_token %}
+  {{ form.as_p }}
+
+    <p class="left">
+      <input type="hidden" name="next" value="{{ next }}">
+      <input type="submit" class="button pill blue" value="{{ _('Login') }}">
+    </p>
+    <p class="right">
+      <a href="" class="forgot">{{ _('Forgot password?') }}</a>
+    </p>
+
+  </fieldset>
+</form>
+
+{% endblock %}

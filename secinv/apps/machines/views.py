@@ -1,7 +1,9 @@
 from django.db.models import Q
 from django.core import serializers
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, Http404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseRedirect, \
+                        HttpResponseNotFound, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson
@@ -21,7 +23,8 @@ from reversion.models import Version
 import re
 import json
 
-DIFF_SECTION_SLUGS = ('iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig', 'sshconfig')
+DIFF_SECTION_SLUGS = ('iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig',
+                     'sshconfig')
 CONFIG_SECTIONS = ('apacheconfig', 'phpconfig', 'mysqlconfig', 'sshconfig')
 
 def get_all_domains():
@@ -100,7 +103,7 @@ def get_all_items(section_slug):
     all_items.sort()
     return all_items
 
-
+@login_required
 def index(request):
     """Machines index page."""
     machines = Machine.objects.all()
@@ -119,6 +122,7 @@ def index(request):
                               context_instance=RequestContext(request))
 
 
+@login_required
 def history(request, machine_slug):
     # TODO: prevent calls.
     #if not request.is_ajax():
@@ -154,6 +158,7 @@ def recurse_ac_includes(ac, field_name='filename'):
     return ac_includes
 
 
+@login_required
 def detail(request, machine_slug):
     m = get_object_or_404(Machine, hostname=machine_slug)
     query = request.GET.get('q', '')
@@ -378,6 +383,7 @@ def detail(request, machine_slug):
                               context_instance=RequestContext(request))
 
 
+@login_required
 def search(request):
     query = request.GET.get('q', '')
     terms = query.split()
@@ -406,6 +412,7 @@ def search(request):
         context_instance=RequestContext(request))
 
 
+@login_required
 def apacheconfig(request, machine_slug, ac_id):
     m = get_object_or_404(Machine, hostname=machine_slug)
     ac = get_object_or_404(ApacheConfig, id=ac_id)
@@ -464,6 +471,7 @@ def apacheconfig(request, machine_slug, ac_id):
         context_instance=RequestContext(request))
 
 
+@login_required
 def diff(request, machine_slug, section_slug, version_number,
          compare_with='previous', item_id=None):
     if section_slug not in DIFF_SECTION_SLUGS:
@@ -553,6 +561,7 @@ def diff(request, machine_slug, section_slug, version_number,
                               context_instance=RequestContext(request))
 
 
+@login_required
 def ac_filter_directives_keys(request):
     #if not request.is_ajax():
     #    return HttpResponse(status=400)
@@ -564,6 +573,8 @@ def ac_filter_directives_keys(request):
     # application/json response.
     return HttpResponse(simplejson.dumps(result), mimetype='application/json')
 
+
+@login_required
 def ac_filter_directives(request):
     #if not request.is_ajax() or request.method != 'POST':
     #    return HttpResponse(status=400)
@@ -582,6 +593,7 @@ def ac_filter_directives(request):
     return HttpResponse(simplejson.dumps(result), mimetype='application/json')
 
 
+@login_required
 def conf_filter_parameters_keys(request, section_slug):
     #if not request.is_ajax() or not section_slug in CONFIG_SECTIONS:
     #    return HttpResponse(status=400)
@@ -597,6 +609,8 @@ def conf_filter_parameters_keys(request, section_slug):
     # application/json response.
     return HttpResponse(simplejson.dumps(result), mimetype='application/json')
 
+
+@login_required
 def conf_filter_parameters(request, section_slug):
     #if not request.is_ajax() or request.method != 'POST' or \
     #   not section_slug in CONFIG_SECTIONS:
@@ -620,6 +634,7 @@ def conf_filter_parameters(request, section_slug):
     return HttpResponse(simplejson.dumps(result), mimetype='application/json')
 
 
+@login_required
 def machine_filter(request):
     """Find machine by hostname, IP, or domain and redirect."""
     if request.method != 'GET':
@@ -646,6 +661,7 @@ def machine_filter(request):
     return HttpResponseRedirect(destination)
 
 
+@login_required
 def conf_filter_results(request, section_slug):
     """Filter other configuration objects by parameters and values."""
     if request.method != 'GET' or not section_slug in CONFIG_SECTIONS:

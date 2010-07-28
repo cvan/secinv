@@ -21,7 +21,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'secinv',
         'USER': 'root',
         'PASSWORD': '',
@@ -70,6 +70,10 @@ MEDIA_URL = '%s/media/' % BASE_URL
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '%s/admin-media/' % BASE_URL
 
+# The URL where requests are redirected after login when the
+# contrib.auth.login view gets no next parameter.
+LOGIN_REDIRECT_URL = '%s/machines/' % BASE_URL
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$i6z4g*1q!hzwf!tm=jyh(1pk3uo_(-azz3hgkl(#*x4-d!8)'
 
@@ -106,10 +110,12 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'secinv.apps.machines',
     #'secinv.apps.haystack',
+    'secinv.apps.accounts',
     'secinv.apps.search',
     'secinv.apps.webapps',
     'reversion',
 )
+
 
 #HAYSTACK_SITECONF = 'secinv.search_sites'
 

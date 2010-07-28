@@ -37,7 +37,8 @@ admin.site.register(Application, ApplicationAdmin)
 class AssessmentAdmin(admin.ModelAdmin):
     list_display = ('application', 'reviewer', 'date_added', 'date_modified')
     list_filter = ['application']
-    search_fields = ['application', 'reviewer', 'notes', 'bugs', 'classification']
+    search_fields = ['application', 'reviewer', 'notes', 'bugs',
+                     'classification']
     date_hierarchy = 'date_added'
     form = ClassificationForm
     model = Assessment

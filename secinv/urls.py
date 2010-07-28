@@ -9,6 +9,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^machines/', include('secinv.apps.machines.urls')),
     (r'^webapps/', include('secinv.apps.webapps.urls')),
+    (r'^accounts/', include('secinv.apps.accounts.urls')),
     #(r'^search/', include('secinv.apps.haystack.urls')),
     #(r'^fulltext/', include('secinv.fulltext.urls')),
 
