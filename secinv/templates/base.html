@@ -42,6 +42,17 @@
         <figure class="logo">
           <h1><a href="{% url machines-index %}"><strong>Sec</strong>Inv</a></h1>
         </figure>
+        <p class="login right">
+        {% if user.is_authenticated %}
+				  {{ _('Welcome,') }} <strong>{{ user.username }}</strong>.
+				  <a href="{% url admin:index %}">{{ _('Admin Panel') }}</a> /
+				  <a href="">{{ _('Change password') }}</a> /
+				  <a href="{% url auth-logout %}">{{ _('Log out') }}</a>
+				{% else %}
+				  {{ _('Log in, please') }}
+				{% endif %}
+				</p>
+				<div class="clear"></div>
         <nav role="navigation">
           <ul>
             <li class="machines">
