@@ -6,54 +6,43 @@
 {% block sidebar %}
           <h2>{{ _('Machines') }}</h2>
 
-          	<fieldset>
-          	  <legend>{{ _('Filter Machines') }}</legend>
+          <fieldset>
+					  <legend>{{ _('Filter Machines') }}</legend>
 
-              <!--
-              {% if all_domains %}
-              <ul>
-                {% for hostname, domain, ac_id in all_domains %}
-                <li>{{ hostname }} {{ domain }} (ac file {{ ac_id }})</li>
-                {% endfor %}
-              </ul>
-              {% endif %}
-              -->
+					  <form action="{% url machine-filter %}" method="get">
+					    <label for="machine-hostname">{{ _('Select by <strong>hostname</strong>') }}</label>
+					    <select name="machine_hostname" id="machine-hostname">
+					      <option selected value="">*</option>
+					    {% for m in all_machines_hn %}
+					      <option value="{{ m.hostname }}">{{ m.hostname }} ({{ m.sys_ip }})</option>
+					    {% endfor %}
+					    </select>
+					  </form>
 
-              <form action="{% url machine-filter %}" method="get">
-              	  <label for="machine-hostname">{{ _('Select by <strong>hostname</strong>') }}</label>
-                  <select name="machine_hostname" id="machine-hostname">
-                    <option selected value="">*</option>
-                  {% for m in all_machines_hn %}
-                    <option value="{{ m.hostname }}">{{ m.hostname }} ({{ m.sys_ip }})</option>
-                  {% endfor %}
-                  </select>
-              </form>
+					  <form action="{% url machine-filter %}" method="get">
+					    <label for="machine-ip">{{ _('Select by <strong>IP address</strong>') }}</label>
+					    <select name="machine_ip" id="machine-ip">
+					      <option selected value="">*</option>
+  					  {% for m in all_machines_ip %}
+					      <option value="{{ m.hostname }}">{{ m.sys_ip }} ({{ m.hostname }})</option>
+	  				  {% endfor %}
+					    </select>
+					  </form>
 
-              <form action="{% url machine-filter %}" method="get">
-              	  <label for="machine-ip">{{ _('Select by <strong>IP address</strong>') }}</label>
-                  <select name="machine_ip" id="machine-ip">
-                    <option selected value="">*</option>
-                  {% for m in all_machines_ip %}
-                    <option value="{{ m.hostname }}">{{ m.sys_ip }} ({{ m.hostname }})</option>
-                  {% endfor %}
-                  </select>
-              </form>
-
-              <form action="{% url machine-filter %}" method="get">
-                  <label for="machine-domain">{{ _('Select by <strong>domain</strong>') }}</label>
-                  <select name="machine_domain" id="machine-domain">
-                    <option selected value="">*</option>
-                  {% for hostname, domain, ac_id in all_domains %}
-                    <option value="{{ hostname }}">{{ domain }}</option>
-                  {% endfor %}
-                  </select>
-              </form>
-            </fieldset>
-
+					  <form action="{% url machine-filter %}" method="get">
+					    <label for="machine-domain">{{ _('Select by <strong>domain</strong>') }}</label>
+					    <select name="machine_domain" id="machine-domain">
+					      <option selected value="">*</option>
+					    {% for hostname, domain, ac_id in all_domains %}
+					      <option value="{{ hostname }}">{{ domain }}</option>
+					    {% endfor %}
+					    </select>
+					  </form>
+          </fieldset>
 
           <form action="{% url conf-filter-results section_slug='apacheconfig' %}" method="get">
-          	<fieldset>
-          	  <legend>{{ _('Filter Apache configuration files') }}</legend>
+            <fieldset>
+              <legend>{{ _('Filter Apache configuration files') }}</legend>
 
               <label for="apacheconfig-parameter">{{ _('Filter by <strong>parameter</strong>') }}</label>
               <select name="conf_parameter" id="apacheconfig-parameter">
@@ -79,8 +68,8 @@
 
 
           <form action="{% url conf-filter-results section_slug='phpconfig' %}" method="get">
-          	<fieldset>
-          	  <legend>{{ _('Filter php.ini files') }}</legend>
+            <fieldset>
+              <legend>{{ _('Filter php.ini files') }}</legend>
 
               <label for="phpconfig-parameter">{{ _('Filter by <strong>parameter</strong>') }}</label>
               <select name="conf_parameter" id="phpconfig-parameter">
@@ -105,8 +94,8 @@
           </form>
 
           <form action="{% url conf-filter-results section_slug='mysqlconfig' %}" method="get">
-          	<fieldset>
-          	  <legend>{{ _('Filter my.cnf files') }}</legend>
+            <fieldset>
+              <legend>{{ _('Filter my.cnf files') }}</legend>
 
               <label for="mysqlconfig-parameter">{{ _('Filter by <strong>parameter</strong>') }}</label>
               <select name="conf_parameter" id="mysqlconfig-parameter">
@@ -132,8 +121,8 @@
 
 
           <form action="{% url conf-filter-results section_slug='sshconfig' %}" method="get">
-          	<fieldset>
-          	  <legend>{{ _('Filter sshd_config files') }}</legend>
+            <fieldset>
+              <legend>{{ _('Filter sshd_config files') }}</legend>
 
               <label for="sshconfig-parameter">{{ _('Filter by <strong>parameter</strong>') }}</label>
               <select name="conf_parameter" id="sshconfig-parameter">
@@ -157,16 +146,15 @@
             </fieldset>
           </form>
 
-
           <script type="text/javascript">
             filterURLs['apacheconfig'] = ['{% url ac-filter-directives-keys %}',
-                                    '{% url ac-filter-directives %}'];
+                                          '{% url ac-filter-directives %}'];
             filterURLs['phpconfig'] = ['{% url conf-filter-parameters-keys section_slug='phpconfig' %}',
-                                 '{% url conf-filter-parameters section_slug='phpconfig' %}'];
+                                       '{% url conf-filter-parameters section_slug='phpconfig' %}'];
             filterURLs['mysqlconfig'] = ['{% url conf-filter-parameters-keys section_slug='mysqlconfig' %}',
-                                   '{% url conf-filter-parameters section_slug='mysqlconfig' %}'];
+                                         '{% url conf-filter-parameters section_slug='mysqlconfig' %}'];
             filterURLs['sshconfig'] = ['{% url conf-filter-parameters-keys section_slug='sshconfig' %}',
-                                   '{% url conf-filter-parameters section_slug='sshconfig' %}'];
+                                       '{% url conf-filter-parameters section_slug='sshconfig' %}'];
 
             var confParameter = '{{ conf_parameter }}';
             var confValue = '{{ conf_value }}';
