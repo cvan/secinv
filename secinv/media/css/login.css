@@ -1,17 +1,17 @@
 html {
-  min-height: 100%;
+    min-height: 100%;
 }
 body {
-  background: #008cc2;
-  background: -webkit-gradient(linear, left top, left bottom, from(#4dcce7), to(#3acf2a));
-  background: -moz-linear-gradient(top, #73d2f3, #008cc2);
-  background: linear-gradient(top, #73d2f3, #008cc2);
-  background-repeat: no-repeat;
+    background: #008cc2;
+    background: -webkit-gradient(linear, left top, left bottom, from(#4dcce7), to(#3acf2a));
+    background: -moz-linear-gradient(top, #73d2f3, #008cc2);
+    background: linear-gradient(top, #73d2f3, #008cc2);
+    background-repeat: no-repeat;
 }
 
 h1 {
-  position: absolute;
-  left: -9999px;
+    position: absolute;
+    left: -9999px;
 }
 
 #wrap {
@@ -19,91 +19,92 @@ h1 {
 }
 
 #content {
-  height: 300px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin: -150px 0 0 -170px; /* 170px = 340px / 2 */
-  width: 340px;
+    height: 300px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -150px 0 0 -170px; /* 170px = 340px / 2 */
+    width: 340px;
 }
 
 form p.left,
 form p.right {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 legend {
-  background-color: #fff;
-/*  border: #ccc 1px solid;
-  border-bottom-width: 0;*/
-  line-height: 2em;
-  -moz-border-radius-topleft: 10px;
-  -moz-border-radius-topright: 10px;
-  -webkit-border-top-left-radius: 10px;
-  -webkit-border-top-right-radius: 10px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  display: inline-block;
-  padding: 0 2em;
-  margin-top: -0.5em;
-  margin-bottom: 0.5em;
+    background-color: #fff;
+/*    border: #ccc 1px solid;
+    border-bottom-width: 0;*/
+    line-height: 2em;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    display: inline-block;
+    padding: 0 2em;
+    margin-top: -0.5em;
+    margin-bottom: 0.5em;
 }
 
 .errorlist {
-  background-color: #fcc;
-  border: #800 1px solid;
-  color: #800;
-  margin: 0;
-  padding: 1em 2em;
+    background-color: #fcc;
+    border: #800 1px solid;
+    color: #800;
+    list-style-type: none;
+    margin: 0;
+    padding: 1em;
 }
 
 fieldset, .blurb {
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  border-width: 0;
-  border-radius: 10px;
-  background-color: #fff;
-  margin: 2em 0 4em 0;
-  padding: 2em;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-width: 0;
+    border-radius: 10px;
+    background-color: #fff;
+    margin: 2em 0 4em 0;
+    padding: 2em;
 }
 
 .blurb :last-child {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 fieldset {
-  padding-top: 0;
+    padding-top: 0;
 }
 
 fieldset legend {
-  color: #008cc2;
+    color: #008cc2;
 }
 fieldset label {
-  color: #333;
+    color: #333;
 }
 
 label,
 button {
-  margin-top: 1.5em;
+    margin-top: 1.5em;
 }
 
 label {
-  font-weight: bold;
-  width: 40%;
+    font-weight: bold;
+    width: 40%;
 }
 
 select {
-  width: 59%;
+    width: 59%;
 }
 
 
 /* @group Buttons */
 
 .forgot {
-  display: block;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.67);
-  line-height: 2;
-  height: 2em;
+    display: block;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.67);
+    line-height: 2;
+    height: 2em;
 }
 
 /*
@@ -111,187 +112,187 @@ Based on CSS3 buttons from
 http://somadesign.ca/demos/buttons-redux.html
 */
 .button, input[type=button], input[type=submit], button {
-	text-decoration: none;
-	border-color: #888;
-	border-color: rgba(0, 0, 0, 0.56);
-	cursor: pointer;
-	outline: none;
-	color: #111;
-	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", "Segoe UI", Verdana, sans-serif; /* TODO: revise */
-	display: inline-block;
-	vertical-align: top;
-	position: relative;
-	font-size: 12px;
-	font-weight: bold;
-	text-align: center;
-	background-color: #aaa;
-	background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
-	background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
-	background-image: linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
-	background-repeat: repeat-x;
-	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.67);
-	line-height: 2;
-/*	margin: 0 0 2em 1em; */
-	padding: 0 1em;
-	height: 2em;
-	-moz-box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
-	-webkit-box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
-	box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
-	-webkit-transition: background 0.185s linear;
-	-moz-transition: all 0.185s linear;
-	-o-transition: all 0.185s linear;
-	transition: all 0.185s linear;
-	/* Make the text unselectable. */
-	-moz-user-select: none;
-	-webkit-user-select: none;
+    text-decoration: none;
+    border-color: #888;
+    border-color: rgba(0, 0, 0, 0.56);
+    cursor: pointer;
+    outline: none;
+    color: #111;
+    font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", "Segoe UI", Verdana, sans-serif; /* TODO: revise */
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    background-color: #aaa;
+    background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
+    background-image: linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    background-repeat: repeat-x;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.67);
+    line-height: 2;
+/*    margin: 0 0 2em 1em; */
+    padding: 0 1em;
+    height: 2em;
+    -moz-box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
+    -webkit-box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
+    box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
+    -webkit-transition: background 0.185s linear;
+    -moz-transition: all 0.185s linear;
+    -o-transition: all 0.185s linear;
+    transition: all 0.185s linear;
+    /* Make the text unselectable. */
+    -moz-user-select: none;
+    -webkit-user-select: none;
 }
 .button, .button:after,
 button, button:after,
 input[type=submit], input[type=button] {
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	border-width: 1px;
-	border-style: solid;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
 }
 .button:after, button:after {
-	display: block;
-	position: absolute;
-	content: ' ';
-	width: 100%;
-	height: 100%;
-	border-color: transparent transparent #ccc;
-	border-color: transparent transparent rgba(255, 255, 255, 0.67);
-	bottom: -2px;
-	left: -1px;
+    display: block;
+    position: absolute;
+    content: ' ';
+    width: 100%;
+    height: 100%;
+    border-color: transparent transparent #ccc;
+    border-color: transparent transparent rgba(255, 255, 255, 0.67);
+    bottom: -2px;
+    left: -1px;
 }
 .button:hover, .button:focus,
 button:hover, button:focus,
 input[type=button]:hover, input[type=button]:focus,
 input[type=submit]:hover, input[type=submit]:focus {
-	background-color: #a8c0cb;
-	text-decoration: none;
+    background-color: #a8c0cb;
+    text-decoration: none;
 }
 .button:active, button:active,
 input[type=submit]:active, input[type=button]:active {
-	line-height: 2.2;
-	-moz-box-shadow:
-		0 0.33em 1em rgba(0, 0, 0, 0.67) inset,
-		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
-		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
-	-webkit-box-shadow:
-		0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
-		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
-		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
-	box-shadow:
-		0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
-		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
-		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
-		-webkit-transition: line-height 0.1s linear;
-		-moz-transition: all 0.1s linear;
-		-o-transition: all 0.1s linear;
-		transition: all 0.1s linear;
+    line-height: 2.2;
+    -moz-box-shadow:
+        0 0.33em 1em rgba(0, 0, 0, 0.67) inset,
+        1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
+        -1px -1px 0 rgba(255, 255, 255, 0.25) inset;
+    -webkit-box-shadow:
+        0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
+        1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
+        -1px -1px 0 rgba(255, 255, 255, 0.25) inset;
+    box-shadow:
+        0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
+        1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
+        -1px -1px 0 rgba(255, 255, 255, 0.25) inset;
+        -webkit-transition: line-height 0.1s linear;
+        -moz-transition: all 0.1s linear;
+        -o-transition: all 0.1s linear;
+        transition: all 0.1s linear;
 }
 .button.bg,
 .button.bg:hover,
 .button.bg:focus {
-	background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
+    background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
 }
 
 /* Colors/Styles */
 .button.cyan {
-	background-color: #30adda;
-	color: #000;
-	text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
+    background-color: #30adda;
+    color: #000;
+    text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
 }
 .button.cyan:hover {
-	background-color: #0a88b8;
+    background-color: #0a88b8;
 }
 
 
 .button.blue {
-	background-color: #9eb4bf;
+    background-color: #9eb4bf;
 }
 .button.blue:hover {
-	background-color: #b4cdda;
+    background-color: #b4cdda;
 }
 .button.darkblue {
-	background-color: #046;
-	color: #fff;
-	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+    background-color: #046;
+    color: #fff;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
 .button.darkblue:hover {
-	background-color: #00547e;
+    background-color: #00547e;
 }
 .button.red {
-	background-color: #900;
-	color: #fff;
-	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+    background-color: #900;
+    color: #fff;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
 .button.red:hover {
-	background-color: #b30000;
+    background-color: #b30000;
 }
 .button.pink {
-	background-color: #f44;
-	color: #000;
-	text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
+    background-color: #f44;
+    color: #000;
+    text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
 }
 .button.pink:hover {
-	background-color: #ff5e5e;
+    background-color: #ff5e5e;
 }
 
 .button.pill, .button.pill:before, .button.pill:after {
-	-moz-border-radius: 1em;
-	-webkit-border-radius: 1em;
-	border-radius: 1em;
+    -moz-border-radius: 1em;
+    -webkit-border-radius: 1em;
+    border-radius: 1em;
 }
 .button.black {
-	background-color: #000;
-	color: #fff;
-	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+    background-color: #000;
+    color: #fff;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
 .button.black:hover {
-	background-color: #222;
+    background-color: #222;
 }
 
 .button.gray {
-	background-color: #ccc;
-	color: #333;
-	text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
+    background-color: #ccc;
+    color: #333;
+    text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
 }
 .button.gray:hover {
-	background-color: #aaa;
+    background-color: #aaa;
 }
 
 .button.sharp {
-	background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.33) 50%, transparent 50%, transparent 100%);
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, 
-		from(rgba(255, 255, 255, 0.75)),
-		color-stop(0.5, rgba(255, 255, 255, 0.33)),
-		color-stop(0.5, transparent ),
-		to(transparent)
-	);
-	background-repeat: repeat-x;
+    background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.33) 50%, transparent 50%, transparent 100%);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, 
+        from(rgba(255, 255, 255, 0.75)),
+        color-stop(0.5, rgba(255, 255, 255, 0.33)),
+        color-stop(0.5, transparent ),
+        to(transparent)
+    );
+    background-repeat: repeat-x;
 }
 .button.small {
-	font-size: 10px;
+    font-size: 10px;
 }
 .button.large {
-	font-size: 15px;
+    font-size: 15px;
 }
 .button.webkit {
-	-webkit-transition: all .185s linear;
+    -webkit-transition: all .185s linear;
 }
 /* @end */
 
 input[type=submit] {
-  float: right;
+    float: right;
 }
 
 form input[type=text],
 form input[type=password] {
-  font: 2em Helvetica, "Liberation Sans", "Bitstream Vera Sans", sans-serif;
-  padding: 4px 8px;
+    font: 2em Helvetica, "Liberation Sans", "Bitstream Vera Sans", sans-serif;
+    padding: 4px 8px;
 }
