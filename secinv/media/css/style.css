@@ -1,9 +1,9 @@
 body {
-  background: #f1f1f1;
-	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
-	background: -moz-linear-gradient(top,  #fff,  #ededed);
-	background: linear-gradient(top,  #fff,  #ededed);
-	margin: 20px 0;
+    background: #f1f1f1;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
+    background: -moz-linear-gradient(top,  #fff,  #ededed);
+    background: linear-gradient(top,  #fff,  #ededed);
+    margin: 20px 0;
 }
 
 body, header {
@@ -72,16 +72,16 @@ header .logo a {
 header .logo a:hover {
     color: #60cff5;
     -webkit-transition: line-height 0.1s linear;
-	-moz-transition: all 0.1s linear;
-	-o-transition: all 0.1s linear;
-	transition: all 0.1s linear;
+    -moz-transition: all 0.1s linear;
+    -o-transition: all 0.1s linear;
+    transition: all 0.1s linear;
 }
 header .logo a:hover strong {
     color: #00648d;
     -webkit-transition: line-height 0.3s linear;
-	-moz-transition: all 0.3s linear;
-	-o-transition: all 0.3s linear;
-	transition: all 0.3s linear;
+    -moz-transition: all 0.3s linear;
+    -o-transition: all 0.3s linear;
+    transition: all 0.3s linear;
 }
 
 header .logo strong {
@@ -129,24 +129,24 @@ body.profiles header nav ul li.profiles a:hover,
 body.config header nav ul li.config a,
 body.config header nav ul li.config a:hover {
     text-decoration: none;
-	text-shadow: 0 1px 0 #000;
-	line-height: 2.2;
-	-moz-box-shadow:
-		0 0.33em 1em rgba(0, 0, 0, 0.67) inset,
-		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
-		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
-	-webkit-box-shadow:
-		0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
-		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
-		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
-	box-shadow:
-		0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
-		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
-		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
+    text-shadow: 0 1px 0 #000;
+    line-height: 2.2;
+    -moz-box-shadow:
+        0 0.33em 1em rgba(0, 0, 0, 0.67) inset,
+        1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
+        -1px -1px 0 rgba(255, 255, 255, 0.25) inset;
+    -webkit-box-shadow:
+        0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
+        1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
+        -1px -1px 0 rgba(255, 255, 255, 0.25) inset;
+    box-shadow:
+        0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
+        1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
+        -1px -1px 0 rgba(255, 255, 255, 0.25) inset;
     -webkit-transition: line-height 0.1s linear;
-	-moz-transition: all 0.1s linear;
-	-o-transition: all 0.1s linear;
-	transition: all 0.1s linear;
+    -moz-transition: all 0.1s linear;
+    -o-transition: all 0.1s linear;
+    transition: all 0.1s linear;
 /*
         box-shadow: inset 0 1px 3px #fff, inset 0 -2px #cbe6f2, 0 0 3px #8ec1da;
         -o-box-shadow: inset 0 1px 3px #fff, inset 0 -2px #cbe6f2, 0 0 3px #8ec1da;
@@ -499,7 +499,7 @@ fieldset label {
 }
 
 nav form {
-	display: inline-block;
+    display: inline-block;
 }
 header form label {
     display: block;
@@ -507,24 +507,24 @@ header form label {
     left: -9999px;
 }
 header form input {
-/*	font: normal 12px/100% Helvetica, Arial, sans-serif; */
+/*    font: normal 12px/100% Helvetica, Arial, sans-serif; */
 }
 
 input#q, input[type=text], input[type=search] {
-	background-color: #fff;
-	border: #333 1px solid;
-	color: #666;
+    background-color: #fff;
+    border: #333 1px solid;
+    color: #666;
 
-	-webkit-border-radius: 2em;
-	-moz-border-radius: 2em;
-	border-radius: 2em;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius: 2em;
 
-	-moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
-	-webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
-	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 
-	padding: 4px 6px 4px 8px;
-	width: 202px;
+    padding: 4px 6px 4px 8px;
+    width: 202px;
 }
 input#q:focus {
     border-color: #000;
@@ -533,25 +533,25 @@ input#q:focus {
 
 /* TODO: remove */
 header form button {
-	color: #000;
-	cursor: pointer;
+    color: #000;
+    cursor: pointer;
 
-	font-size: 11px;
-	position: relative;
-	bottom: -2px;
-	height: 32px;
-	width: 40px;
-	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
-	-webkit-border-radius: 2em;
-	-moz-border-radius: 2em 2em 2em 2em;
-	border-radius: 2em;
+    font-size: 11px;
+    position: relative;
+    bottom: -2px;
+    height: 32px;
+    width: 40px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em 2em 2em 2em;
+    border-radius: 2em;
 
-	background: #5f5f5f;
-	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#dde1e5));
-	background: -moz-linear-gradient(top,  #fff,  #dde1e5);
+    background: #5f5f5f;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#dde1e5));
+    background: -moz-linear-gradient(top,  #fff,  #dde1e5);
 
-	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#9e9e9e', endColorstr='#454545'); /* ie7 */
-	-ms-filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#9e9e9e', endColorstr='#454545'); /* ie8 */
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#9e9e9e', endColorstr='#454545'); /* ie7 */
+    -ms-filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#9e9e9e', endColorstr='#454545'); /* ie8 */
 }
 header form button strong {
 /*    background: url(../img/search.png) 50% 50% no-repeat; */
@@ -590,168 +590,168 @@ Based on CSS3 buttons from
 http://somadesign.ca/demos/buttons-redux.html
 */
 .button, input[type=button], input[type=submit], button {
-	text-decoration: none;
-	border-color: #888;
-	border-color: rgba(0, 0, 0, 0.56);
-	cursor: pointer;
-	outline: none;
-	color: #111;
-	font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", "Segoe UI", Verdana, sans-serif; /* TODO: revise */
-	display: inline-block;
-	vertical-align: top;
-	position: relative;
-	font-size: 12px;
-	font-weight: bold;
-	text-align: center;
-	background-color: #aaa;
-	background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
-	background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
-	background-image: linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
-	background-repeat: repeat-x;
-	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.67);
-	line-height: 2;
-/*	margin: 0 0 2em 1em; */
-	padding: 0 1em;
-	height: 2em;
-	-moz-box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
-	-webkit-box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
-	box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
-	-webkit-transition: background 0.185s linear;
-	-moz-transition: all 0.185s linear;
-	-o-transition: all 0.185s linear;
-	transition: all 0.185s linear;
-	/* Make the text unselectable. */
-	-moz-user-select: none;
-	-webkit-user-select: none;
+    text-decoration: none;
+    border-color: #888;
+    border-color: rgba(0, 0, 0, 0.56);
+    cursor: pointer;
+    outline: none;
+    color: #111;
+    font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", "Segoe UI", Verdana, sans-serif; /* TODO: revise */
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    background-color: #aaa;
+    background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
+    background-image: linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    background-repeat: repeat-x;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.67);
+    line-height: 2;
+/*    margin: 0 0 2em 1em; */
+    padding: 0 1em;
+    height: 2em;
+    -moz-box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
+    -webkit-box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
+    box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset, -1px -1px 0 rgba(255, 255, 255, 0.5) inset;
+    -webkit-transition: background 0.185s linear;
+    -moz-transition: all 0.185s linear;
+    -o-transition: all 0.185s linear;
+    transition: all 0.185s linear;
+    /* Make the text unselectable. */
+    -moz-user-select: none;
+    -webkit-user-select: none;
 }
 .button, .button:after,
 button, button:after,
 input[type=submit], input[type=button] {
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	border-width: 1px;
-	border-style: solid;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
 }
 .button:after, button:after {
-	display: block;
-	position: absolute;
-	content: ' ';
-	width: 100%;
-	height: 100%;
-	border-color: transparent transparent #ccc;
-	border-color: transparent transparent rgba(255, 255, 255, 0.67);
-	bottom: -2px;
-	left: -1px;
+    display: block;
+    position: absolute;
+    content: ' ';
+    width: 100%;
+    height: 100%;
+    border-color: transparent transparent #ccc;
+    border-color: transparent transparent rgba(255, 255, 255, 0.67);
+    bottom: -2px;
+    left: -1px;
 }
 .button:hover, .button:focus,
 button:hover, button:focus,
 input[type=button]:hover, input[type=button]:focus,
 input[type=submit]:hover, input[type=submit]:focus {
-	background-color: #a8c0cb;
-	text-decoration: none;
+    background-color: #a8c0cb;
+    text-decoration: none;
 }
 .button:active, button:active,
 input[type=submit]:active, input[type=button]:active {
-	line-height: 2.2;
-	-moz-box-shadow:
-		0 0.33em 1em rgba(0, 0, 0, 0.67) inset,
-		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
-		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
-	-webkit-box-shadow:
-		0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
-		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
-		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
-	box-shadow:
-		0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
-		1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
-		-1px -1px 0 rgba(255, 255, 255, 0.25) inset;
-		-webkit-transition: line-height 0.1s linear;
-		-moz-transition: all 0.1s linear;
-		-o-transition: all 0.1s linear;
-		transition: all 0.1s linear;
+    line-height: 2.2;
+    -moz-box-shadow:
+        0 0.33em 1em rgba(0, 0, 0, 0.67) inset,
+        1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
+        -1px -1px 0 rgba(255, 255, 255, 0.25) inset;
+    -webkit-box-shadow:
+        0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
+        1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
+        -1px -1px 0 rgba(255, 255, 255, 0.25) inset;
+    box-shadow:
+        0 0.33em 2em rgba(0, 0, 0, 0.67) inset,
+        1px 1px 0 rgba(255, 255, 255, 0.25) inset, 
+        -1px -1px 0 rgba(255, 255, 255, 0.25) inset;
+        -webkit-transition: line-height 0.1s linear;
+        -moz-transition: all 0.1s linear;
+        -o-transition: all 0.1s linear;
+        transition: all 0.1s linear;
 }
 .button.bg,
 .button.bg:hover,
 .button.bg:focus {
-	background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
+    background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.75)), to(rgba(255, 255, 255, 0)));
 }
 
 /* Colors/Styles */
 .button.cyan {
-	background-color: #30adda;
-	color: #000;
-	text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
+    background-color: #30adda;
+    color: #000;
+    text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
 }
 .button.cyan:hover {
-	background-color: #0a88b8;
+    background-color: #0a88b8;
 }
 
 
 .button.blue {
-	background-color: #9eb4bf;
+    background-color: #9eb4bf;
 }
 .button.blue:hover {
-	background-color: #b4cdda;
+    background-color: #b4cdda;
 }
 .button.darkblue {
-	background-color: #046;
-	color: #fff;
-	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+    background-color: #046;
+    color: #fff;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
 .button.darkblue:hover {
-	background-color: #00547e;
+    background-color: #00547e;
 }
 .button.red {
-	background-color: #900;
-	color: #fff;
-	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+    background-color: #900;
+    color: #fff;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
 .button.red:hover {
-	background-color: #b30000;
+    background-color: #b30000;
 }
 .button.pink {
-	background-color: #f44;
-	color: #000;
-	text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
+    background-color: #f44;
+    color: #000;
+    text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.3);
 }
 .button.pink:hover {
-	background-color: #ff5e5e;
+    background-color: #ff5e5e;
 }
 
 .button.pill, .button.pill:before, .button.pill:after {
-	-moz-border-radius: 1em;
-	-webkit-border-radius: 1em;
-	border-radius: 1em;
+    -moz-border-radius: 1em;
+    -webkit-border-radius: 1em;
+    border-radius: 1em;
 }
 .button.black {
-	background-color: #000;
-	color: #fff;
-	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+    background-color: #000;
+    color: #fff;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
 .button.black:hover {
-	background-color: #222;
+    background-color: #222;
 }
 .button.sharp {
-	background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.33) 50%, transparent 50%, transparent 100%);
-	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, 
-		from(rgba(255, 255, 255, 0.75)),
-		color-stop(0.5, rgba(255, 255, 255, 0.33)),
-		color-stop(0.5, transparent ),
-		to(transparent)
-	);
-	background-repeat: repeat-x;
+    background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.33) 50%, transparent 50%, transparent 100%);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, 
+        from(rgba(255, 255, 255, 0.75)),
+        color-stop(0.5, rgba(255, 255, 255, 0.33)),
+        color-stop(0.5, transparent ),
+        to(transparent)
+    );
+    background-repeat: repeat-x;
 }
 .button.small {
-	font-size: 10px;
+    font-size: 10px;
 }
 .button.large {
-	font-size: 15px;
+    font-size: 15px;
 }
 .button.webkit {
-	-webkit-transition: all .185s linear;
+    -webkit-transition: all .185s linear;
 }
 /* @end */
 
@@ -760,9 +760,9 @@ input[type=submit]:active, input[type=button]:active {
 
 hgroup#masthead {
     background: #333;
-	background: -webkit-gradient(radial, left top, left bottom, from(#000), to(#666));
-	background: -moz-radial-gradient(top left, #666, #000);
-	background: radial-gradient(top left, #666, #000);
+    background: -webkit-gradient(radial, left top, left bottom, from(#000), to(#666));
+    background: -moz-radial-gradient(top left, #666, #000);
+    background: radial-gradient(top left, #666, #000);
     margin: 0 -10px 10px -11px;
     padding: 20px 10px 20px 10px;
     position: relative;
@@ -771,7 +771,7 @@ hgroup#masthead h2,
 hgroup#masthead h4 {
     color: #fff;
     font-size: 2em;
-	font-weight: bold;
+    font-weight: bold;
     text-shadow: #000 0 1px 1px;
     margin: 0;
 }
