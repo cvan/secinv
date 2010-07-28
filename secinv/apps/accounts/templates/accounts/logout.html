@@ -1,0 +1,17 @@
+{% extends "accounts/base.html" %}
+{% load i18n %}
+
+{% block head_title %}{{ _('Login') }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="blurb">
+<h2>{{ _('Logged out') }}</h2>
+
+<p>{% blocktrans %}Thanks for spending some quality time with the Web site today.{% endblocktrans %}</p>
+
+<p><a href="{% url auth-login %}">{{ _('Log in again') }}</a></p>
+
+</div>
+
+{% endblock %}

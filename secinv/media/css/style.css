@@ -67,6 +67,7 @@ header .logo a {
     color: #666;
     padding: 0 10px 10px 10px;
     text-decoration: none;
+    width: 60%;
 }
 header .logo a:hover {
     color: #60cff5;

@@ -9,6 +9,11 @@ body {
   background-repeat: no-repeat;
 }
 
+h1 {
+  position: absolute;
+  left: -9999px;
+}
+
 #wrap {
 
 }
@@ -25,13 +30,6 @@ body {
 form p.left,
 form p.right {
   margin-bottom: 0;
-}
-
-fieldset {
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  border-width: 0;
-  border-radius: 10px;
 }
 
 legend {
@@ -59,11 +57,24 @@ legend {
   padding: 1em 2em;
 }
 
-fieldset {
+fieldset, .blurb {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-width: 0;
+  border-radius: 10px;
   background-color: #fff;
   margin: 2em 0 4em 0;
-  padding: 0 2em 2em 2em;
+  padding: 2em;
 }
+
+.blurb :last-child {
+  margin-bottom: 0;
+}
+
+fieldset {
+  padding-top: 0;
+}
+
 fieldset legend {
   color: #008cc2;
 }

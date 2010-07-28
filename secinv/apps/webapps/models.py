@@ -84,7 +84,10 @@ class Application(models.Model):
         return a
 
     def visibility_value(self):
-        return VISIBILITY_DICT[self.visibility]
+        try:
+            return VISIBILITY_DICT[self.visibility]
+        except KeyError:
+            return ''
 
     class Meta:
         verbose_name = _('Application')
