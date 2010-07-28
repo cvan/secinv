@@ -45,11 +45,9 @@
         <p class="login right">
         {% if user.is_authenticated %}
 				  {{ _('Welcome,') }} <strong>{{ user.username }}</strong>.
-				  <a href="{% url admin:index %}">{{ _('Admin Panel') }}</a> /
-				  <a href="">{{ _('Change password') }}</a> /
+				  <a href="{% url admin:index %}">{{ _('Admin panel') }}</a> /
+				  <a href="{% url admin:password_change %}">{{ _('Change password') }}</a> /
 				  <a href="{% url auth-logout %}">{{ _('Log out') }}</a>
-				{% else %}
-				  {{ _('Log in, please') }}
 				{% endif %}
 				</p>
 				<div class="clear"></div>
