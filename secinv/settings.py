@@ -81,6 +81,9 @@ LOGIN_REDIRECT_URL = '%s/machines/' % BASE_URL
 # when using the login_required() decorator.
 LOGIN_URL = '%s/accounts/login/' % BASE_URL
 
+# Length of default Authorization Token.
+AUTH_TOKEN_LENGTH = 20
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$i6z4g*1q!hzwf!tm=jyh(1pk3uo_(-azz3hgkl(#*x4-d!8)'
 

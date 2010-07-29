@@ -30,7 +30,8 @@ class ApacheConfigInline(admin.TabularInline):
 
 class MachineAdmin(admin.ModelAdmin):
     fieldsets = [(None,               {'fields': ['sys_ip',
-                                                  'hostname', 'ext_ip']}),
+                                                  'hostname', 'ext_ip',
+                                                  'token']}),
                  ('Date information', {'fields': ['date_modified',
                                                   'date_scanned'],
                                        'classes': 'collapse'}),]

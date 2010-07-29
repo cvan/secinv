@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 #from ..search.search import SearchManager
 from ..fields import *
+from ..settings import AUTH_TOKEN_LENGTH
 from .utils import diff_list, diff_dict, get_version_diff
 from reversion.models import Version
 
@@ -9,13 +10,23 @@ import datetime
 import re
 import reversion
 
+def generate_token():
+    import math
+    from random import Random
+    import string
+
+    s = ''.join(Random().sample(string.letters + string.digits,
+                                AUTH_TOKEN_LENGTH - 1))
+    chunk_count = int(math.ceil(len(s) / 5.0))
+    return '-'.join([str(s[i * 5:i * 5 + 5]) for i in xrange(chunk_count)])
+
 
 class Machine(models.Model):
     sys_ip = models.IPAddressField(_('IP address'))
     hostname = models.CharField(max_length=255)
     ext_ip = models.IPAddressField(_('external IP address'), blank=True,
                                    null=True)
-    token = models.ForeignKey('AuthToken')
+    token = models.ForeignKey('AuthToken', blank=True, null=True)
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
     date_modified = models.DateTimeField(_('date modified'),
@@ -192,7 +203,8 @@ if not reversion.is_registered(Machine):
 
 class AuthToken(models.Model):
     token = models.CharField(_('authorization token'), blank=True,
-                             null=True, max_length=255)
+                             null=True, max_length=255,
+        default=generate_token)
     active = models.BooleanField(_('active'), default=1)
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
