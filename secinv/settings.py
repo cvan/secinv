@@ -60,6 +60,9 @@ USE_L10N = True
 #MEDIA_ROOT = '/var/www/html/secinv/secinv/media/'
 MEDIA_ROOT = path('media/')
 
+# Strip trailing slash from BASE_URL.
+BASE_URL = BASE_URL.rstrip('/')
+
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
@@ -73,6 +76,10 @@ ADMIN_MEDIA_PREFIX = '%s/admin-media/' % BASE_URL
 # The URL where requests are redirected after login when the
 # contrib.auth.login view gets no next parameter.
 LOGIN_REDIRECT_URL = '%s/machines/' % BASE_URL
+
+# The URL where requests are redirected for login, especially
+# when using the login_required() decorator.
+LOGIN_URL = '%s/accounts/login/' % BASE_URL
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$i6z4g*1q!hzwf!tm=jyh(1pk3uo_(-azz3hgkl(#*x4-d!8)'
