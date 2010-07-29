@@ -16,7 +16,7 @@ def generate_token():
     from string import letters, digits
 
     s = ''.join(SystemRandom().sample(letters + digits,
-                                AUTH_TOKEN_LENGTH))
+                                      AUTH_TOKEN_LENGTH))
     chunk_count = int(ceil(len(s) / 5.0))
     return '-'.join([str(s[i * 5:i * 5 + 5]) for i in xrange(chunk_count)])
 
