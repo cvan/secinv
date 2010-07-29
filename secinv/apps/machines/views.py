@@ -223,7 +223,8 @@ def detail(request, machine_slug):
     if sshconfig_history.exists():
         sshconfig_latest = sshconfig_history[0]
 
-        sshconfig_versions = get_version_diff_field(sshconfig_history[0], 'body')
+        sshconfig_versions = get_version_diff_field(sshconfig_history[0],
+                                                    'body')
 
 
     # RPMs.
@@ -239,7 +240,6 @@ def detail(request, machine_slug):
 
         rpms_versions = get_version_diff(rpms_history[0], '\n')
 
-
     rpms_latest = {'installed': rpms_list, 'date_added': rpms_date_added}
 
 
@@ -252,7 +252,8 @@ def detail(request, machine_slug):
     if iptables_history.exists():
         iptables_latest = iptables_history[0]
 
-        iptables_versions = get_version_diff_field(iptables_history[0], 'body')
+        iptables_versions = get_version_diff_field(iptables_history[0],
+                                                   'body')
 
 
     ## Apache configuration files.
@@ -277,9 +278,9 @@ def detail(request, machine_slug):
     apacheconfig_latest_body = ''
     if apacheconfig_history.exists():
         try:
-            apacheconfig_latest = ApacheConfig.objects.filter(machine__id=m.id,
-                filename__endswith='/httpd.conf', active=True).order_by(
-                '-date_added').all()[0]
+            apacheconfig_latest = ApacheConfig.objects.filter(
+                machine__id=m.id, filename__endswith='/httpd.conf',
+                active=True).order_by('-date_added').all()[0]
         except:
             pass
 
@@ -299,7 +300,7 @@ def detail(request, machine_slug):
 
                     try:
                         a = ApacheConfig.objects.get(machine__id=m.id,
-                            filename__endswith=ls[1].rtrim('"').rtrim("'"),
+                            filename__endswith=ls[1],
                             active=True)
                         i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
                     except (ApacheConfig.DoesNotExist,
@@ -427,12 +428,16 @@ def apacheconfig(request, machine_slug, ac_id):
     for line in lines:
         ls = line.replace('<span class="nb">', '').replace('</span>', '').split()
         if len(ls) == 2 and ls[0].lower() == 'include':
+            if ls[1][0] == ls[1][-1] and ls[1][0] in ('"', "'"):
+                ls[1] = ls[1:-1]
+
             try:
                 a = ApacheConfig.objects.get(machine__id=m.id,
-                    filename__endswith=ls[1].rtrim('"').rtrim("'"),
-                    active=True)
+                                             filename__endswith=ls[1],
+                                             active=True)
                 i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
-            except (ApacheConfig.DoesNotExist, ApacheConfig.MultipleObjectsReturned):
+            except (ApacheConfig.DoesNotExist,
+                    ApacheConfig.MultipleObjectsReturned):
                 i_fn = '%s' % ls[1]
 
             line = '<span class="nb">%s</span> %s' % (ls[0], i_fn)
