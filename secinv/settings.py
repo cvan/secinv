@@ -81,7 +81,7 @@ LOGIN_REDIRECT_URL = '%s/machines/' % BASE_URL
 # when using the login_required() decorator.
 LOGIN_URL = '%s/accounts/login/' % BASE_URL
 
-# Length of default Authorization Token.
+# Default length of auto-generated Authorization Tokens.
 AUTH_TOKEN_LENGTH = 20
 
 # Make this unique, and don't share it with anybody.

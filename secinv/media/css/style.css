@@ -887,7 +887,7 @@ position:relative;
     margin-bottom: 0;
 }
 
-#rpms-latest ul {
+.rpms-list {
     height: 200px;
     overflow: auto;
 }

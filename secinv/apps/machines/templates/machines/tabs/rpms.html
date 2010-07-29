@@ -20,7 +20,7 @@
             {% endif %}
           <div class="clear"></div>
 
-          <ul>
+          <ul class="rpms-list">
             {% for rpm in rpms.installed %}
             <li>{{ rpm }}</li>
             {% endfor %}
@@ -46,7 +46,7 @@
               <tr>
                 <td>
                 {% if rpms_ver.diff.pair.diff.added %}
-                  <ul>
+                  <ul class="rpms-list">
                   {% for rpm in rpms_ver.diff.pair.diff.added %}
                     <li><ins>{{ rpm }}</ins></li>
                   {% endfor %}
