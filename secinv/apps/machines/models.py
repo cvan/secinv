@@ -198,7 +198,6 @@ class Machine(models.Model):
 
 if not reversion.is_registered(Machine):
     reversion.register(Machine, fields=['sys_ip', 'hostname', 'ext_ip'])
-    #reversion.register(Machine)
 
 
 class AuthToken(models.Model):
@@ -458,6 +457,8 @@ if not reversion.is_registered(ApacheConfig):
 class RPMs(models.Model):
     machine = models.ForeignKey('Machine')
     v_rpms = models.TextField(_('RPMs'), blank=True, null=True)
+    filename = models.CharField(_('filename'), max_length=255, blank=True,
+                                null=True)
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
