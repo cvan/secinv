@@ -11,13 +11,13 @@ import re
 import reversion
 
 def generate_token():
-    import math
-    from random import Random
-    import string
+    from math import ceil
+    from random import SystemRandom
+    from string import letters, digits
 
-    s = ''.join(Random().sample(string.letters + string.digits,
-                                AUTH_TOKEN_LENGTH - 1))
-    chunk_count = int(math.ceil(len(s) / 5.0))
+    s = ''.join(SystemRandom().sample(letters + digits,
+                                AUTH_TOKEN_LENGTH))
+    chunk_count = int(ceil(len(s) / 5.0))
     return '-'.join([str(s[i * 5:i * 5 + 5]) for i in xrange(chunk_count)])
 
 
