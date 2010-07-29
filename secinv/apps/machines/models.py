@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-#from ..fulltext.search import SearchManager
+#from ..search.search import SearchManager
 from ..fields import *
 from .utils import diff_list, diff_dict, get_version_diff
 from reversion.models import Version
@@ -13,7 +13,9 @@ import reversion
 class Machine(models.Model):
     sys_ip = models.IPAddressField(_('IP address'))
     hostname = models.CharField(max_length=255)
-    ext_ip = models.IPAddressField(_('external IP address'), blank=True, null=True)
+    ext_ip = models.IPAddressField(_('external IP address'), blank=True,
+                                   null=True)
+    token = models.ForeignKey('AuthToken')
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
     date_modified = models.DateTimeField(_('date modified'),
@@ -39,45 +41,51 @@ class Machine(models.Model):
 
     def httpd(self):
         try:
-            s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-            processes = re.split(',', s.k_processes)
+            s = Services.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
+            processes = s.k_processes.split(',')
             return 'httpd' in processes
         except IndexError:
             return False
 
     def mysqld(self):
         try:
-            s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-            processes = re.split(',', s.k_processes)
+            s = Services.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
+            processes = s.k_processes.split(',')
             return 'mysqld' in processes
         except IndexError:
             return False
 
     def openvpn(self):
         try:
-            s = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
-            processes = re.split(',', s.k_processes)
+            s = Services.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
+            processes = s.k_processes.split(',')
             return 'openvpn' in processes
         except IndexError:
             return False
 
     def nfs(self):
         try:
-            s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            s = System.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
             return s.nfs
         except IndexError:
             return False
 
     def ip_fwd(self):
         try:
-            s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            s = System.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
             return s.ip_fwd
         except IndexError:
             return False
 
     def iptables(self):
         try:
-            s = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            s = System.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
             return s.iptables
         except IndexError:
             return False
@@ -86,47 +94,56 @@ class Machine(models.Model):
         excerpt = ''
 
         try:
-            i = Interface.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            i = Interface.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
         except IndexError:
             i = None
 
         try:
-            sys = System.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            sys = System.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
         except IndexError:
             sys = None
 
         try:
-            serv = Services.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            serv = Services.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
         except IndexError:
             serv = None
 
         try:
-            r = RPMs.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            r = RPMs.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
         except IndexError:
             r = None
 
         try:
-            ipt = IPTables.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            ipt = IPTables.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
         except IndexError:
             ipt = None
 
         try:
-            sc = SSHConfig.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            sc = SSHConfig.objects.filter(machine__id=self.id).order_by(
+               '-date_added').all()[0]
         except IndexError:
             sc = None
 
         try:
-            ac = ApacheConfig.objects.filter(machine__id=self.id).order_by('-date_added').all()
+            ac = ApacheConfig.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()
         except IndexError:
             ac = None
 
         try:
-            pc = PHPConfig.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            pc = PHPConfig.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
         except IndexError:
             pc = None
 
         try:
-            mc = MySQLConfig.objects.filter(machine__id=self.id).order_by('-date_added').all()[0]
+            mc = MySQLConfig.objects.filter(machine__id=self.id).order_by(
+                '-date_added').all()[0]
         except IndexError:
             mc = None
 
@@ -136,29 +153,29 @@ class Machine(models.Model):
             if not '__' in sf:
                 val = self.__getattribute__(sf)
             elif i and 'interface__' in sf:
-                val = i.__getattribute__(re.split('__', sf)[1])
+                val = i.__getattribute__(sf.split('__')[1])
             elif sys and 'system__' in sf:
-                val = sys.__getattribute__(re.split('__', sf)[1])
+                val = sys.__getattribute__(sf.split('__')[1])
             elif serv and 'services__' in sf:
-                val = serv.__getattribute__(re.split('__', sf)[1])
+                val = serv.__getattribute__(sf.split('__')[1])
             elif r and 'rpms__' in sf:
-                val = r.__getattribute__(re.split('__', sf)[1])
+                val = r.__getattribute__(sf.split('__')[1])
             elif ipt and 'iptables__' in sf:
-                val = ipt.__getattribute__(re.split('__', sf)[1])
+                val = ipt.__getattribute__(sf.split('__')[1])
             elif sc and 'sshconfig__' in sf:
-                val = sc.__getattribute__(re.split('__', sf)[1])
+                val = sc.__getattribute__(sf.split('__')[1])
             elif ac and 'apacheconfig__' in sf:
                 #if type(ac) is list:
                 #    for o in ac:
-                #        val += '%s ' % o.__getattribute__(re.split('__', sf)[1])
+                #        val += '%s ' % o.__getattribute__(sf.split('__')[1])
                 #else:
-                #    val = ac.__getattribute__(re.split('__', sf)[1])
-                #val = ac[1].__getattribute__(re.split('__', sf)[1])
-                val = ' '.join([o.__getattribute__(re.split('__', sf)[1]) for o in ac])
+                #    val = ac.__getattribute__(sf.split('__')[1])
+                #val = ac[1].__getattribute__(sf.split('__')[1])
+                val = ' '.join([o.__getattribute__(sf.split('__')[1]) for o in ac])
             elif pc and 'phpconfig__' in sf:
-                val = pc.__getattribute__(re.split('__', sf)[1])
+                val = pc.__getattribute__(sf.split('__')[1])
             elif mc and 'mysqlconfig__' in sf:
-                val = mc.__getattribute__(re.split('__', sf)[1])
+                val = mc.__getattribute__(sf.split('__')[1])
 
             excerpt += '%s ' % val
 
@@ -388,14 +405,8 @@ class ApacheConfig(models.Model):
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
-#    def __unicode__(self):
-#        return u'%s' % self.body[0:100]
-
     def __unicode__(self):
-        fn = self.filename
-        if re.search('/', self.filename):
-            fn = re.split('/', self.filename)[-1]
-        return u'%s' % fn
+        return u'%s - %s' % (self.machine.hostname, self.filename)
 
     @models.permalink
     def get_absolute_url(self):

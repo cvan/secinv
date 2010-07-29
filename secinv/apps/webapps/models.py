@@ -39,20 +39,26 @@ class Application(models.Model):
     overview = models.TextField(_('overview'), blank=True, null=True)
 
     contacts = models.TextField(_('contact points'), blank=True, null=True)
-    url = models.URLField(_('URL'), verify_exists=False, blank=True, null=True)
-    source_code_url = models.URLField(_('source code URL'), verify_exists=False,
+    url = models.URLField(_('URL'), verify_exists=False, blank=True,
+                          null=True)
+    source_code_url = models.URLField(_('source code URL'),
+                                      verify_exists=False,
                                       blank=True, null=True)
 
-    source_code_path = models.CharField(_('source code local path'), max_length=255,
+    source_code_path = models.CharField(_('source code local path'),
+                                        max_length=255,
                                         blank=True, null=True)
 
-    bugzilla_product = models.CharField(_('Bugzilla Product field'), max_length=255,
+    bugzilla_product = models.CharField(_('Bugzilla Product field'),
+                                        max_length=255,
                                         blank=True, null=True)
-    bugzilla_component = models.CharField(_('Bugzilla Component field'), max_length=255,
-                                          blank=True, null=True)
+    bugzilla_component = models.CharField(_('Bugzilla Component field'),
+                                          max_length=255, blank=True,
+                                          null=True)
 
-    visibility = models.CharField(_('public facing?'), max_length=1, blank=True,
-                                  null=True, choices=VISIBILITY_CHOICES)
+    visibility = models.CharField(_('public facing?'), max_length=1,
+                                  blank=True, null=True,
+                                  choices=VISIBILITY_CHOICES)
 
     # Application info.
     cc = models.BooleanField(_('handles credit cards'), default=0)
@@ -78,7 +84,8 @@ class Application(models.Model):
 
     def assessments(self):
         try:
-            a = Assessment.objects.filter(application__id=self.id).order_by('-date_added').all()
+            a = Assessment.objects.filter(application__id=self.id).order_by(
+                '-date_added').all()
         except Assessment.DoesNotExist:
             a = None
         return a
@@ -108,12 +115,15 @@ class Assessment(models.Model):
     bugs = models.TextField(_('Bugzilla links'), blank=True, null=True)
 
     # TODO: Multiple Checkbox Field.
-    #classification = models.CharField(_('assessment type (code review, app penetration, risk assessment)'),
-                                      #max_length=255,
+    classification = models.CharField(_('assessment type (code review, app penetration, risk assessment)'),
+                                      max_length=255,
+                                      blank=True, null=True)
+    '''
     classification = models.CharField(_('assessment type'),
                                       max_length=255,
                                       blank=True, null=True,
                                       choices=CLASSIFICATION_CHOICES)
+    '''
 
     date_added = models.DateTimeField(_('date added'), editable=False,
                                       default=datetime.datetime.now)
