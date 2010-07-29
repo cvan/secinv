@@ -7,11 +7,8 @@ import os
 import sys
 
 def all_zeros(txt):
-    if not type(txt) is str:
-        raise ValueError
-    if not txt:
-        return False
-    return txt and not int(float.fromhex(txt.strip().replace(':', '').replace('-', '')))
+    return txt and not int(float.fromhex(
+        str(txt).strip().replace(':', '').replace('-', ''))) or False
 
 def diff_list(l_old, l_new):
     """Creates a new dictionary representing a difference between two lists."""
@@ -46,11 +43,9 @@ setup_environ(settings)
 
 import reversion
 
-
-from apps.machines.models import *
-#from apps.machines.models import Interface, System, Services, RPMs, \
-#                                 SSHConfig, IPTables, ApacheConfig, \
-#                                 AuthToken, PHPConfig, MySQLConfig
+from apps.machines.models import Machine, Services, System, RPMs, Interface, \
+                                 SSHConfig, IPTables, ApacheConfig, \
+                                 PHPConfig, MySQLConfig, AuthToken
 
 
 class ServerFunctions:
@@ -142,15 +137,14 @@ class ServerFunctions:
 
             # If all fields are empty, then device is inactive -- so do not
             # insert a row.
-            if i_dict['i_ip'] == '' and \
-               i_dict['i_mac'] == '' and \
-               i_dict['i_mask'] == '':
+            if not i_dict['i_ip'] and not i_dict['i_mac'] and \
+               not i_dict['i_mask']:
                 continue
 
             # If interface already exists in table, update accordingly.
             try:
-                i_object = Interface.objects.filter(machine__id=self.machine_id,
-                                                    i_name=interface).latest()
+                i_object = Interface.objects.filter(
+                    machine__id=self.machine_id, i_name=interface).latest()
 
                 if i_object.i_ip != i_dict['i_ip'] or \
                    i_object.i_mac != i_dict['i_mac'] or \
@@ -169,10 +163,10 @@ class ServerFunctions:
 
             except Interface.DoesNotExist:
                 i_object = Interface.objects.create(machine=self.machine_obj,
-                    i_name=interface,
-                    i_ip=i_dict['i_ip'],
-                    i_mac=i_dict['i_mac'],
-                    i_mask=i_dict['i_mask'])
+                                                    i_name=interface,
+                                                    i_ip=i_dict['i_ip'],
+                                                    i_mac=i_dict['i_mac'],
+                                                    i_mask=i_dict['i_mask'])
                 with reversion.revision:
                     i_object.save()
 
@@ -186,8 +180,9 @@ class ServerFunctions:
         # Update each deactivated interface as inactive.
         for i in i_diff['removed']:
             try:
-                i_latest = Interface.objects.filter(machine__id=self.machine_id,
-                                                    i_name=i, active=True).latest()
+                i_latest = Interface.objects.filter(
+                    machine__id=self.machine_id,
+                    i_name=i, active=True).latest()
             except Interface.DoesNotExist:
                 continue
 
@@ -258,7 +253,8 @@ class ServerFunctions:
 
         ## RPMs.
         try:
-            r_object = RPMs.objects.filter(machine__id=self.machine_id).latest()
+            r_object = RPMs.objects.filter(
+                machine__id=self.machine_id).latest()
 
             # TODO: Change rpms_dict.
 
@@ -276,34 +272,6 @@ class ServerFunctions:
                 r_object.save()
 
 
-        ## SSH Configuration file.
-        '''
-        params = sshconfig_dict.keys()
-        csv_params = '\n'.join(params)
-        values = sshconfig_dict.values()
-        csv_values = '\n'.join(values)
-
-        try:
-            s_object = SSHConfig.objects.filter(
-                machine__id=self.machine_id).latest()
-
-            if s_object.k_parameters != csv_params or \
-               s_object.v_values != csv_values:
-
-                s_object.machine = self.machine_obj
-                s_object.k_parameters = csv_params
-                s_object.v_values = csv_values
-                s_object.date_added = datetime.datetime.now()
-                with reversion.revision:
-                    s_object.save()
-
-        except SSHConfig.DoesNotExist:
-            s_object = SSHConfig.objects.create(machine=self.machine_obj,
-                                                k_parameters=csv_params,
-                                                v_values=csv_values)
-            with reversion.revision:
-                s_object.save()
-        '''
         ## SSH Configuration file.
         try:
             s_object = SSHConfig.objects.get(machine__id=self.machine_id)
@@ -383,7 +351,8 @@ class ServerFunctions:
                     #print 'Activating AC %s ...' % ac['filename']
 
             except ApacheConfig.DoesNotExist:
-                a_object = ApacheConfig.objects.create(machine=self.machine_obj,
+                a_object = ApacheConfig.objects.create(
+                    machine=self.machine_obj,
                     body=ac['body'], filename=ac['filename'],
                     directives=ac['directives'], domains=ac['domains'],
                     included=ac['included'])
@@ -464,4 +433,3 @@ class ServerFunctions:
             #print 'Adding MySQL Config ...'
 
         return True
-

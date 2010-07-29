@@ -11,7 +11,8 @@ from django.utils import simplejson
 from .models import Machine, Services, System, RPMs, Interface, SSHConfig, \
                     IPTables, ApacheConfig, PHPConfig, MySQLConfig
 from .forms import MachineSearchForm
-from .utils import diff_list, diff_dict, get_version_diff, get_version_diff_field
+from .utils import diff_list, diff_dict, get_version_diff, \
+                   get_version_diff_field
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -233,7 +234,7 @@ def detail(request, machine_slug):
         '-date_added').all()
 
     if rpms_history.exists():
-        rpms_list = re.split('\n', rpms_history[0].v_rpms)
+        rpms_list = rpms_history[0].v_rpms.split('\n')
         rpms_date_added = rpms_history[0].date_added
 
         rpms_versions = get_version_diff(rpms_history[0], '\n')
@@ -288,9 +289,9 @@ def detail(request, machine_slug):
                                                  HtmlFormatter())
 
             body = ''
-            lines = re.split('\n', apacheconfig_latest_body)
+            lines = apacheconfig_latest_body.split('\n')
             for line in lines:
-                ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
+                ls = line.replace('<span class="nb">', '').replace('</span>', '').split()
                 if len(ls) == 2 and ls[0].lower() == 'include':
                     # Strip quotation marks, if available, for filenames.
                     if ls[1][0] == ls[1][-1] and ls[1][0] in ('"', "'"):
@@ -298,8 +299,8 @@ def detail(request, machine_slug):
 
                     try:
                         a = ApacheConfig.objects.get(machine__id=m.id,
-                                                     filename__endswith=ls[1],
-                                                     active=True)
+                            filename__endswith=ls[1].rtrim('"').rtrim("'"),
+                            active=True)
                         i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
                     except (ApacheConfig.DoesNotExist,
                             ApacheConfig.MultipleObjectsReturned):
@@ -334,7 +335,8 @@ def detail(request, machine_slug):
     if phpconfig_history.exists():
         phpconfig_latest = phpconfig_history[0]
 
-        phpconfig_versions = get_version_diff_field(phpconfig_history[0], 'body')
+        phpconfig_versions = get_version_diff_field(phpconfig_history[0], 
+        'body')
 
 
     ## MySQL configuration file.
@@ -421,16 +423,14 @@ def apacheconfig(request, machine_slug, ac_id):
 
     # TODO: ADD AS FILTER.
     body = ''
-    lines = re.split('\n', highlighted_code)
+    lines = highlighted_code.split('\n')
     for line in lines:
-        ls = re.split(' ', line.replace('<span class="nb">', '').replace('</span>', ''))
+        ls = line.replace('<span class="nb">', '').replace('</span>', '').split()
         if len(ls) == 2 and ls[0].lower() == 'include':
-            # TODO: in Apache Config Parser, handle ``quoted`` Include filenames.
-
             try:
                 a = ApacheConfig.objects.get(machine__id=m.id,
-                                             filename__endswith=ls[1],
-                                             active=True)
+                    filename__endswith=ls[1].rtrim('"').rtrim("'"),
+                    active=True)
                 i_fn = '<a href="%s">%s</a>' % (a.get_absolute_url(), ls[1])
             except (ApacheConfig.DoesNotExist, ApacheConfig.MultipleObjectsReturned):
                 i_fn = '%s' % ls[1]

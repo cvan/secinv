@@ -321,7 +321,7 @@ class GetNestedItemsNode(template.Node):
 
         content = self.nodelist.render(context)
 
-        lines = re.split('\n', content)
+        lines = content.split('\n')
         output = ''
 
         for line in lines:
