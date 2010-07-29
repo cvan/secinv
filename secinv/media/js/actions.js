@@ -2,7 +2,7 @@ var selectedSection = '';
 
 $(function() {
 
-    $('select#machine-hostname, select#machine-ip, select#machine-domain, aside#sidebar select[id$=-value]').change(function() {
+    $('aside#sidebar select[id^=machine-], aside#sidebar select[id$=-value]').change(function() {
         $(this).closest('form').submit();
     }).keyup(function() {
         $(this).closest('form').submit();
@@ -11,8 +11,8 @@ $(function() {
     });
 
     // Get section name of `selected` `option`'s parent `select` field.
-    if ($("select[id$='-parameter'] option[selected]").length)
-        selectedSection = $("select[id$='-parameter'] option[selected]").parent().attr('id').split('-')[0];
+    if ($('select[id$=-parameter] option[selected]').length)
+        selectedSection = $('select[id$=-parameter] option[selected]').parent().attr('id').split('-')[0];
 
     $("select[id$='-parameter']").each(function(index) {
         var section = $(this).attr('id').split('-')[0];
@@ -61,17 +61,6 @@ function doPopulate(section) {
 
 function doChange(section) {
     var paramVal = $('select#' + section + '-parameter').val();
-
-/*
-    if ($("select[id$='-parameter']").length) {
-        //selectedSection = $("select[id$='-parameter'] option[selected]").parent().attr('id').split('-')[0];
-        $("select[id$='-parameter']:not(#" + section + "-parameter").each(function() {
-            //if ($(this).attr('id') != section + '-parameter')
-            $(this).val('');
-        });
-    }
-
-*/
 
     $("select[id$='-parameter']:not(#" + section + "-parameter").val('');
 
