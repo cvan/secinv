@@ -10,6 +10,7 @@ def all_zeros(txt):
     return txt and not int(float.fromhex(
         str(txt).strip().replace(':', '').replace('-', ''))) or False
 
+
 def diff_list(l_old, l_new):
     """Creates a new dictionary representing a difference between two lists."""
     set_old, set_new = set(l_old), set(l_new)

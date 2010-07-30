@@ -4,8 +4,6 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = patterns('',
-    #(r'^$', 'index'),
-#    (r'^$', 'django.contrib.auth.views.login', {'template_name': 'login/index.html', 'next': reverse('machines-index')}),
     url(r'^login/$',
         auth_views.login,
         {'template_name': 'accounts/index.html'},
