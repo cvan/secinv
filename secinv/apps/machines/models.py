@@ -203,7 +203,7 @@ if not reversion.is_registered(Machine):
 class AuthToken(models.Model):
     token = models.CharField(_('authorization token'), blank=True,
                              null=True, max_length=255,
-        default=generate_token)
+                             default=generate_token)
     active = models.BooleanField(_('active'), default=1)
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
