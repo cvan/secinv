@@ -107,7 +107,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'secinv.urls'
 
 TEMPLATE_DIRS = (
-    path('secinv/templates'),
+    path('templates'),
 )
 
 INSTALLED_APPS = (
