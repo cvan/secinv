@@ -126,3 +126,20 @@ Any time you want to run the development server:
 <pre>
 python manage.py runserver
 </pre>
+
+# Creating a self-signed SSL certificate for XML-RPC server
+
+<pre>
+cd ~/
+openssl genrsa -des3 -out server.key 4096
+openssl req -new -key server.key -out server.csr
+cp server.key server.key.org
+openssl rsa -in server.key.org -out server.key
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+</pre>
+
+# XML-RPC Server
+
+Modify the `server/settings.conf` file as you see fit (namely, the SSL key &
+certificate files and the database credentials).
+
