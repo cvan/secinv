@@ -1,5 +1,13 @@
 from ConfigParser import ConfigParser
-import sys
+from OpenSSL import SSL
+from os.path import expanduser
+from sys import exit
+import BaseHTTPServer
+import SimpleHTTPServer
+import SimpleXMLRPCServer
+import SocketServer
+import socket
+
 
 # Path to server configuration file.
 SERVER_CONFIG_FN = 'server.conf'
@@ -10,24 +18,14 @@ server_config = ConfigParser()
 try:
     server_config.readfp(file(SERVER_CONFIG_FN))
 except IOError:
-    sys.exit("Error: Cannot open server configuration file '%s'"
-             % SERVER_CONFIG_FN)
+    exit("Error: Cannot open server configuration file '%s'"
+         % SERVER_CONFIG_FN)
 
 LISTEN_HOST = server_config.get('server', 'listen_host')
 LISTEN_PORT = server_config.get('server', 'listen_port')
 
-KEY_FILE = server_config.get('server', 'key_file')
-CERT_FILE = server_config.get('server', 'cert_file')
-
-
-import BaseHTTPServer
-import SimpleHTTPServer
-import SimpleXMLRPCServer
-import SocketServer
-import os
-import socket
-
-from OpenSSL import SSL
+KEY_FILE = expanduser(server_config.get('server', 'key_file'))
+CERT_FILE = expanduser(server_config.get('server', 'cert_file'))
 
 
 class SecureXMLRPCServer(BaseHTTPServer.HTTPServer,
@@ -41,7 +39,8 @@ class SecureXMLRPCServer(BaseHTTPServer.HTTPServer,
         except TypeError:
             # An exception is raised in Python 2.5, as the __init__ method
             # instead accepts three arguments: self, allow_none, encoding.
-            SimpleXMLRPCServer.SimpleXMLRPCDispatcher.__init__(self, False, None)
+            SimpleXMLRPCServer.SimpleXMLRPCDispatcher.__init__(self, False,
+                                                               None)
 
         SocketServer.BaseServer.__init__(self, server_address, HandlerClass)
         ctx = SSL.Context(SSL.SSLv23_METHOD)
