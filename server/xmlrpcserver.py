@@ -10,7 +10,7 @@ import socket
 
 
 # Path to server configuration file.
-SERVER_CONFIG_FN = 'server.conf'
+SERVER_CONFIG_FN = 'settings.conf'
 
 # Parse server.conf for server settings and database credentials.
 server_config = ConfigParser()
@@ -24,8 +24,8 @@ except IOError:
 LISTEN_HOST = server_config.get('server', 'listen_host')
 LISTEN_PORT = server_config.get('server', 'listen_port')
 
-KEY_FILE = expanduser(server_config.get('server', 'key_file'))
-CERT_FILE = expanduser(server_config.get('server', 'cert_file'))
+KEY_FILE = expanduser(server_config.get('server', 'ssl_key_file'))
+CERT_FILE = expanduser(server_config.get('server', 'ssl_cert_file'))
 
 
 class SecureXMLRPCServer(BaseHTTPServer.HTTPServer,
