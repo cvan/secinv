@@ -51,51 +51,6 @@
         </div><!-- #services-latest -->
         <div id="services-history" class="history">
 
-<!--
-<div id="tableContainer" class="tableContainer">
-<table width="100%" class="scrollTable nested">
-            <caption>{{ _('History') }}</caption>
-<thead class="fixedHeader">
-	<tr>
-                <th class="pair_name">{{ _('Process') }}</th>
-                <th class="pair_port">{{ _('Port') }}</th>
-                <th class="timestamp">{{ _('Modified') }}</th>
-	</tr>
-</thead>
-<tbody class="scrollContent">
-            {% for services_ver in services_versions %}
-              <tr>
-                <td colspan="2">
-                  <table>
-                  {% for process, port in services_ver.diff.pair.merged.items %}
-                    <tr>
-                      <td class="pair_name">
-                        {% differ services_ver.diff.pair.diff process %}{{ process }}{% enddiffer %}
-                      </td>
-                      <td class="pair_port">
-                        {% differ services_ver.diff.pair.diff process %}{{ port }}{% enddiffer %}
-                      </td>
-                    </tr>
-                  {% endfor %}
-                  </table>
-                </td>
-                <td class="timestamp">
-                  <time datetime="{{ services_ver.fields.date_added|date:'c' }}">
-                    {{ services_ver.fields.date_added }}
-                  </time>
-                </td>
-              </tr>
-            {% empty %}
-              <tr>
-                <td></td>
-              </tr>
-            {% endfor %}
-
-</tbody>
-</table>
-</div>
--->
-
           <table class="nested">
             <caption>{{ _('History') }}</caption>
             <thead>

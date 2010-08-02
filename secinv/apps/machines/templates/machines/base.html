@@ -7,37 +7,37 @@
           <h2>{{ _('Machines') }}</h2>
 
           <fieldset>
-					  <legend>{{ _('Filter Machines') }}</legend>
+            <legend>{{ _('Filter Machines') }}</legend>
 
-					  <form action="{% url machine-filter %}" method="get">
-					    <label for="machine-hostname">{{ _('Select by <strong>hostname</strong>') }}</label>
-					    <select name="machine_hostname" id="machine-hostname">
-					      <option selected value="">*</option>
-					    {% for m in all_machines_hn %}
-					      <option value="{{ m.hostname }}">{{ m.hostname }} ({{ m.sys_ip }})</option>
-					    {% endfor %}
-					    </select>
-					  </form>
+            <form action="{% url machine-filter %}" method="get">
+              <label for="machine-hostname">{{ _('Select by <strong>hostname</strong>') }}</label>
+              <select name="machine_hostname" id="machine-hostname">
+                <option selected value="">*</option>
+              {% for m in all_machines_hn %}
+                <option value="{{ m.hostname }}">{{ m.hostname }} ({{ m.sys_ip }})</option>
+              {% endfor %}
+              </select>
+            </form>
 
-					  <form action="{% url machine-filter %}" method="get">
-					    <label for="machine-ip">{{ _('Select by <strong>IP address</strong>') }}</label>
-					    <select name="machine_ip" id="machine-ip">
-					      <option selected value="">*</option>
-  					  {% for m in all_machines_ip %}
-					      <option value="{{ m.hostname }}">{{ m.sys_ip }} ({{ m.hostname }})</option>
-	  				  {% endfor %}
-					    </select>
-					  </form>
+            <form action="{% url machine-filter %}" method="get">
+              <label for="machine-ip">{{ _('Select by <strong>IP address</strong>') }}</label>
+              <select name="machine_ip" id="machine-ip">
+                <option selected value="">*</option>
+              {% for m in all_machines_ip %}
+                <option value="{{ m.hostname }}">{{ m.sys_ip }} ({{ m.hostname }})</option>
+              {% endfor %}
+              </select>
+            </form>
 
-					  <form action="{% url machine-filter %}" method="get">
-					    <label for="machine-domain">{{ _('Select by <strong>domain</strong>') }}</label>
-					    <select name="machine_domain" id="machine-domain">
-					      <option selected value="">*</option>
-					    {% for hostname, domain, ac_id in all_domains %}
-					      <option value="{{ hostname }}">{{ domain }}</option>
-					    {% endfor %}
-					    </select>
-					  </form>
+            <form action="{% url machine-filter %}" method="get">
+              <label for="machine-domain">{{ _('Select by <strong>domain</strong>') }}</label>
+              <select name="machine_domain" id="machine-domain">
+                <option selected value="">*</option>
+              {% for hostname, domain, ac_id in all_domains %}
+                <option value="{{ hostname }}">{{ domain }}</option>
+              {% endfor %}
+              </select>
+            </form>
           </fieldset>
 
           <form action="{% url conf-filter-results section_slug='apacheconfig' %}" method="get">
