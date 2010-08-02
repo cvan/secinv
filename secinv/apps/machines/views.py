@@ -1,18 +1,20 @@
 from django.db.models import Q
 from django.core import serializers
 from django.core.urlresolvers import reverse
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, \
-                        HttpResponseNotFound, Http404
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import (login_required,
+                                            permission_required)
+from django.http import (HttpResponse, HttpResponseRedirect,
+                         HttpResponseNotFound, Http404)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson
 
-from .models import Machine, Services, System, RPMs, Interface, SSHConfig, \
-                    IPTables, ApacheConfig, PHPConfig, MySQLConfig
+from .models import (Machine, Services, System, RPMs, Interface, SSHConfig,
+                     IPTables, ApacheConfig, PHPConfig, MySQLConfig)
 from .forms import MachineSearchForm
-from .utils import diff_list, diff_dict, get_version_diff, \
-                   get_version_diff_field
+from .utils import (diff_list, diff_dict, get_version_diff,
+                    get_version_diff_field)
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -150,7 +152,8 @@ def recurse_ac_includes(ac, field_name='filename'):
             l = i_ac.__getattribute__(field_name)
 
             if i_ac.included:
-                l = [i_ac.__getattribute__(field_name), recurse_ac_includes(i_ac)]
+                l = [i_ac.__getattribute__(field_name),
+                     recurse_ac_includes(i_ac)]
 
             ac_includes.append(l)
         except ApacheConfig.DoesNotExist:
@@ -343,13 +346,14 @@ def detail(request, machine_slug):
     ## MySQL configuration file.
     mysqlconfig_latest = []
     mysqlconfig_versions = []
-    mysqlconfig_history = MySQLConfig.objects.filter(machine__id=m.id, active=True
-        ).order_by('-date_added').all()
+    mysqlconfig_history = MySQLConfig.objects.filter(machine__id=m.id,
+        active=True).order_by('-date_added').all()
 
     if mysqlconfig_history.exists():
         mysqlconfig_latest = mysqlconfig_history[0]
 
-        mysqlconfig_versions = get_version_diff_field(mysqlconfig_history[0], 'body')
+        mysqlconfig_versions = get_version_diff_field(mysqlconfig_history[0],
+                                                      'body')
 
 
     template_context = {'query': query,
@@ -719,3 +723,23 @@ def conf_filter_results(request, section_slug):
     return render_to_response('machines/conf_results.html', template_context,
                               context_instance=RequestContext(request))
 
+@staff_member_required
+#@permission_required('machines.add_machine, machines.add_authtoken')
+#@permission_required('machines.add_machine')
+#@permission_required('machines.add_authorizationtokens')
+def add_multiple_machines(request):
+    machines = Machine.objects.all()
+    query = request.GET.get('q', '')
+
+    template_context = {'machines': machines,
+                        'query': query,
+                        'all_machines_hn': get_all_machines('-hostname'),
+                        'all_machines_ip': get_all_machines('-sys_ip'),
+                        'all_domains': get_all_domains(),
+                        'all_directives': get_all_directives(),
+                        'all_php_items': get_all_items('phpconfig'),
+                        'all_mysql_items': get_all_items('mysqlconfig'),
+                        'all_ssh_items': get_all_items('sshconfig'),}
+    return render_to_response('machines/add_multiple_machines.html',
+                              template_context,
+                              context_instance=RequestContext(request))
