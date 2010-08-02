@@ -1,34 +1,42 @@
-#from .models import Machine
-from .models import *
+from .models import (Machine, Services, System, RPMs, Interface, SSHConfig,
+                     IPTables, ApacheConfig, PHPConfig, MySQLConfig, 
+                     AuthToken)
 from django.contrib import admin
+from django.conf.urls.defaults import patterns, url
 
-#admin.site.register(Machine)
-
-#class ChoiceInline(admin.StackedInline):
+from .views import add_multiple_machines
 
 class SystemInline(admin.TabularInline):
     model = System
+
 
 class InterfaceInline(admin.TabularInline):
     model = Interface
     extra = 2
 
+
 class ServicesInline(admin.TabularInline):
     model = Services
+
 
 class SSHConfigInline(admin.TabularInline):
     model = SSHConfig
 
+
 class RPMSInline(admin.TabularInline):
     model = RPMs
+
 
 class IPTablesInline(admin.TabularInline):
     model = IPTables
 
+
 class ApacheConfigInline(admin.TabularInline):
     model = ApacheConfig
 
+
 class MachineAdmin(admin.ModelAdmin):
+    model = Machine
     fieldsets = [(None,               {'fields': ['sys_ip',
                                                   'hostname', 'ext_ip',
                                                   'token']}),
@@ -37,7 +45,8 @@ class MachineAdmin(admin.ModelAdmin):
                                        'classes': 'collapse'}),]
 
     inlines = [SystemInline, InterfaceInline, ServicesInline, 
-               SSHConfigInline, RPMSInline, IPTablesInline, ApacheConfigInline]
+               SSHConfigInline, RPMSInline, IPTablesInline,
+               ApacheConfigInline]
 
     list_display = ('sys_ip', 'hostname', 'ext_ip',
                     'date_added', 'date_modified', 'date_scanned')
@@ -55,8 +64,16 @@ class MachineAdmin(admin.ModelAdmin):
                      'phpconfig__body', 'phpconfig__filename',
                      'mysqlconfig__body', 'mysqlconfig__filename']
 
-
     date_hierarchy = 'date_added'
+
+    def get_urls(self):
+        urls = super(MachineAdmin, self).get_urls()
+        my_urls = patterns('',
+            url(r'^add_multiple_machines/$',
+                self.admin_site.admin_view(add_multiple_machines),
+                name='add_multiple_machines'),
+        )
+        return my_urls + urls
 
 admin.site.register(Machine, MachineAdmin)
 
@@ -65,4 +82,3 @@ class AuthTokenAdmin(admin.ModelAdmin):
     list_display = ('token', 'active')
 
 admin.site.register(AuthToken, AuthTokenAdmin)
-
