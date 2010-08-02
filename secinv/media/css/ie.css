@@ -8,7 +8,7 @@ details.differences summary,
 details.differences dl,
 details.differences dt,
 details.differences dd {
-	zoom: 1;  /* IE7 hack for display:inline-block */
-	*display: inline;
+  zoom: 1;  /* IE7 hack for display:inline-block */
+  *display: inline;
 }
 

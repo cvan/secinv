@@ -2,7 +2,7 @@
 /* 52framework General StyleSheet - contains styles for all the HTML elements this framework supports */
 
 body {
-	font-size: 52%/1.52em;
+  font-size: 52%/1.52em;
 }
 
 /* ** ** Common Additive Classes ** ** */
@@ -16,17 +16,17 @@ body {
 .align_center   { text-align: center; }
 .align_justify  { text-align: justify; }
 
-a {	color: #666; }
+a {  color: #666; }
 a:hover, a:focus { color: #333; text-decoration: underline; }
 a:active, a:visited { }
 
 blockquote {
-	color: #999;
+  color: #999;
     font: 1.52em/1.3em italic Georgia, "Times New Roman", Times, serif; 
-	margin: 5px; 
-	padding: 10px;
-	quotes: none;
-	width: 100%;
+  margin: 5px; 
+  padding: 10px;
+  quotes: none;
+  width: 100%;
 }
 blockquote.left { border-right: #ccc 1px dashed; width: 35%; }
 blockquote.right { border-left: #ccc 1px dashed; width: 35%; }
@@ -42,8 +42,8 @@ h6 { font-size: 1.52em; }
 /* @end */
 
 p { margin: 0 0 1.52em; }
-	p img.left { float: left; margin: 1.52em 1.52em 1.52em 0; padding: 0; }
-	p img.right { float: right; margin: 1.52em 0 1.52em 1.52em; }
+  p img.left { float: left; margin: 1.52em 1.52em 1.52em 0; padding: 0; }
+  p img.right { float: right; margin: 1.52em 0 1.52em 1.52em; }
 
 /* @group Forms */
 fieldset {
@@ -74,12 +74,12 @@ form label {
 }
 /* @end */
 
-strong   		{ font-weight: 600; }
-em, dfn  		{ font-style: italic; }
-dfn 	 		{ font-weight: 600; }
-sup, sub 		{ line-height: 0; }
+strong       { font-weight: 600; }
+em, dfn      { font-style: italic; }
+dfn        { font-weight: 600; }
+sup, sub     { line-height: 0; }
 abbr, acronym   { border-bottom: #ccc 1px dashed; }
-address 		{ font-style: italic; margin: 0 0 1.5em; }
+address     { font-style: italic; margin: 0 0 1.5em; }
 pre, code       {
     display: block;
     font: 1em "Andale Mono", "Lucida Console", monospace;

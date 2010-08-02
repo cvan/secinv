@@ -44,9 +44,9 @@ setup_environ(settings)
 
 import reversion
 
-from apps.machines.models import Machine, Services, System, RPMs, Interface, \
-                                 SSHConfig, IPTables, ApacheConfig, \
-                                 PHPConfig, MySQLConfig, AuthToken
+from apps.machines.models import (Machine, Services, System, RPMs, Interface,
+                                  SSHConfig, IPTables, ApacheConfig,
+                                  PHPConfig, MySQLConfig, AuthToken)
 
 
 class ServerFunctions:
