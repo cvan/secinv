@@ -724,22 +724,13 @@ def conf_filter_results(request, section_slug):
                               context_instance=RequestContext(request))
 
 @staff_member_required
-#@permission_required('machines.add_machine, machines.add_authtoken')
-#@permission_required('machines.add_machine')
-#@permission_required('machines.add_authorizationtokens')
+@permission_required('machines.add_machine')
+@permission_required('machines.add_authtoken')
 def add_multiple_machines(request):
-    machines = Machine.objects.all()
-    query = request.GET.get('q', '')
+    #if request.method != 'POST':
+    #    raise Http404(_('Invalid request method.'))
 
-    template_context = {'machines': machines,
-                        'query': query,
-                        'all_machines_hn': get_all_machines('-hostname'),
-                        'all_machines_ip': get_all_machines('-sys_ip'),
-                        'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives(),
-                        'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),
-                        'all_ssh_items': get_all_items('sshconfig'),}
+    template_context = {}
     return render_to_response('machines/add_multiple_machines.html',
                               template_context,
                               context_instance=RequestContext(request))
