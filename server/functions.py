@@ -66,9 +66,10 @@ class ServerFunctions:
             s = AuthToken.objects.get(token=auth_token, active=True)
             if s:
                 self.is_authenticated = True
-                return True
         except AuthToken.DoesNotExist:
-            return False
+            pass
+
+        return self.is_authenticated
 
     def machine(self, ip_dict, system_dict, services_dict, rpms_dict,
                 sshconfig_dict, ipt_dict, acl_list, phpini_dict, mycnf_dict):
