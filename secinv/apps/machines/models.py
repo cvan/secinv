@@ -221,8 +221,8 @@ class Interface(models.Model):
     machine = models.ForeignKey('Machine')
     i_name = models.CharField(_('interface name'), max_length=50)
     i_ip = models.IPAddressField(_('IP address'), blank=True, null=True)
-    #i_mac = models.CharField(_('MAC address'), max_length=17, blank=True, null=True)
-    i_mac = models.CharField(_('MAC address'), max_length=255, blank=True, null=True)
+    i_mac = models.CharField(_('MAC address'), max_length=255, blank=True,
+                             null=True)
     i_mask = models.IPAddressField(_('netmask'), blank=True, null=True)
     active = models.BooleanField(_('active'), default=1)
     date_added = models.DateTimeField(_('date added'),
@@ -234,8 +234,8 @@ class Interface(models.Model):
 
     def version_changes(self):
         """
-        Create a dictionary of the differences between the current and previous
-        interface of the same interface name.
+        Create a dictionary of the differences between the current and
+        previous interface of the same interface name.
         """
         i_diff = {}
 
@@ -274,12 +274,13 @@ class System(models.Model):
 
     def __unicode__(self):
         return u'%s - %s - %s - %s - %s' % (self.kernel_rel, self.rh_rel,
-                                            self.nfs, self.ip_fwd, self.iptables)
+                                            self.nfs, self.ip_fwd,
+                                            self.iptables)
 
     def version_changes(self):
         """
-        Create a dictionary of the differences between the current and previous
-        entry of the system info.
+        Create a dictionary of the differences between the current and
+        previous entry of the system info.
         """
         i_diff = {}
 
@@ -319,8 +320,8 @@ class Services(models.Model):
 
     def version_changes(self):
         """
-        Create a dictionary of the differences between the current and previous
-        services entries.
+        Create a dictionary of the differences between the current and
+        previous services entries.
         """
         s_diff = {}
 
@@ -358,8 +359,8 @@ class SSHConfig(models.Model):
     '''
     def version_changes(self):
         """
-        Create a dictionary of the differences between the current and previous
-        SSH configuration entries.
+        Create a dictionary of the differences between the current and
+        previous SSH configuration entries.
         """
         s_diff = {}
 
@@ -394,9 +395,6 @@ class ApacheConfig(models.Model):
 
     # TODO: Store as SerializedTextField.
     body = CompressedTextField(_('contents'), blank=True, null=True)
-    #body = SerializedTextField(_('contents'), blank=True, null=True)
-    #body = SerializedTextField()
-#    body = SerializedTextField(blank=True, null=True)
 
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
@@ -408,8 +406,6 @@ class ApacheConfig(models.Model):
     # objects for the included Apache config files (since the files themselves
     # may be unreadable).
     included = SerializedTextField()
-
-#    included = models.ManyToManyField('ApacheConfig')
 
     active = models.BooleanField(_('status'), default=1)
 
@@ -464,8 +460,8 @@ class RPMs(models.Model):
 
     def version_changes(self):
         """
-        Create a dictionary of the differences between the current and previous
-        RPMs installed.
+        Create a dictionary of the differences between the current and
+        previous RPMs installed.
         """
         r_diff = {}
 
@@ -523,7 +519,7 @@ class PHPConfig(models.Model):
                                       default=datetime.datetime.now)
 
     def __unicode__(self):
-        return u'%s - %s' % (self.filename, self.body[0:50])
+        return u'%s - %s' % (self.machine.hostname, self.filename)
 
     @models.permalink
     def get_absolute_url(self):
@@ -551,7 +547,7 @@ class MySQLConfig(models.Model):
                                       default=datetime.datetime.now)
 
     def __unicode__(self):
-        return u'%s - %s' % (self.filename, self.body[0:50])
+        return u'%s - %s' % (self.machine.hostname, self.filename)
 
     @models.permalink
     def get_absolute_url(self):
