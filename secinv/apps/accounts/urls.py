@@ -1,7 +1,6 @@
 from django.conf.urls.defaults import patterns, url, include
 from django.core.urlresolvers import reverse
 from django.contrib.auth import views as auth_views
-from . import views
 
 urlpatterns = patterns('',
     url(r'^login/$', auth_views.login,
