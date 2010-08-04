@@ -1,0 +1,14 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify adminmedia %}
+
+{% block object-tools %}
+    {% if has_add_permission %}
+    <ul class="object-tools">
+      <li>
+        <a href="{% url admin:add_multiple_machines %}" class="addlink">
+          {{ _('Add multiple machines') }}</a>
+      </li>
+    </ul>
+    {% endif %}
+{% endblock %}
+
