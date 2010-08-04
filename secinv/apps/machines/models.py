@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 #from ..search.search import SearchManager
 from ..fields import *
-from ..settings import AUTH_TOKEN_LENGTH
+from django.conf import settings
 from .utils import diff_list, diff_dict, get_version_diff
 from reversion.models import Version
 
@@ -16,7 +16,7 @@ def generate_token():
     from string import letters, digits
 
     s = ''.join(SystemRandom().sample(letters + digits,
-                                      AUTH_TOKEN_LENGTH))
+                                      settings.AUTH_TOKEN_LENGTH))
     chunk_count = int(ceil(len(s) / 5.0))
     return '-'.join([str(s[i * 5:i * 5 + 5]) for i in xrange(chunk_count)])
 
