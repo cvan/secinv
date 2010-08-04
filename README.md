@@ -15,8 +15,15 @@ an XML-RPC client.
 * django-reversion 1.3.1
 * pygments 1.3.1
 
+# Installing Packages on RedHat
+To get started:
+
+<pre>
+yum install httpd mysql python-devel git
+</pre>
 
 # Installing Packages on Ubuntu
+
 If you're running a recent version of Ubuntu, you can [install the required
 dependencies automatically](apt:python-dev,python-virtualenv,libmysqlclient-dev).
 Otherwise, the following command will install the required dependencies:
@@ -92,7 +99,7 @@ cd ~/Sites/virtualenvs
 Use `git` to grab the latest copy of the development branch:
 
 <pre>
-mkvirtualenv --no-site-packages secinv
+mkvirtualenv --python=/usr/bin/python2.6 --no-site-packages secinv
 git clone git://github.com/cvan/secinv.git
 cd secinv/
 </pre>
