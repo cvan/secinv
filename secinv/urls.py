@@ -7,12 +7,11 @@ from django.http import HttpResponsePermanentRedirect
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'secinv.apps.machines.views.index', name='index'),
-    (r'^machines/', include('secinv.apps.machines.urls')),
-    (r'^webapps/', include('secinv.apps.webapps.urls')),
-    (r'^accounts/', include('secinv.apps.accounts.urls')),
-    #(r'^search/', include('secinv.apps.haystack.urls')),
-    #(r'^fulltext/', include('secinv.fulltext.urls')),
+    url(r'^$', 'apps.machines.views.index', name='index'),
+    (r'^machines/', include('apps.machines.urls')),
+    (r'^webapps/', include('apps.webapps.urls')),
+    (r'^accounts/', include('apps.accounts.urls')),
+    #(r'^search/', include('apps.haystack.urls')),
 
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),

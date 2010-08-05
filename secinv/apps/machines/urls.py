@@ -10,7 +10,7 @@ ac_id = r'(?P<ac_id>[0-9]+)'
 item_id = r'(?P<item_id>[0-9]+)'
 directive_slug = r'(?P<directive_slug>[-\w]+)'
 
-urlpatterns = patterns('secinv.apps.machines.views',
+urlpatterns = patterns('apps.machines.views',
     url(r'^$', 'index', name='machines-index'),
     url(r'^search/', 'search', name='machines-search'),
 

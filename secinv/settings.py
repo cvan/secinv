@@ -94,6 +94,18 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.eggs.Loader',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.media',
+    'django.core.context_processors.request',
+    'django.core.context_processors.csrf',
+
+    'django.contrib.messages.context_processors.messages',
+
+    'context_processors.global_settings',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -104,7 +116,7 @@ MIDDLEWARE_CLASSES = (
     'reversion.middleware.RevisionMiddleware',
 )
 
-ROOT_URLCONF = 'secinv.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     path('templates'),
@@ -118,16 +130,16 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'secinv.apps.machines',
-    #'secinv.apps.haystack',
-    'secinv.apps.accounts',
-    'secinv.apps.search',
-    'secinv.apps.webapps',
+    'apps.machines',
+    #''apps.haystack',
+    'apps.accounts',
+    'apps.search',
+    'apps.webapps',
     'reversion',
 )
 
 
-#HAYSTACK_SITECONF = 'secinv.search_sites'
+#HAYSTACK_SITECONF = ''search_sites'
 
 #HAYSTACK_SEARCH_ENGINE = 'simple'
 
