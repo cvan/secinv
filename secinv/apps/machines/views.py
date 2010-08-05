@@ -617,13 +617,7 @@ def machine_filter(request):
     ip = request.GET.get('machine_ip', '')
     domain = request.GET.get('machine_domain', '')
 
-    m_hn = ''
-    if hostname:
-        m_hn = hostname
-    elif ip:
-        m_hn = ip
-    elif domain:
-        m_hn = domain
+    m_hn = hostname or ip or domain
 
     if m_hn:
         m = get_object_or_404(Machine, hostname=m_hn)
