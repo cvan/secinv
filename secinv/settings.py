@@ -131,7 +131,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'apps.machines',
-    #''apps.haystack',
+    #'apps.haystack',
     'apps.accounts',
     'apps.search',
     'apps.webapps',
@@ -139,7 +139,7 @@ INSTALLED_APPS = (
 )
 
 
-#HAYSTACK_SITECONF = ''search_sites'
+#HAYSTACK_SITECONF = 'search_sites'
 
 #HAYSTACK_SEARCH_ENGINE = 'simple'
 
