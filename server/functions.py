@@ -227,9 +227,9 @@ class ServerFunctions:
 
         ## Services.
         procs = services_dict.keys()
-        csv_procs = ','.join(procs)
+        csv_procs = '|'.join(procs)
         ports = services_dict.values()
-        csv_ports = ','.join(ports)
+        csv_ports = '|'.join(ports)
 
         try:
             s_object = Services.objects.filter(

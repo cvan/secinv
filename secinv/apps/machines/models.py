@@ -54,7 +54,7 @@ class Machine(models.Model):
         try:
             s = Services.objects.filter(machine__id=self.id).order_by(
                 '-date_added').all()[0]
-            processes = s.k_processes.split(',')
+            processes = s.k_processes.split('|')
             return 'httpd' in processes
         except IndexError:
             return False
@@ -63,7 +63,7 @@ class Machine(models.Model):
         try:
             s = Services.objects.filter(machine__id=self.id).order_by(
                 '-date_added').all()[0]
-            processes = s.k_processes.split(',')
+            processes = s.k_processes.split('|')
             return 'mysqld' in processes
         except IndexError:
             return False
@@ -72,7 +72,7 @@ class Machine(models.Model):
         try:
             s = Services.objects.filter(machine__id=self.id).order_by(
                 '-date_added').all()[0]
-            processes = s.k_processes.split(',')
+            processes = s.k_processes.split('|')
             return 'openvpn' in processes
         except IndexError:
             return False
@@ -311,10 +311,16 @@ if not reversion.is_registered(System):
 class Services(models.Model):
     machine = models.ForeignKey('Machine')
     # TODO: Use TextFields.
+    '''
     k_processes = models.CharField(_('processes'), max_length=255, blank=True,
                                    null=True)
     v_ports = models.CommaSeparatedIntegerField(_('ports'), max_length=255,
                                                 blank=True, null=True)
+    '''
+
+    k_processes = models.TextField(_('processes'), blank=True, null=True)
+    v_ports = models.TextField(_('ports'), blank=True, null=True)
+
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
 
@@ -327,7 +333,7 @@ class Services(models.Model):
 
         try:
             s_latest = Services.objects.get(machine__id=self.machine_id)
-            s_v = get_version_diff(s_latest, ',')
+            s_v = get_version_diff(s_latest, '|')
             if s_v:
                 s_diff = s_v[0]
         except Services.DoesNotExist:

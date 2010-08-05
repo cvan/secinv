@@ -75,12 +75,12 @@ def diff_dict(a, b, delimiter=None):
         for key, value in b.iteritems():
             if key[:2] == 'k_' and delimiter in value:
                 key_name = key
-                a_pair_k = re.split(delimiter, a[key]) if key in a else []
-                b_pair_k = re.split(delimiter, value)
+                a_pair_k = a[key].split(delimiter) if key in a else []
+                b_pair_k = value.split(delimiter)
             if key[:2] == 'v_' and delimiter in value:
                 value_name = value
-                a_pair_v = re.split(delimiter, a[key]) if key in a else []
-                b_pair_v = re.split(delimiter, value)
+                a_pair_v = a[key].split(delimiter) if key in a else []
+                b_pair_v = value.split(delimiter)
 
         if key_name and value_name:
             a_pair_dict = dict(zip(a_pair_k, a_pair_v))

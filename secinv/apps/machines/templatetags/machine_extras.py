@@ -15,7 +15,7 @@ register = template.Library()
 
 @register.filter
 @stringfilter
-def split_as_list(value, splitter=',', autoescape=None):
+def split_as_list(value, splitter='|', autoescape=None):
     if not isinstance(value, SafeData):
         value = mark_safe(value)
     value = value.split(splitter)
@@ -26,56 +26,15 @@ def split_as_list(value, splitter=',', autoescape=None):
 split_as_list.is_safe = True
 split_as_list.needs_autoescape = True
 
+
+@register.filter
 def dict_get(value, arg):
-    #custom template tag used like so:
-    #{{dictionary|dict_get:var}}
-    #where dictionary is duh a dictionary and var is a variable representing
-    #one of it's keys
-
+    """
+    Custom template tag used like so:
+    {{ dictionary|dict_get:var }}
+    """
     return value[arg]
-
 register.filter('dict_get', dict_get)
-
-'''
-@register.filter
-def diff(value, arg, autoescape=None):
-    # value = sytem
-    if arg in value['diff']['added']:
-        result = '<ins>%s</ins>' % value['fields'][arg]
-
-    if arg in value['diff']['changed']:
-        result = '<mark>%s</mark>' % value['fields'][arg]
-
-    if arg in value['diff']['removed']:
-        result = '<del>%s</del>' % value['fields'][arg]
-
-    if arg in value['diff']['unchanged']:
-        result = '%s' % value['fields'][arg]
-
-    return result
-diff.is_safe = True
-diff.needs_autoescape = True
-
-
-@register.filter
-def diff(value, arg, autoescape=False):
-    # value = sytem
-    if arg in value['diff']['added']:
-        result = '<ins>%s</ins>' % value['fields'][arg]
-
-    if arg in value['diff']['changed']:
-        result = '<mark>%s</mark>' % value['fields'][arg]
-
-    if arg in value['diff']['removed']:
-        result = '<del>%s</del>' % value['fields'][arg]
-
-    if arg in value['diff']['unchanged']:
-        result = '%s' % value['fields'][arg]
-
-    return result
-diff.is_safe = True
-diff.needs_autoescape = True
-'''
 
 
 @register.filter
@@ -89,52 +48,10 @@ def enum(value, arg, autoescape=False):
     choices = arg.split(',')
     yes = ugettext('%(yes)s') % {'yes': escaper(force_unicode(choices[0]))}
     no = ugettext('%(no)s') % {'no': escaper(force_unicode(choices[1]))}
+
     return yes if value else no
 enum.is_safe = True
 enum.needs_autoescape = True
-
-
-'''
-from ..models import *
-def do_latest_content(parser, token):
-    bits = token.split_contents()
-    if len(bits) != 5:
-        raise template.TemplateSyntaxError("'get_latest_content' tag takes exactly four arguments")
-    model_args = bits[1].split('.')
-    model = get_model(model_args[0], model_args[1])
-    return LatestContentNode(model, bits[2], bits[4])
-'''
-
-'''
-def do_latest_content(parser, token):
-    bits = token.split_contents()
-    if len(bits) != 5:
-        raise template.TemplateSyntaxError("'get_latest_content' tag takes exactly four arguments")
-
-    model_args = bits[1].split('.')
-    if len(model_args) != 2:
-        raise template.TemplateSyntaxError("First argument to 'get_latest_content' must be an 'application name'.'model name' string")
-        model = get_model(*model_args)
-        if model is None:
-            raise template.TemplateSyntaxError("'get_latest_content' tag got an invalid model: %s" % bits[1])
-        return LatestContentNode(model, bits[2], bits[4])
-    #return ''
-
-
-class LatestContentNode(template.Node):
-    def __init__(self, model, num, varname):
-        self.model = model
-        self.num = int(num)
-        self.varname = varname
-
-    def render(self, context):
-        context[self.varname] = self.model._default_manager.all()[:self.num]
-        #context[self.varname] = self.model.objects.all()[:self.num]
-        return ''
-
-register.tag('get_latest_content', do_latest_content)
-'''
-
 
 
 class DifferNode(template.Node):
@@ -170,7 +87,6 @@ class DifferNode(template.Node):
         if 'removed' in diff_dict and field_name in diff_dict['removed']:
             emphasis_tag = 'del'
 
-
         output = self.nodelist.render(context)
 
         emphasis_start = ('<%s>' % emphasis_tag) if len(emphasis_tag) else ''
@@ -200,13 +116,9 @@ def differ(parser, token):
     diff_dict = bits[1]
     field_name = bits[2]
 
-
     nodelist = parser.parse(('enddiffer',))
     parser.delete_first_token()
     return DifferNode(nodelist, diff_dict, field_name)
-#differ = register.tag(differ)
-
-
 
 
 class SplitAsListNode(template.Node):
@@ -238,7 +150,7 @@ def split_as_list(parser, token):
 
         or
 
-        {% split_as_list ',' services.processes as processes_list %}
+        {% split_as_list '|' services.processes as processes_list %}
     """
 
     bits = token.split_contents()
@@ -253,7 +165,7 @@ def split_as_list(parser, token):
     destination_list = bits[3]
 
     # Remove quotation marks from string value.
-    delimiter = ','
+    delimiter = '|'
     if num_bits == 5:
         delimiter = bits[1]
         if delimiter[0] in ('"', "'") and delimiter[0] == delimiter[-1]:
@@ -263,28 +175,6 @@ def split_as_list(parser, token):
         destination_list = bits[4]
 
     return SplitAsListNode(source_string, destination_list, delimiter)
-
-
-
-def autolinebreaks(value, autoescape=None):
-    """
-    Checks if the content is HTML or plain text. If plain text ,
-    line breaks are replaced with the appropriate HTML; a single
-    newline becomes an HTML line break (`<br>`) and a new line
-    followed by a blank line becomes a paragraph break (`</p>`).
-    """
-    import re
-    html_match = re.compile('<br>|<br />|<p>|<table>', re.IGNORECASE)
-    if not html_match.search(value):
-        from django.utils.html import linebreaks
-        autoescape = autoescape and not isinstance(value, SafeData)
-        return mark_safe(linebreaks(value, autoescape).replace('<br />', '<br>\n'))
-    else:
-        return value.replace('<br />', '<br>\n')
-autolinebreaks.is_safe = True
-autolinebreaks.needs_autoescape = True
-autolinebreaks = stringfilter(autolinebreaks)
-register.filter(autolinebreaks)
 
 
 def engine(f):
@@ -340,7 +230,8 @@ class GetNestedItemsNode(template.Node):
                     continue
 
             try:
-                ac = ApacheConfig.objects.get(machine__id=machine_id, filename=value)
+                ac = ApacheConfig.objects.get(machine__id=machine_id,
+                                              filename=value)
 
                 domains = '\n'
 
@@ -377,7 +268,8 @@ def get_nested_items(parser, token):
     bits = token.split_contents()
 
     if len(bits) != 3:
-        raise template.TemplateSyntaxError("%r tag requires two arguments: (field name) and machine_id." % bits[0])
+        raise template.TemplateSyntaxError(
+            "%r tag requires two arguments: (field name) and machine_id." % bits[0])
 
     field_name = bits[1]
     machine_id = bits[2]
@@ -385,8 +277,6 @@ def get_nested_items(parser, token):
     nodelist = parser.parse(('endget_nested_items',))
     parser.delete_first_token()
     return GetNestedItemsNode(nodelist, field_name, machine_id)
-
-
 
 
 '''
@@ -423,7 +313,8 @@ def highlight(value, arg=None, autoescape=None):
             lexer = guess_lexer(value)
         except ValueError:
             # Just make it plain text.
-            lexer = get_lexer_by_name(u'text', stripnl=False, encoding=u'UTF-8')
+            lexer = get_lexer_by_name(u'text', stripnl=False,
+                                      encoding=u'UTF-8')
 
     # TODO: Translation. uggetttext?
     code = highlight(value, lexer, HtmlFormatter())

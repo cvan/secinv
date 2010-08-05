@@ -183,7 +183,7 @@ def detail(request, machine_slug):
         services_latest = services_history[0]
 
         # Get historical versions of Services objects.
-        services_versions = get_version_diff(services_history[0], ',')
+        services_versions = get_version_diff(services_history[0], '|')
 
 
 
@@ -332,8 +332,8 @@ def detail(request, machine_slug):
     if phpconfig_history.exists():
         phpconfig_latest = phpconfig_history[0]
 
-        phpconfig_versions = get_version_diff_field(phpconfig_history[0], 
-        'body')
+        phpconfig_versions = get_version_diff_field(phpconfig_history[0],
+                                                    'body')
 
 
     ## MySQL configuration file.
