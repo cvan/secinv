@@ -106,21 +106,14 @@ def get_all_items(section_slug):
     all_items.sort()
     return all_items
 
+
 @login_required
 def index(request):
     """Machines index page."""
     machines = Machine.objects.all()
     query = request.GET.get('q', '')
 
-    template_context = {'machines': machines,
-                        'query': query,
-                        'all_machines_hn': get_all_machines('-hostname'),
-                        'all_machines_ip': get_all_machines('-sys_ip'),
-                        'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives(),
-                        'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),
-                        'all_ssh_items': get_all_items('sshconfig'),}
+    template_context = {'machines': machines}
     return render_to_response('machines/index.html', template_context,
                               context_instance=RequestContext(request))
 
@@ -356,8 +349,7 @@ def detail(request, machine_slug):
                                                       'body')
 
 
-    template_context = {'query': query,
-                        'machine': m,
+    template_context = {'machine': m,
                         'system': system_latest,
                         'system_versions': system_versions,
                         'services': services_latest,
@@ -378,14 +370,7 @@ def detail(request, machine_slug):
                         'phpconfig': phpconfig_latest,
                         'phpconfig_versions': phpconfig_versions,
                         'mysqlconfig': mysqlconfig_latest,
-                        'mysqlconfig_versions': mysqlconfig_versions,
-                        'all_machines_hn': get_all_machines('-hostname'),
-                        'all_machines_ip': get_all_machines('-sys_ip'),
-                        'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives(),
-                        'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),
-                        'all_ssh_items': get_all_items('sshconfig'),}
+                        'mysqlconfig_versions': mysqlconfig_versions,}
     return render_to_response('machines/detail.html', template_context,
                               context_instance=RequestContext(request))
 
@@ -406,15 +391,7 @@ def search(request):
 
     template_context = {'form': form,
                         'results': results,
-                        'query': query,
-                        'terms': terms,
-                        'all_machines_hn': get_all_machines('-hostname'),
-                        'all_machines_ip': get_all_machines('-sys_ip'),
-                        'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives(),
-                        'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),
-                        'all_ssh_items': get_all_items('sshconfig'),}
+                        'terms': terms,}
     return render_to_response('machines/search.html', template_context,
         context_instance=RequestContext(request))
 
@@ -466,13 +443,8 @@ def apacheconfig(request, machine_slug, ac_id):
 
     query = request.GET.get('q', '')
     template_context = {'machine': m,
-                        'query': query,
                         'ac': ac,
                         'ac_body': body,
-                        'all_machines_hn': get_all_machines('-hostname'),
-                        'all_machines_ip': get_all_machines('-sys_ip'),
-                        'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives(),
                         'apacheconfig_versions': apacheconfig_versions,
                         'apacheconfig_includes': apacheconfig_includes,
                         'ac_includes': ac_includes}
@@ -549,7 +521,6 @@ def diff(request, machine_slug, section_slug, version_number,
         v_num_previous = v_num - 1
 
     template_context = {'machine': m,
-                        'query': query,
                         'section': section_slug,
                         'obj_current': past_history[0],
                         'body_current': body_current,
@@ -558,14 +529,7 @@ def diff(request, machine_slug, section_slug, version_number,
                         'version_previous': str(v_num_previous),
                         'older_version': str(older_version),
                         'newer_version': str(newer_version),
-                        'compare_with': compare_with,
-                        'all_machines_hn': get_all_machines('-hostname'),
-                        'all_machines_ip': get_all_machines('-sys_ip'),
-                        'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives(),
-                        'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),
-                        'all_ssh_items': get_all_items('sshconfig'),}
+                        'compare_with': compare_with,}
     return render_to_response('machines/diff.html', template_context,
                               context_instance=RequestContext(request))
 
@@ -708,18 +672,10 @@ def conf_filter_results(request, section_slug):
     results.sort()
 
 
-    template_context = {'query': query,
-                        'conf_parameter': conf_parameter,
+    template_context = {'conf_parameter': conf_parameter,
                         'conf_value': conf_value,
                         'results': results,
-                        'section_slug': section_slug,
-                        'all_machines_hn': get_all_machines('-hostname'),
-                        'all_machines_ip': get_all_machines('-sys_ip'),
-                        'all_domains': get_all_domains(),
-                        'all_directives': get_all_directives(),
-                        'all_php_items': get_all_items('phpconfig'),
-                        'all_mysql_items': get_all_items('mysqlconfig'),
-                        'all_ssh_items': get_all_items('sshconfig'),}
+                        'section_slug': section_slug}
     return render_to_response('machines/conf_results.html', template_context,
                               context_instance=RequestContext(request))
 
