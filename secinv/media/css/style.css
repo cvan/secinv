@@ -816,6 +816,20 @@ hgroup#masthead h4 a:hover {
     color: #ccc;
 }
 
+hgroup#masthead h3 .step-links {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+}
+
+hgroup#masthead h3.pagination a {
+    color: #999;
+    font-size: 0.7em;
+    margin-left: 0.5em;
+}
+hgroup#masthead h3.pagination a:hover {
+    color: #ccc;
+}
 
 
 hgroup#masthead h4 {

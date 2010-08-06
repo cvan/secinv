@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django.core import serializers
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import (login_required,
@@ -25,6 +26,8 @@ from reversion.models import Version
 
 import re
 import json
+
+LIMIT_PER_PAGE = 25
 
 DIFF_SECTION_SLUGS = ('iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig',
                      'sshconfig')
@@ -115,8 +118,19 @@ def get_all_items(section_slug):
 @login_required
 def index(request):
     """Machines index page."""
-    machines = Machine.objects.all()
-    query = request.GET.get('q', '')
+    machines = Machine.objects.order_by('hostname').all()
+    paginator = Paginator(machines, LIMIT_PER_PAGE)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    # If page requested is out of range, display the last page of results.
+    try:
+        machines = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        machines = paginator.page(paginator.num_pages)
 
     template_context = {'machines': machines}
     return render_to_response('machines/index.html', template_context,
@@ -163,7 +177,6 @@ def recurse_ac_includes(ac, field_name='filename'):
 @login_required
 def detail(request, machine_slug):
     m = get_object_or_404(Machine, hostname=machine_slug)
-    query = request.GET.get('q', '')
 
     ## System.
     system_latest = []
@@ -189,7 +202,6 @@ def detail(request, machine_slug):
 
         # Get historical versions of Services objects.
         services_versions = get_version_diff(services_history[0], '|')
-
 
 
     ## Interfaces.
@@ -446,7 +458,6 @@ def apacheconfig(request, machine_slug, ac_id):
     # Recurse includes.
     ac_includes = recurse_ac_includes(ac)
 
-    query = request.GET.get('q', '')
     template_context = {'machine': m,
                         'ac': ac,
                         'ac_body': body,
@@ -464,7 +475,6 @@ def diff(request, machine_slug, section_slug, version_number,
         raise Http404
 
     m = get_object_or_404(Machine, hostname=machine_slug)
-    query = request.GET.get('q', '')
     v_num = int(version_number)
 
     body_current = ''
@@ -639,7 +649,6 @@ def conf_filter_results(request, section_slug):
     if request.method != 'GET' or not section_slug in CONFIG_SECTIONS:
         return HttpResponse(status=400)
 
-    query = request.GET.get('q', '')
     conf_parameter = request.GET.get('conf_parameter', '')
     conf_value = request.GET.get('conf_value', '')
 
