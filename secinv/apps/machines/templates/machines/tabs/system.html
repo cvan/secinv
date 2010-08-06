@@ -29,13 +29,13 @@
                   {% differ system.version_changes.diff 'rh_rel' %}{{ system.rh_rel }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.version_changes.diff 'nfs' %}{{ system.nfs|enum:'Yes,No' }}{% enddiffer %}
+                  {% differ system.version_changes.diff 'nfs' %}{{ system.nfs|yesno:'Yes,No' }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.version_changes.diff 'ip_fwd' %}{{ system.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
+                  {% differ system.version_changes.diff 'ip_fwd' %}{{ system.ip_fwd|yesno:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ system.version_changes.diff 'iptables' %}{{ system.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
+                  {% differ system.version_changes.diff 'iptables' %}{{ system.iptables|yesno:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td class="timestamp">
                   <time datetime="{{ system.date_added|date:'c' }}">
@@ -71,13 +71,13 @@
                   {% differ sys_ver.diff 'rh_rel' %}{{ sys_ver.fields.rh_rel }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ sys_ver.diff 'nfs' %}{{ sys_ver.fields.nfs|enum:'Yes,No' }}{% enddiffer %}
+                  {% differ sys_ver.diff 'nfs' %}{{ sys_ver.fields.nfs|yesno:'Yes,No' }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ sys_ver.diff 'ip_fwd' %}{{ sys_ver.fields.ip_fwd|enum:'Enabled,Disabled' }}{% enddiffer %}
+                  {% differ sys_ver.diff 'ip_fwd' %}{{ sys_ver.fields.ip_fwd|yesno:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td>
-                  {% differ sys_ver.diff 'iptables' %}{{ sys_ver.fields.iptables|enum:'Enabled,Disabled' }}{% enddiffer %}
+                  {% differ sys_ver.diff 'iptables' %}{{ sys_ver.fields.iptables|yesno:'Enabled,Disabled' }}{% enddiffer %}
                 </td>
                 <td class="timestamp">
                   <time datetime="{{ sys_ver.fields.date_added|date:'c' }}">

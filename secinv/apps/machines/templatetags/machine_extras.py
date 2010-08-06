@@ -3,8 +3,6 @@ from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.encoding import force_unicode, iri_to_uri
 from django.utils.safestring import mark_safe, SafeData
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext
 
 from .. import utils
 from ..models import ApacheConfig
@@ -35,23 +33,6 @@ def dict_get(value, arg):
     """
     return value[arg]
 register.filter('dict_get', dict_get)
-
-
-@register.filter
-def enum(value, arg, autoescape=False):
-    if autoescape:
-        from django.utils.html import conditional_escape
-        escaper = conditional_escape
-    else:
-        escaper = lambda x: x
-
-    choices = arg.split(',')
-    yes = ugettext('%(yes)s') % {'yes': escaper(force_unicode(choices[0]))}
-    no = ugettext('%(no)s') % {'no': escaper(force_unicode(choices[1]))}
-
-    return yes if value else no
-enum.is_safe = True
-enum.needs_autoescape = True
 
 
 class DifferNode(template.Node):
