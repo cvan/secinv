@@ -30,6 +30,9 @@ DIFF_SECTION_SLUGS = ('iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig',
                      'sshconfig')
 CONFIG_SECTIONS = ('apacheconfig', 'phpconfig', 'mysqlconfig', 'sshconfig')
 
+def compare_second(a, b):
+    return cmp(a[1], b[1])
+
 def get_all_domains():
     all_domains = []
 
@@ -44,11 +47,13 @@ def get_all_domains():
                                                    active=True)
                     for k in i_a.domains.keys():
                         if not [m.hostname, k, i_a.id] in all_domains:
-                            all_domains.append([m.hostname, k, i_a.id])
+                            label = '%s (%s)' % (k, m.hostname)
+                            all_domains.append([m.hostname, label, i_a.id])
                 except ApacheConfig.DoesNotExist:
                     pass
 
-    all_domains.sort()
+    all_domains.sort(compare_second)
+
     return all_domains
 
 def get_all_machines(order_by='id'):
