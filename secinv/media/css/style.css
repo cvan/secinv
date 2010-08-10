@@ -570,12 +570,12 @@ aside#sidebar select {
 }
 
 aside#sidebar label {
-    width: 40%;
+    width: 48.5%;
 }
 
 aside#sidebar select {
 /*    width: 100%; */
-    width: 59%;
+    width: 50%;
 }
 
 

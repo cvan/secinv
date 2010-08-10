@@ -160,27 +160,6 @@
 {% block content %}
       <hgroup id="masthead">
         <h2>{{ _('Machines') }}</h2>
-<!--
-{% if machines.object_list %}
-        <h3 class="pagination">
-          <span class="current">
-          {% blocktrans with machines.number as page_num with machines.paginator.num_pages as page_count  %}
-            Page {{ page_num }} of {{ page_count }}
-          {% endblocktrans %}
-          </span>
-
-          <span class="step-links">
-          {% if machines.has_previous %}
-            <a href="?page={{ machines.previous_page_number }}">&larr; {{ _('Previous') }}</a>
-          {% endif %}
-
-          {% if machines.has_next %}
-            <a href="?page={{ machines.next_page_number }}">{{ _('Next') }} &rarr;</a>
-          {% endif %}
-          </span>
-        </h3>
-{% endif %}
--->
       </hgroup>
 
 {% if machines.object_list %}
