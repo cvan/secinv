@@ -1,4 +1,6 @@
+from django.core.urlresolvers import reverse
 from django.db import models
+from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 #from ..search.search import SearchManager
 from ..fields import *
@@ -195,6 +197,33 @@ class Machine(models.Model):
     @property
     def slug(self):
         return re.sub('[^a-z0-9A-Z-]', '-', self.hostname)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('machines-detail', (), {'machine_slug': self.machine.hostname})
+
+    def json_data(self):
+        """JSON data for Machines index."""
+        return [self.id,
+                self.sys_ip,
+                '<a href="%s">%s</a>' %
+                    (reverse('machines-detail', args=[self.hostname]),
+                     self.hostname),
+                    self.ext_ip or '&mdash;',
+                '<mark class="enabled">&#10004;</span>' if self.httpd() \
+                    else '<mark class="disabled">&#10006;</mark>',
+                '<mark class="enabled">&#10004;</span>' if self.mysqld() \
+                    else '<mark class="disabled">&#10006;</mark>',
+                '<mark class="enabled">&#10004;</span>' if self.openvpn() \
+                    else '<mark class="disabled">&#10006;</mark>',
+                '<mark class="enabled">&#10004;</span>' if self.nfs() \
+                    else '<mark class="disabled">&#10006;</mark>',
+                '<time>%s</time>' %
+                    self.date_added.strftime('%m/%d/%Y %g:%m %p') \
+                    if self.date_added else '',
+                '<time>%s</time>' %
+                    self.date_scanned.strftime('%m/%d/%Y %g:%m %p') \
+                    if self.date_scanned else '']
 
 if not reversion.is_registered(Machine):
     reversion.register(Machine, fields=['sys_ip', 'hostname', 'ext_ip'])

@@ -453,7 +453,7 @@ table.wide thead tr th {
     border-right-color: #666;
 }
 
-table.wide time {
+table time {
     font-size: 0.9em;
 }
 
@@ -980,11 +980,17 @@ span.deleted {
     background-color: #800;
 }
 
-.enabled mark {
+.enabled mark,
+.enabled {
     color: #080;
 }
-.disabled mark {
+.disabled mark,
+.disabled {
     color: #800;
+}
+.enabled,
+.disabled {
+  background-color: transparent;
 }
 
 .enabled mark,

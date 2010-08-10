@@ -12,6 +12,9 @@ directive_slug = r'(?P<directive_slug>[-\w]+)'
 
 urlpatterns = patterns('apps.machines.views',
     url(r'^$', 'index', name='machines-index'),
+
+    url(r'^datatables/%s.json$' % section_slug, 'datatables', name='datatables'), # JSON.
+
     url(r'^search/', 'search', name='machines-search'),
 
     url(r'^filters/$', 'machine_filter', name='machine-filter'),

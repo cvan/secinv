@@ -35,6 +35,7 @@
             src="{{ MEDIA_URL }}js/jquery-ui-1.8.1.custom.min.js"></script>
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/main.js"></script>
+    {% block extrahead %}{% endblock %}
   </head>
   <body class="{% block body_class %}{% endblock %}">
     <div id="wrap" class="row">

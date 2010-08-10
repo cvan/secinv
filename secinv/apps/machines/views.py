@@ -10,6 +10,8 @@ from django.http import (HttpResponse, HttpResponseRedirect,
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils import simplejson
+from django.utils.html import escape
+from django.utils.translation import ugettext_lazy as _
 
 from .models import (Machine, Services, System, RPMs, Interface, SSHConfig,
                      IPTables, ApacheConfig, PHPConfig, MySQLConfig)
@@ -25,13 +27,19 @@ from pygments.lexers import ApacheConfLexer
 from reversion.models import Version
 
 import re
-import json
 
-LIMIT_PER_PAGE = 25
+LIMIT_PER_PAGE = 5
 
-DIFF_SECTION_SLUGS = ('iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig',
-                     'sshconfig')
-CONFIG_SECTIONS = ('apacheconfig', 'phpconfig', 'mysqlconfig', 'sshconfig')
+DIFF_SECTION_SLUGS = ['iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig',
+                     'sshconfig']
+CONFIG_SECTIONS = ['apacheconfig', 'phpconfig', 'mysqlconfig', 'sshconfig']
+DATATABLES_SECTIONS = ['machines']
+DATATABLES_COLUMNS = {'machines': ['id', 'sys_ip', 'hostname', 'ext_ip']}
+DATATABLES_FIELDS = {'machines': ['id', 'sys_ip', 'hostname', 'ext_ip',
+                                  'httpd', 'mysqld', 'openvpn', 'nfs',
+                                  'date_added', 'date_scanned']}
+DATATABLES_TABLES = {'machines': 'machines_machine'}
+
 
 def compare_second(a, b):
     return cmp(a[1], b[1])
@@ -698,3 +706,103 @@ def add_multiple_machines(request):
     return render_to_response('machines/add_multiple_machines.html',
                               template_context,
                               context_instance=RequestContext(request))
+
+
+@login_required
+def datatables(request, section_slug):
+    #if not request.is_ajax() or request.method != 'GET':
+    #    return HttpResponse(status=400)
+
+    if section_slug not in DATATABLES_SECTIONS:
+        raise Http404
+
+    s_columns = DATATABLES_COLUMNS[section_slug]
+    s_fields = DATATABLES_FIELDS[section_slug]
+    s_table = DATATABLES_TABLES[section_slug]
+
+    try:
+        s_index = s_columns[s_columns.index('id')]
+    except ValueError:
+        s_index = s_columns[0]
+
+    result = ''
+
+    # Paging.
+    i_display_length = int(escape(request.GET.get('iDisplayLength', '0')))
+    s_limit = ''
+    if i_display_length and i_display_length != -1:
+        i_display_start = int(escape(request.GET.get('iDisplayStart', '0')))
+        s_limit = "LIMIT %s, %s" % (i_display_start, i_display_length)
+
+    # Ordering.
+    i_sort_col_0 = escape(request.GET.get('iSortCol_0', ''))
+    s_order = ''
+    s_order_by = []
+    if i_sort_col_0:
+        s_orders = []
+        for i in xrange(int(escape(request.GET.get('iSortingCols', '')))):
+            i_sort_col_i = escape(request.GET.get('iSortCol_%s' % i, ''))
+            if request.GET.get('bSortable_%s' % i_sort_col_i) == 'true':
+                s_orders.append(' '.join([s_fields[int(i_sort_col_i)],
+                    escape(request.GET.get('sSortDir_%s' % i))]))
+
+                s_order_by.append((int(i_sort_col_i),
+                                  escape(request.GET.get('sSortDir_%s' % i))))
+
+        if s_orders:
+            s_order = 'ORDER BY %s' % ', '.join(s_orders)
+    
+
+    # Filtering.
+    s_where = ''
+    s_search = escape(request.GET.get('sSearch', ''))
+    if s_search:
+        s_likes = []
+        for value in s_columns:
+            s_likes.append("%s LIKE '%%%s%%'" % (value, s_search))
+        s_where = 'WHERE (%s)' % (' OR '.join(s_likes))
+
+    for index, value in enumerate(s_columns):
+        i_index = request.GET.get('sSearch_%s' % index)
+        if request.GET.get('bSearchable_%s' % index) == 'true' and \
+           i_index:
+            if s_where:
+                s_where += ' AND '
+            else:
+                s_where = 'WHERE '
+            s_where += "%s LIKE '%%%s%%'" % (value, escape(i_index))
+
+    from django.db import connection
+    cursor = connection.cursor()
+
+    r = Machine.objects.raw("SELECT SQL_CALC_FOUND_ROWS %s FROM %s %s %s" % (
+        ', '.join(s_columns), s_table, s_where.replace('%', '%%'),
+        s_limit))
+
+    r_l = list(r)
+    aa_data = [r.__getattribute__('json_data')() for r in r_l]
+
+    i_filtered_total = len(r_l)
+
+    cursor.execute("SELECT COUNT(%s) AS count FROM %s" % (s_index, s_table))
+    i_total = int(cursor.fetchone()[0])
+
+    for s in s_order_by:
+        s_by, s_order = s
+
+        def compare_order_by(a, b):
+            return cmp(a[s_by], b[s_by])
+
+        aa_data.sort(compare_order_by)
+
+        if s_order == 'desc':
+            aa_data.reverse()
+
+    result = {'sEcho': int(escape(request.GET.get('sEcho', '0'))),
+              'iTotalRecords': i_total,
+              'iTotalDisplayRecords': i_filtered_total,
+              'aaData': aa_data}
+
+    return HttpResponse(simplejson.dumps(result),
+                        mimetype='application/json')
+
