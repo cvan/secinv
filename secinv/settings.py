@@ -8,7 +8,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 path = lambda *a: os.path.join(ROOT, *a)
 
 # Base URL path.
-BASE_URL = ''
+BASE_URL = '/secinv'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -22,7 +22,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'secinv',
+        'NAME': 'secinv2',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '',
@@ -84,6 +84,9 @@ LOGIN_URL = '%s/accounts/login/' % BASE_URL
 # Default length of auto-generated Authorization Tokens.
 AUTH_TOKEN_LENGTH = 20
 
+# For memcached.
+CACHE_BACKEND = 'memcached://10.2.72.7:11211/'
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$i6z4g*1q!hzwf!tm=jyh(1pk3uo_(-azz3hgkl(#*x4-d!8)'
 
@@ -91,7 +94,7 @@ SECRET_KEY = '6$i6z4g*1q!hzwf!tm=jyh(1pk3uo_(-azz3hgkl(#*x4-d!8)'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-    'django.template.loaders.eggs.Loader',
+#    'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -107,6 +110,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -114,6 +118,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'reversion.middleware.RevisionMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
