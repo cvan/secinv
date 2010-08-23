@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{% block head_title %}{{ _('SecInv') }}{% endblock %}</title>
+    <title>{% block head_title %}{{ _('LittleSIS') }}{% endblock %}</title>
     <meta charset="utf-8">
 
     <script type="text/javascript" src="{{ MEDIA_URL }}js/html5.js"></script>
@@ -41,7 +41,7 @@
     <div id="wrap" class="row">
       <header>
         <figure class="logo">
-          <h1><a href="{% url index %}"><strong>Sec</strong>Inv</a></h1>
+          <h1><a href="{% url index %}"><strong>Little</strong>SIS</a></h1>
         </figure>
         <p class="login right">
         {% if user.is_authenticated %}
@@ -74,11 +74,11 @@
       </header>
 
       <div id="row" class="content-wrap">
-        <section id="content" class="content col_13 col"> <!-- col_11 -->
+        <section id="content" class="content col_14 col"> <!-- col_11 -->
 {% block content %}{% endblock %}
         </section><!-- #content -->
 
-        <aside id="sidebar" class="col_7 col"> <!-- col_5 -->
+        <aside id="sidebar" class="col_6 col"> <!-- col_5 -->
 {% block sidebar %}{% endblock %}
         </aside>
 
