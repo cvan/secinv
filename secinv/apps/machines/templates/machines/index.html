@@ -121,7 +121,7 @@
 
     $(document).ready(function() {
         $('#machines-index').dataTable({
-            "bProcessing": false,
+            "bProcessing": true,
             "bServerSide": true,
             "sAjaxSource": "{% url datatables section_slug='machines' %}",
             "fnServerData": fnDataTablesPipeline,
