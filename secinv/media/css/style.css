@@ -398,6 +398,7 @@ table.wide {
     margin: 0 -10px 0 -10px;
 /*    width: 660px; *//* .col_11 width + 10px margins */
     width: 780px; /* .col_13 width + 10px margins */
+    width: 840px;
 }
 
 hgroup#masthead+table.wide {
@@ -570,12 +571,12 @@ aside#sidebar select {
 }
 
 aside#sidebar label {
-    width: 40%;
+    width: 48.5%;
 }
 
 aside#sidebar select {
 /*    width: 100%; */
-    width: 59%;
+    width: 50%;
 }
 
 
