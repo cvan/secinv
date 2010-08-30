@@ -2,7 +2,8 @@
 /* 52framework General StyleSheet - contains styles for all the HTML elements this framework supports */
 
 body {
-  font-size: 52%/1.52em;
+  font-size: 52%;
+  line-height: 1.52em;
 }
 
 /* ** ** Common Additive Classes ** ** */
