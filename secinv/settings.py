@@ -1,10 +1,9 @@
-# Django settings for secinv project.
+# Django settings for littlesis project.
 
 import os
 
-# The filepaths relative to settings.
+# Make filepaths relative to settings.
 ROOT = os.path.dirname(os.path.abspath(__file__))
-# Used to translate every path in settings.py to an absolute path.
 path = lambda *a: os.path.join(ROOT, *a)
 
 # Base URL path.
@@ -85,7 +84,7 @@ LOGIN_URL = '%s/accounts/login/' % BASE_URL
 AUTH_TOKEN_LENGTH = 20
 
 # For memcached.
-CACHE_BACKEND = 'memcached://10.2.72.7:11211/'
+#CACHE_BACKEND = 'memcached://10.2.72.7:11211/'
 
 # For django_compressor.
 COMPRESS = True
@@ -104,7 +103,6 @@ SECRET_KEY = '6$i6z4g*1q!hzwf!tm=jyh(1pk3uo_(-azz3hgkl(#*x4-d!8)'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#    'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -122,6 +120,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
+    'middleware.ProfileMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -158,4 +157,3 @@ INSTALLED_APPS = (
 
 #HAYSTACK_SITECONF = 'search_sites'
 #HAYSTACK_SEARCH_ENGINE = 'simple'
-

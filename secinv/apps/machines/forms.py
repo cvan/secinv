@@ -1,8 +1,10 @@
-from ..search.search import BaseSearchForm
-from django.db.models import Q
 from django import forms
-from .models import Machine
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+
+from search.search import BaseSearchForm
+from .models import Machine
+
 
 HISTORY_CHOICES = (
     ('h', _('History')),

@@ -1,33 +1,20 @@
-from django.db import models
-
 import base64
-
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
 
-'''
-class SerializedDataField(models.TextField):
-    """
-    Because Django for some reason feels its needed to repeatedly call
-    to_python even after it's been converted this does not support strings.
-    """
-    __metaclass__ = models.SubfieldBase
+from django.db import models
 
-    def to_python(self, value):
-        if value is None:
-            return
-        if not isinstance(value, basestring):
-            return value
-        value = pickle.loads(base64.b64decode(value))
-        return value
 
-    def get_db_prep_save(self, value):
-        if value is None:
-            return
-        return base64.b64encode(pickle.dumps(value))
-'''
+def dbsafe_encode(value):
+    value = base64.b64encode(pickle.dumps(deepcopy(value)))
+    return PickledObject(value)
+
+
+def dbsafe_decode(value):
+    value = pickle.loads(base64.b64decode(value))
+    return value
 
 
 class SerializedTextField(models.TextField):
@@ -38,19 +25,17 @@ class SerializedTextField(models.TextField):
     __metaclass__ = models.SubfieldBase
 
     def to_python(self, value):
-        if value is None or value is '':
-            return
-        if not isinstance(value, basestring):
-            return value
-        try:
-            return pickle.loads(base64.b64decode(value))
-        except:
-            return
+        if value is not None:
+            try:
+                value = dbsafe_decode(value)
+            except:
+                pass
+        return value
 
     def get_db_prep_save(self, value):
-        if value is None or value is '':
-            return
-        return base64.b64encode(pickle.dumps(value))
+        if value is not None and not isinstance(value, PickledObject):
+            value = dbsafe_encode(value)
+        return value
 
 
 class CompressedTextField(models.TextField):
@@ -85,4 +70,3 @@ class CompressedTextField(models.TextField):
                     return value
 
                 return tmp
-

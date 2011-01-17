@@ -1,4 +1,3 @@
-@charset "utf-8";
 /* 52framework General StyleSheet - contains styles for all the HTML elements this framework supports */
 
 body {
@@ -17,34 +16,32 @@ body {
 .align_center   { text-align: center; }
 .align_justify  { text-align: justify; }
 
-a {  color: #666; }
+a { color: #666; }
 a:hover, a:focus { color: #333; text-decoration: underline; }
 a:active, a:visited { }
 
 blockquote {
-  color: #999;
-    font: 1.52em/1.3em italic Georgia, "Times New Roman", Times, serif; 
-  margin: 5px; 
-  padding: 10px;
-  quotes: none;
-  width: 100%;
+    color: #999;
+    font: 1.52em/1.3em italic Georgia, "Times New Roman", Times, serif;
+    margin: 5px;
+    padding: 10px;
+    quotes: none;
+    width: 100%;
 }
 blockquote.left { border-right: #ccc 1px dashed; width: 35%; }
 blockquote.right { border-left: #ccc 1px dashed; width: 35%; }
 
-/* @group Header */
+/* @group Headings */
 h1, h2, h3, h4, h5 { margin: 0 0 0.5em; line-height: 1.1em; }
 h1 { font-size: 2.52em; }
-h2 { font-size: 1.952em; } 
-h3 { font-size: 1.652em; } 
-h4 { font-size: 1.452em; } 
-h5 { font-size: 1.252em; } 
+h2 { font-size: 1.952em; }
+h3 { font-size: 1.652em; }
+h4 { font-size: 1.452em; }
+h5 { font-size: 1.252em; }
 h6 { font-size: 1.52em; }
 /* @end */
 
 p { margin: 0 0 1.52em; }
-  p img.left { float: left; margin: 1.52em 1.52em 1.52em 0; padding: 0; }
-  p img.right { float: right; margin: 1.52em 0 1.52em 1.52em; }
 
 /* @group Forms */
 fieldset {
@@ -75,22 +72,19 @@ form label {
 }
 /* @end */
 
-strong       { font-weight: 600; }
-em, dfn      { font-style: italic; }
-dfn        { font-weight: 600; }
-sup, sub     { line-height: 0; }
-abbr, acronym   { border-bottom: #ccc 1px dashed; }
-address     { font-style: italic; margin: 0 0 1.5em; }
-pre, code       {
+strong { font-weight: 600; }
+em, dfn { font-style: italic; }
+dfn { font-weight: 600; }
+sup, sub { line-height: 0; }
+abbr, acronym { border-bottom: #ccc 1px dashed; }
+address { font-style: italic; margin: 0 0 1.5em; }
+pre, code {
     display: block;
     font: 1em "Andale Mono", "Lucida Console", monospace;
     line-height: 1.5;
 }
 code {
-/*    background-color: #dedede; */
     display: block;
-/*    padding: 0 2px 4px 26px;
-    background: #fff url(code.jpg) no-repeat left top; */
     line-height: 1.67em;
 }
 pre {
@@ -102,4 +96,3 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
 }
-

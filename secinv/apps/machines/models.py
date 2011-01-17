@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 #from ..search.search import SearchManager
-from ..fields import *
+from apps.fields import *
 from django.conf import settings
 from .utils import diff_list, diff_dict, get_version_diff
 from reversion.models import Version

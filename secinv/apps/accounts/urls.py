@@ -20,6 +20,4 @@ urlpatterns = patterns('',
         name='auth-password-reset-complete'),
     url(r'^password/reset/done/$', auth_views.password_reset_done,
         name='auth-password-reset-done'),
-
 )
-

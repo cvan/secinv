@@ -4,11 +4,11 @@
 
 # All python compiled files.
 *.pyc
-
+*.bak
 *._*
 
-
 *media/CACHE*
+settings_local.py
 *.pyc
 .DS_Store
 _build

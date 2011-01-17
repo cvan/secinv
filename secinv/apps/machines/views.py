@@ -1,3 +1,5 @@
+import re
+
 from django.db.models import Q
 from django.core import serializers
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -13,20 +15,19 @@ from django.utils import simplejson
 from django.utils.html import escape
 from django.utils.translation import ugettext_lazy as _
 
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import ApacheConfLexer
+from reversion.models import Version
+
+from apps.fields import dbsafe_decode
 from .models import (Machine, Services, System, RPMs, Interface, SSHConfig,
                      IPTables, ApacheConfig, PHPConfig, MySQLConfig)
 from .forms import MachineSearchForm
 from .utils import (diff_list, diff_dict, get_version_diff,
                     get_version_diff_field)
 
-from pygments import highlight
-from pygments.lexers import PythonLexer
-from pygments.formatters import HtmlFormatter
-from pygments.lexers import ApacheConfLexer
-
-from reversion.models import Version
-
-import re
 
 LIMIT_PER_PAGE = 5
 
@@ -44,83 +45,63 @@ DATATABLES_TABLES = {'machines': 'machines_machine'}
 def compare_second(a, b):
     return cmp(a[1], b[1])
 
+
 def get_all_domains():
     all_domains = []
-
-    m_all = Machine.objects.all()
-    for m in m_all:
-        a_m = ApacheConfig.objects.filter(machine__id=m.id, active=True).all()
-        for a in a_m:
-            for fn in a.included:
-                try:
-                    i_a = ApacheConfig.objects.get(machine__id=m.id,
-                                                   filename=fn,
-                                                   active=True)
-                    for k in i_a.domains.keys():
-                        if not [m.hostname, k, i_a.id] in all_domains:
-                            label = '%s (%s)' % (k, m.hostname)
-                            all_domains.append([m.hostname, label, i_a.id])
-                except ApacheConfig.DoesNotExist:
-                    pass
-
+    ac = ApacheConfig.objects.filter(active=True).values_list(
+        'machine__hostname', 'domains', 'machine__id')
+    for c in ac:
+        m_hn, domains, m_id = c
+        domains = dbsafe_decode(domains).keys()
+        for d in domains:
+            label = '%s (%s)' % (d, m_hn)
+            all_domains.append((m_hn, label, m_id))
     all_domains.sort(compare_second)
-
     return all_domains
+
 
 def get_all_machines(order_by='id'):
     return Machine.objects.all().order_by(order_by)
 
-#
+
 # TODO: Apache Parser -- Force directives to be uppercased.
-#
 def get_all_directives():
-    all_directives_dict = {}
-
-    a_all = ApacheConfig.objects.filter(active=True).all()
+    dirs = {}
+    a_all = ApacheConfig.objects.filter(active=True).values_list('directives')
     for a in a_all:
-        for k, v in a.directives.iteritems():
-            if k in all_directives_dict:
-                all_directives_dict[k] += v
+        directives = dbsafe_decode(a[0]) or {}
+        for k, v in directives.iteritems():
+            if k in dirs:
+                dirs[k] += v
             else:
-                all_directives_dict[k] = v
-
-    all_directives = []
-
-    for key, values in all_directives_dict.iteritems():
-        all_directives.append([key, list(set(values))])
-
-    all_directives.sort()
-    return all_directives
+                dirs[k] = v
+    dirs = [(k, sorted(list(set(v)))) for k, v in dirs.iteritems()]
+    return sorted(dirs)
 
 
 def get_all_items(section_slug):
     if not section_slug in CONFIG_SECTIONS:
         raise ValueError
 
-    all_items_dict = {}
+    all_items = {}
 
     if section_slug == 'phpconfig':
-        a_all = PHPConfig.objects.filter(active=True).all()
+        a_all = PHPConfig.objects.filter(active=True).values_list('items')
     elif section_slug == 'mysqlconfig':
-        a_all = MySQLConfig.objects.filter(active=True).all()
+        a_all = MySQLConfig.objects.filter(active=True).values_list('items')
     elif section_slug == 'sshconfig':
-        a_all = SSHConfig.objects.filter(active=True).all()
+        a_all = SSHConfig.objects.filter(active=True).values_list('items')
 
     for a in a_all:
-        if a.items:
-            for k, v in a.items.iteritems():
-                if k in all_items_dict:
-                    all_items_dict[k] += v
-                else:
-                    all_items_dict[k] = v
+        items = dbsafe_decode(a[0]) or {}
+        for k, v in items.iteritems():
+            if k in all_items:
+                all_items[k] += v
+            else:
+                all_items[k] = v
 
-    all_items = []
-
-    for key, values in all_items_dict.iteritems():
-        all_items.append([key, list(set(values))])
-
-    all_items.sort()
-    return all_items
+    all_items = [(k, sorted(list(set(v)))) for k, v in all_items.iteritems()]
+    return sorted(all_items)
 
 
 @login_required
@@ -506,15 +487,17 @@ def diff(request, machine_slug, section_slug, version_number,
             older_version = ''
             newer_version = ''
 
+            num_vers = len(obj_versions)
+
             if compare_with == 'current':
-                if (v_num - 2) < len(obj_versions):
+                if (v_num - 2) < num_vers:
                     older_version = v_num - 1 # index + 1
-                if v_num < len(obj_versions):
+                if v_num < num_vers:
                     newer_version = v_num + 1
             elif compare_with == 'previous':
-                if (v_num - 3) < len(obj_versions):
+                if (v_num - 3) < num_vers:
                     older_version = v_num - 2
-                if v_num < len(obj_versions):
+                if v_num < num_vers:
                     newer_version = v_num + 1
 
             if older_version < 0:
@@ -736,7 +719,7 @@ def datatables(request, section_slug):
 
         if s_orders:
             s_order = 'ORDER BY %s' % ', '.join(s_orders)
-    
+
 
     # Filtering.
     s_where = ''
@@ -749,8 +732,7 @@ def datatables(request, section_slug):
 
     for index, value in enumerate(s_columns):
         i_index = request.GET.get('sSearch_%s' % index)
-        if request.GET.get('bSearchable_%s' % index) == 'true' and \
-           i_index:
+        if request.GET.get('bSearchable_%s' % index) == 'true' and i_index:
             if s_where:
                 s_where += ' AND '
             else:
@@ -761,8 +743,7 @@ def datatables(request, section_slug):
     cursor = connection.cursor()
 
     r = Machine.objects.raw("SELECT SQL_CALC_FOUND_ROWS %s FROM %s %s %s" % (
-        ', '.join(s_columns), s_table, s_where.replace('%', '%%'),
-        s_limit))
+        ', '.join(s_columns), s_table, s_where.replace('%', '%%'), s_limit))
 
     r_l = list(r)
     aa_data = [r.__getattribute__('json_data')() for r in r_l]
@@ -788,6 +769,4 @@ def datatables(request, section_slug):
               'iTotalDisplayRecords': i_filtered_total,
               'aaData': aa_data}
 
-    return HttpResponse(simplejson.dumps(result),
-                        mimetype='application/json')
-
+    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
