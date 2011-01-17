@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 #from ..fulltext.search import SearchManager
-from ..fields import *
+from apps.fields import *
 from reversion.models import Version
 
 import datetime
