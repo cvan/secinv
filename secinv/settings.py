@@ -8,9 +8,9 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 path = lambda *a: os.path.join(ROOT, *a)
 
 # Base URL path.
-BASE_URL = '/secinv'
+BASE_URL = ''
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -87,6 +87,16 @@ AUTH_TOKEN_LENGTH = 20
 # For memcached.
 CACHE_BACKEND = 'memcached://10.2.72.7:11211/'
 
+# For django_compressor.
+COMPRESS = True
+
+#COMPRESS_CSS_FILTERS = [
+#     'compressor.filters.cssmin.CSSMinFilter'
+#]
+#COMPRESS_JS_FILTERS = [
+#     'compressor.filters.jsmin.JSMinFilter'
+#]
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$i6z4g*1q!hzwf!tm=jyh(1pk3uo_(-azz3hgkl(#*x4-d!8)'
 
@@ -110,6 +120,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -128,6 +139,8 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'compressor',
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -135,16 +148,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'apps.machines',
-    #'apps.haystack',
-    'apps.accounts',
-    'apps.search',
-    'apps.webapps',
+    'machines',
+    #'haystack',
+    'accounts',
+    'search',
+    'webapps',
     'reversion',
 )
 
-
 #HAYSTACK_SITECONF = 'search_sites'
-
 #HAYSTACK_SEARCH_ENGINE = 'simple'
 

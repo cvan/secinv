@@ -1,5 +1,6 @@
 # Exclude all config files.
 *.conf
+*.bak
 
 # All python compiled files.
 *.pyc
@@ -7,6 +8,7 @@
 *._*
 
 
+*media/CACHE*
 *.pyc
 .DS_Store
 _build

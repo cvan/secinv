@@ -3,3 +3,6 @@ Django==1.2
 django-reversion==1.3.1
 Pygments==1.3.1
 pyOpenSSL
+BeautifulSoap
+django_compressor
+python-memcached

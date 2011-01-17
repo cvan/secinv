@@ -1,12 +1,15 @@
 {% extends "machines/base.html" %}
+{% load compress %}
 {% load i18n %}
 
 {% block head_title %}{{ _('Machines') }} | {{ block.super }}{% endblock %}
 
 {% block extrahead %}
 
+{% compress css %}
 <link rel="stylesheet" type="text/css"
       href="{{ MEDIA_URL }}css/demo_table.css" media="screen">
+{% endcompress %}
 
 <script type="text/javascript" language="javascript" src="{{ MEDIA_URL }}js/jquery.dataTables.js"></script>
 <script type="text/javascript" charset="utf-8">
@@ -149,10 +152,7 @@
             ]
         });
 
-
     });
-
-
 </script>
 
 {% endblock %}
@@ -162,7 +162,6 @@
         <h2>{{ _('Machines') }}</h2>
       </hgroup>
 
-{% if machines.object_list %}
 
       <div id="dynamic">
         <table class="display" id="machines-index">
@@ -204,11 +203,6 @@
         </table>
       </div>
       <div class="spacer"></div>
-
-
-{% else %}
-      <p>{{ _('No machines are available.') }}</p>
-{% endif %}
 
 {% endblock %}
 

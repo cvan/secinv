@@ -126,22 +126,7 @@ def get_all_items(section_slug):
 @login_required
 def index(request):
     """Machines index page."""
-    machines = Machine.objects.order_by('hostname').all()
-    paginator = Paginator(machines, LIMIT_PER_PAGE)
-
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
-
-    # If page requested is out of range, display the last page of results.
-    try:
-        machines = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        machines = paginator.page(paginator.num_pages)
-
-    template_context = {'machines': machines}
-    return render_to_response('machines/index.html', template_context,
+    return render_to_response('machines/index.html', {},
                               context_instance=RequestContext(request))
 
 

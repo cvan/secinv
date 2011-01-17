@@ -1,3 +1,4 @@
+{% load compress %}
 {% load i18n %}
 <!DOCTYPE html>
 <html>
@@ -5,11 +6,10 @@
     <title>{% block head_title %}{{ _('LittleSIS') }}{% endblock %}</title>
     <meta charset="utf-8">
 
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/html5.js"></script>
-
     <link rel="shortcut icon" type="image/x-icon"
           href="{{ MEDIA_URL }}img/favicon.ico">
 
+{% compress css %}
     <link rel="stylesheet" type="text/css"
           href="{{ MEDIA_URL }}css/reset.css" media="screen">
     <link rel="stylesheet" type="text/css"
@@ -23,10 +23,12 @@
           media="screen">
     <link rel="stylesheet" type="text/css"
           href="{{ MEDIA_URL }}css/ui.tabs.css" media="screen">
+{% endcompress %}
 
     <!--[if lt IE 8]>
     <link rel="stylesheet" type="text/css"
           href="{{ MEDIA_URL }}css/ie.css" media="screen">
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/html5.js"></script>
     <![endif]-->
 
     <script type="text/javascript"
@@ -35,6 +37,7 @@
             src="{{ MEDIA_URL }}js/jquery-ui-1.8.1.custom.min.js"></script>
     <script type="text/javascript"
             src="{{ MEDIA_URL }}js/main.js"></script>
+
     {% block extrahead %}{% endblock %}
   </head>
   <body class="{% block body_class %}{% endblock %}">
