@@ -13,25 +13,34 @@ directive_slug = r'(?P<directive_slug>[-\w]+)'
 urlpatterns = patterns('apps.machines.views',
     url(r'^$', 'index', name='machines-index'),
 
-    url(r'^datatables/%s.json$' % section_slug, 'datatables', name='datatables'), # JSON.
-
     url(r'^search/', 'search', name='machines-search'),
 
     url(r'^filters/$', 'machine_filter', name='machine-filter'),
 
-    url(r'^filters/apacheconfig.json$', 'ac_filter_directives_keys', name='ac-filter-directives-keys'),  # JSON.
-    url(r'^filters/apacheconfig/directive.json$', 'ac_filter_directives', name='ac-filter-directives'), # JSON.
+    url(r'^filters/apacheconfig.json$', 'ac_filter_directives_keys',
+        name='ac-filter-directives-keys'),
+    url(r'^filters/apacheconfig/directive.json$', 'ac_filter_directives',
+        name='ac-filter-directives'),
 
-    url(r'^filters/%s/results/$' % section_slug, 'conf_filter_results', name='conf-filter-results'),
-    url(r'^filters/%s.json$' % section_slug, 'conf_filter_parameters_keys', name='conf-filter-parameters-keys'), # JSON.
-    url(r'^filters/%s/directive.json$' % section_slug, 'conf_filter_parameters', name='conf-filter-parameters'), # JSON.
+    url(r'^filters/%s/results/$' % section_slug, 'conf_filter_results',
+        name='conf-filter-results'),
+    url(r'^filters/%s.json$' % section_slug, 'conf_filter_parameters_keys',
+        name='conf-filter-parameters-keys'),
+    url(r'^filters/%s/directive.json$' % section_slug,
+        'conf_filter_parameters', name='conf-filter-parameters'),
+
+    url(r'^datatables/%s.json$' % section_slug, 'datatables',
+        name='datatables'),
 
     url(r'^%s/$' % machine_slug, 'detail', name='machines-detail'),
 
-    url(r'^%s/apacheconfig/%s/$' % (machine_slug, ac_id), 'apacheconfig', name='apacheconfig'),
+    url(r'^%s/apacheconfig/%s/$' % (machine_slug, ac_id), 'apacheconfig',
+        name='apacheconfig'),
 
-    url(r'^%s/diff/%s/r/%s/%s/$' % (machine_slug, section_slug, version_number, compare_with), 'diff', name='diff'),
-    url(r'^%s/diff/%s/%s/r/%s/%s/$' % (machine_slug, section_slug, item_id, version_number, compare_with), 'diff', name='diff-ac'),
-
-    url(r'^%s/history.json$' % machine_slug, 'history', name='history'),
+    url(r'^%s/diff/%s/r/%s/%s/$' % (
+        machine_slug, section_slug, version_number, compare_with),
+        'diff', name='diff'),
+    url(r'^%s/diff/%s/%s/r/%s/%s/$' % (
+        machine_slug, section_slug, item_id, version_number, compare_with),
+        'diff', name='diff-ac'),
 )
