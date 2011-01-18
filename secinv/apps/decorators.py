@@ -15,5 +15,6 @@ def json_view(f):
                                 content_type='application/json')
     return wrapper
 
-json_view.error = lambda s: http.HttpResponseBadRequest(
+
+json_view.error = lambda s: HttpResponseBadRequest(
     simplejson.dumps(s), content_type='application/json')

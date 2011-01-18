@@ -74,12 +74,12 @@
         </nav>
       </header>
 
-      <div id="row" class="content-wrap">
-        <section id="content" class="content col_14 col"> <!-- col_11, col_13 -->
+      <div id="main" class="content-wrap">
+        <section id="content" class="content col_14 col">
 {% block content %}{% endblock %}
         </section><!-- #content -->
 
-        <aside id="sidebar" class="col_6 col"> <!-- col_5, col_7 -->
+        <aside id="sidebar" class="col_6 col">
 {% block sidebar %}{% endblock %}
         </aside>
 
@@ -89,14 +89,13 @@
     </div><!-- #wrap -->
 
     <footer class="row">
-      <section class="col_10 col align_left"> <!-- col_8 -->
-        &copy; {{ _('Copyright 2010, Mozilla Corporation. All rights reserved.') }}
+      <section class="col_10 col">
+        &copy; {{ _('Copyright 2011, Mozilla Corporation. All rights reserved.') }}
       </section>
-      <section class="col_10 col align_right"> <!-- col_8 -->
-        <a href="">{{ _('Licensed under MPL 1.1 / GPL 2.0 / LGPL 2.1') }}</a>
+      <section class="col_10 col license">
+        {{ _('Licensed under MPL 1.1 / GPL 2.0 / LGPL 2.1') }}
       </section>
     </footer>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/actions.js"></script>
-
   </body>
 </html>

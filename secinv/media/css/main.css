@@ -253,6 +253,10 @@ footer a:hover {
     color: #bbb;
 }
 
+footer .license {
+    float: right;
+}
+
 /* @group Headings */
 
 /* (Adapted from AMO) */

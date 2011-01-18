@@ -114,8 +114,6 @@ body {
     line-height: 1.52em;
 }
 
-.left  { float: left; }
-.right { float: right; }
 .clear {
     clear: both;
     display: block;

@@ -118,7 +118,6 @@ def detail(request, machine_slug):
     system_history = System.objects.filter(machine__id=m.id).order_by(
         '-date_added').all()
 
-
     if system_history.exists():
         system_latest = system_history[0]
 
@@ -174,7 +173,7 @@ def detail(request, machine_slug):
                                                     'body')
 
 
-    # RPMs.
+    ## RPMs.
     rpms_list = []
     rpms_date_added = None
     rpms_versions = []
@@ -321,7 +320,7 @@ def detail(request, machine_slug):
                         'phpconfig': phpconfig_latest,
                         'phpconfig_versions': phpconfig_versions,
                         'mysqlconfig': mysqlconfig_latest,
-                        'mysqlconfig_versions': mysqlconfig_versions}
+                        'mysqlconfig_versions': mysqlconfig_versions,}
     return render_to_response('machines/detail.html', template_context,
                               context_instance=RequestContext(request))
 
