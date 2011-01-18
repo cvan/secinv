@@ -33,6 +33,5 @@ urlpatterns = patterns('apps.machines.views',
     url(r'^%s/diff/%s/r/%s/%s/$' % (machine_slug, section_slug, version_number, compare_with), 'diff', name='diff'),
     url(r'^%s/diff/%s/%s/r/%s/%s/$' % (machine_slug, section_slug, item_id, version_number, compare_with), 'diff', name='diff-ac'),
 
-    url(r'^%s/history/$' % machine_slug, 'history', name='history'),
+    url(r'^%s/history.json$' % machine_slug, 'history', name='history'),
 )
-

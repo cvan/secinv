@@ -7,7 +7,7 @@
 *.bak
 *._*
 
-*media/CACHE*
+*CACHE*
 settings_local.py
 *.pyc
 .DS_Store

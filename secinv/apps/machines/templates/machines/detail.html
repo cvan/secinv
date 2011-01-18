@@ -5,76 +5,6 @@
 {% block head_title %}{{ machine.hostname }} | {{ block.super }}{% endblock %}
 
 {% block content %}
-<script type="text/javascript">
-
-$(function() {
-
-    var $tabs = $(".system").tabs({
-        spinner: 'Retrieving data ...',
-        selected: 0,
-        select: function(e, ui) {
-            getTabs(ui.panel.id);
-        },
-        cache: true
-    });
-
-});
-
-
-function getTabs(section) {
-
-    var newHTML = "";
-
-    if (section == 'sys-history') {
-
-        $.getJSON('{% url history machine_slug=machine.hostname %}', function(data) {
-
-            newHTML += "<table>\n<caption>{{ _('History') }}</caption>\n";
-            newHTML += "<thead>\n<tr>\n";
-            newHTML += "<th>{{ _('Kernel release') }}</th>\n";
-            newHTML += "<th>{{ _('RedHat release') }}</th>\n";
-            newHTML += "<th>{{ _('NFS') }}</th>\n";
-            newHTML += '<th class="timestamp">{{ _('Modified') }}</th>\n';
-            newHTML += "</tr>\n</thead>\n<tbody>\n";
-
-            $.each(data, function(key, value) {
-                var v = value.fields;
-
-                newHTML += "\n<tr>\n<td>\n";
-
-                if (v.kernel_rel)
-                    newHTML += v.kernel_rel;
-
-                newHTML += "\n</td>\n<td>\n";
-
-                if (v.rh_rel)
-                    newHTML += v.rh_rel;
-
-                newHTML += "\n</td>\n<td>\n";
-
-                if (v.nfs)
-                    newHTML += v.nfs;
-
-                newHTML += "\n</td>\n<td>\n";
-
-                if (v.date_added)
-                    newHTML += v.date_added;
-
-                newHTML += "\n</td>\n</tr>\n";
-
-            });
-
-            newHTML += "\n</tbody>\n</table>\n";
-
-            $(".system #" + section + ".ui-widget-content").html(newHTML);
-
-        });
-    }
-
-}
-
-</script>
-
       <hgroup id="masthead">
         <h2>{{ _('Machines') }}</h2>
         <h3>{{ machine.hostname }} <em>{{ machine.sys_ip }}</em></h3>
@@ -188,6 +118,4 @@ function getTabs(section) {
           {% include "machines/tabs/sshconfig.html" %}
         </div><!-- #sshconfig -->
       </section>
-
 {% endblock %}
-

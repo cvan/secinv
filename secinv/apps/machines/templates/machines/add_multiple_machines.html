@@ -15,8 +15,8 @@
       {% trans "Add multiple machines" %}
 <!--
       <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-      <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
-      {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo; 
+      <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo;
+      {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo;
       {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 -->
   </div>
@@ -25,30 +25,32 @@
 {% block content %}
 <div id="content-main">
   {{ perm }}
-  <hr />
-  {% blocktrans %}
+  <hr>
   <p>
-    You can add multiple machines at once by providing the following
-    parameters each on a CSV-formatted line:
+    {% blocktrans %}
+      You can add multiple machines at once by providing the following
+      parameters each on a CSV-formatted line:
+    {% endblocktrans %}
   </p>
   <ul>
-    <li>IP address</li>
+    <li>{{ _('IP address') }}</li>
     <li>
-      Authentication key (optional &mdash; a unique key will be
-      auto-generated if left blank)
+      {% blocktrans %}
+        Authentication key (optional &mdash; a unique key will be
+        auto-generated if left blank)
+      {% endblocktrans %}
     </li>
   </ul>
-  {% endblocktrans %}
-
   <form id="load-form" action="." method="post">
     {% csrf_token %}
     {% block form_top %}{% endblock %}
-    <p><label class="hidden" for="csv_machines">{{ _('CSV-formatted rows for machines') }}</label></p>
+    <p>
+      <label class="hidden" for="csv_machines">
+        {{ _('CSV-formatted rows for machines') }}
+      </label>
+    </p>
     <p><textarea id="csv_machines" name="csv_machines" rows="15" cols="120"></textarea></p>
-    <p><input id="submit-button" type="submit" name="submit" value="Submit" /></p>
+    <p><input id="submit-button" type="submit" name="submit" value="Submit"></p>
   </form>
 </div>
 {% endblock %}
-
-
-

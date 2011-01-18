@@ -1,8 +1,5 @@
 import re
 
-from django.db.models import Q
-from django.core import serializers
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import (login_required,
@@ -11,9 +8,8 @@ from django.http import (HttpResponse, HttpResponseRedirect,
                          HttpResponseNotFound, Http404)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.utils import simplejson
 from django.utils.html import escape
-from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.http import require_GET, require_POST
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -21,12 +17,13 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import ApacheConfLexer
 from reversion.models import Version
 
+from apps.decorators import json_view
 from apps.fields import dbsafe_decode
 from .models import (Machine, Services, System, RPMs, Interface, SSHConfig,
                      IPTables, ApacheConfig, PHPConfig, MySQLConfig)
 from .forms import MachineSearchForm
 from .utils import (diff_list, diff_dict, get_version_diff,
-                    get_version_diff_field)
+                    get_version_diff_field, get_params)
 
 
 LIMIT_PER_PAGE = 5
@@ -65,43 +62,23 @@ def get_all_machines(order_by='id'):
 
 
 # TODO: Apache Parser -- Force directives to be uppercased.
-def get_all_directives():
-    dirs = {}
+def get_all_directives(keys=False):
+    """Returns directives from ApacheConfig files."""
     a_all = ApacheConfig.objects.filter(active=True).values_list('directives')
-    for a in a_all:
-        directives = dbsafe_decode(a[0]) or {}
-        for k, v in directives.iteritems():
-            if k in dirs:
-                dirs[k] += v
-            else:
-                dirs[k] = v
-    dirs = [(k, sorted(list(set(v)))) for k, v in dirs.iteritems()]
-    return sorted(dirs)
+    return get_params(a_all, keys)
 
 
-def get_all_items(section_slug):
-    if not section_slug in CONFIG_SECTIONS:
+def get_all_items(section_slug, keys=False):
+    """Returns items from PHP, MySQL, or SSH config files."""
+    if section_slug not in CONFIG_SECTIONS:
         raise ValueError
-
-    all_items = {}
-
     if section_slug == 'phpconfig':
         a_all = PHPConfig.objects.filter(active=True).values_list('items')
     elif section_slug == 'mysqlconfig':
         a_all = MySQLConfig.objects.filter(active=True).values_list('items')
     elif section_slug == 'sshconfig':
         a_all = SSHConfig.objects.filter(active=True).values_list('items')
-
-    for a in a_all:
-        items = dbsafe_decode(a[0]) or {}
-        for k, v in items.iteritems():
-            if k in all_items:
-                all_items[k] += v
-            else:
-                all_items[k] = v
-
-    all_items = [(k, sorted(list(set(v)))) for k, v in all_items.iteritems()]
-    return sorted(all_items)
+    return get_params(a_all, keys)
 
 
 @login_required
@@ -111,29 +88,12 @@ def index(request):
                               context_instance=RequestContext(request))
 
 
-@login_required
-def history(request, machine_slug):
-    # TODO: prevent calls.
-    #if not request.is_ajax():
-    #    return HttpResponse(status=400)
-
-    m = get_object_or_404(Machine, hostname=machine_slug)
-
-    # Retrieve all the system history.
-    system_history = System.objects.filter(machine__id=m.id).order_by(
-        '-date_added').all()
-
-    return HttpResponse(serializers.serialize('json', system_history),
-                        mimetype='application/json')
-
-
 def recurse_ac_includes(ac, field_name='filename'):
     ac_includes = []
     for fn in ac.included:
         try:
             i_ac = ApacheConfig.objects.get(machine__id=ac.machine_id,
-                                            filename=fn,
-                                            active=True)
+                                            filename=fn, active=True)
 
             l = i_ac.__getattribute__(field_name)
 
@@ -361,7 +321,7 @@ def detail(request, machine_slug):
                         'phpconfig': phpconfig_latest,
                         'phpconfig_versions': phpconfig_versions,
                         'mysqlconfig': mysqlconfig_latest,
-                        'mysqlconfig_versions': mysqlconfig_versions,}
+                        'mysqlconfig_versions': mysqlconfig_versions}
     return render_to_response('machines/detail.html', template_context,
                               context_instance=RequestContext(request))
 
@@ -520,90 +480,59 @@ def diff(request, machine_slug, section_slug, version_number,
                         'version_previous': str(v_num_previous),
                         'older_version': str(older_version),
                         'newer_version': str(newer_version),
-                        'compare_with': compare_with,}
+                        'compare_with': compare_with}
     return render_to_response('machines/diff.html', template_context,
                               context_instance=RequestContext(request))
 
 
 @login_required
+@json_view
 def ac_filter_directives_keys(request):
-    #if not request.is_ajax():
-    #    return HttpResponse(status=400)
-
-    all_directives = get_all_directives()
-    result = [f[0] for f in all_directives]
-
-    # Serialize the result of the database retrieval to JSON and send an
-    # application/json response.
-    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+    return get_all_directives(keys=True)
 
 
 @login_required
+@require_POST
+@json_view
 def ac_filter_directives(request):
-    #if not request.is_ajax() or request.method != 'POST':
-    #    return HttpResponse(status=400)
-
     result = ''
-    if request.method == 'POST':
-        directive = request.POST.get('parameter', '')
-
-        if directive:
-            all_directives = get_all_directives()
-            for v in all_directives:
-                if v[0] == directive:
-                    result = v[1]
-                    break
-
-    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+    parameter = request.POST.get('parameter', '')
+    dirs = dict(get_all_directives())
+    result = dirs[parameter]
+    return result
 
 
 @login_required
+@json_view
 def conf_filter_parameters_keys(request, section_slug):
-    #if not request.is_ajax() or not section_slug in CONFIG_SECTIONS:
-    #    return HttpResponse(status=400)
-
     if section_slug == 'apacheconfig':
-        all_params = get_all_directives()
+        params = get_all_directives(keys=True)
     elif section_slug in ('phpconfig', 'mysqlconfig', 'sshconfig'):
-        all_params = get_all_items(section_slug)
-
-    result = [f[0] for f in all_params]
-
-    # Serialize the result of the database retrieval to JSON and send an
-    # application/json response.
-    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+        params = get_all_items(section_slug, keys=True)
+    return params
 
 
 @login_required
+@require_POST
+@json_view
 def conf_filter_parameters(request, section_slug):
-    #if not request.is_ajax() or request.method != 'POST' or \
-    #   not section_slug in CONFIG_SECTIONS:
-    #    return HttpResponse(status=400)
-
+    if section_slug not in CONFIG_SECTIONS:
+        return HttpResponse(status=400)
     result = ''
-    if request.method == 'POST':
-        parameter = request.POST.get('parameter', '')
-
-        if parameter:
-            if section_slug == 'apacheconfig':
-                all_params = get_all_directives()
-            elif section_slug in ('phpconfig', 'mysqlconfig', 'sshconfig'):
-                all_params = get_all_items(section_slug)
-
-            for v in all_params:
-                if v[0] == parameter:
-                    result = v[1]
-                    break
-
-    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+    parameter = request.POST.get('parameter', '')
+    if section_slug == 'apacheconfig':
+        params = get_all_directives()
+    elif section_slug in ('phpconfig', 'mysqlconfig', 'sshconfig'):
+        params = get_all_items(section_slug)
+    parms = dict(params)
+    result = dirs[parameter]
+    return result
 
 
 @login_required
+@require_GET
 def machine_filter(request):
     """Find machine by hostname, IP, or domain and redirect."""
-    if request.method != 'GET':
-        return HttpResponse(status=400)
-
     hostname = request.GET.get('machine_hostname', '')
     ip = request.GET.get('machine_ip', '')
     domain = request.GET.get('machine_domain', '')
@@ -622,15 +551,13 @@ def machine_filter(request):
 @login_required
 def conf_filter_results(request, section_slug):
     """Filter other configuration objects by parameters and values."""
-    if request.method != 'GET' or not section_slug in CONFIG_SECTIONS:
+    if section_slug not in CONFIG_SECTIONS:
         return HttpResponse(status=400)
 
     conf_parameter = request.GET.get('conf_parameter', '')
     conf_value = request.GET.get('conf_value', '')
 
     a_all = results = []
-
-    # Store matching objects in results list.
 
     # Field name for dictionary of parameters/values.
     params_field = 'items'
@@ -651,10 +578,9 @@ def conf_filter_results(request, section_slug):
                 if param == conf_parameter or not conf_parameter:
                     for v in values:
                         if conf_value == v or not conf_value:
-                            results.append([param, v, a])
+                            results.append((param, v, a))
 
-    results.sort()
-
+    results = sorted(results)
 
     template_context = {'conf_parameter': conf_parameter,
                         'conf_value': conf_value,
@@ -663,13 +589,13 @@ def conf_filter_results(request, section_slug):
     return render_to_response('machines/conf_results.html', template_context,
                               context_instance=RequestContext(request))
 
+
 @staff_member_required
 @permission_required('machines.add_machine')
 @permission_required('machines.add_authtoken')
+@require_POST
+@json_view
 def add_multiple_machines(request):
-    #if request.method != 'POST':
-    #    raise Http404(_('Invalid request method.'))
-
     template_context = {}
     return render_to_response('machines/add_multiple_machines.html',
                               template_context,
@@ -677,10 +603,8 @@ def add_multiple_machines(request):
 
 
 @login_required
+@json_view
 def datatables(request, section_slug):
-    #if not request.is_ajax() or request.method != 'GET':
-    #    return HttpResponse(status=400)
-
     if section_slug not in DATATABLES_SECTIONS:
         raise Http404
 
@@ -769,4 +693,4 @@ def datatables(request, section_slug):
               'iTotalDisplayRecords': i_filtered_total,
               'aaData': aa_data}
 
-    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+    return result

@@ -6,7 +6,7 @@
 {% block content %}
 <form method="post" action="{% url django.contrib.auth.views.login %}">
   <fieldset>
-    <legend>{{ _('SecInv Login') }}</legend>
+    <legend>{{ _('LittleSIS Login') }}</legend>
     {% csrf_token %}
     {{ form.as_p }}
     <p class="left">

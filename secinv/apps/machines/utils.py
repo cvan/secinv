@@ -1,6 +1,8 @@
 import difflib
 import re
 
+from apps.fields import dbsafe_decode
+
 from reversion.models import Version
 
 
@@ -37,13 +39,11 @@ def diff_dict(a, b, delimiter=None):
     (removed, added, changed, unchanged).
     """
 
-    removed = dict()
-    added = dict()
-    changed = dict()
-    unchanged = dict()
+    removed = added = changed = unchanged = dict()
 
     # If inactive object is now active, mark each field as 'added'.
-    if 'active' in a and a['active'] == False and 'active' in b and b['active'] == True:
+    if ('active' in a and a['active'] == False and 'active' in b and
+        b['active'] == True):
         for key, value in b.iteritems():
             added[key] = value
     # If object is inactive, mark each field as 'removed'.
@@ -175,3 +175,26 @@ def get_version_diff_field(obj_item, field_name):
     versions.reverse()
     return versions
 
+
+def get_params(values, keys=False):
+    """
+    Returns directives from a list of values. If `keys` is true, a list of
+    parameter keys is returned. Otherwise, a dictionary of parameters and
+    their values is returned.
+    """
+    dirs = [] if keys else {}
+    for val in values:
+        directives = dbsafe_decode(val[0]) or {}
+        if keys:
+            dirs += directives.keys()
+        else:
+            for k, v in directives.iteritems():
+                if k in dirs:
+                    dirs[k] += v
+                else:
+                    dirs[k] = v
+    if keys:
+        dirs = list(set(dirs))
+    else:
+        dirs = [(k, sorted(list(set(v)))) for k, v in dirs.iteritems()]
+    return sorted(dirs)
