@@ -11,7 +11,7 @@
 
 {% compress css %}
     <link rel="stylesheet" type="text/css"
-          href="{{ MEDIA_URL }}css/general.css" media="screen">
+          href="{{ MEDIA_URL }}css/base.css" media="screen">
     <link rel="stylesheet" type="text/css"
           href="{{ MEDIA_URL }}css/grid.css" media="screen">
     <link rel="stylesheet" type="text/css"
@@ -42,9 +42,14 @@
     <div id="wrap" class="row">
       <header>
         <figure class="logo">
-          <h1><a href="{% url index %}"><strong>Little</strong>SIS</a></h1>
+          <h1>
+            <a href="{% url index %}">
+              {{ _('<strong>Little</strong>SIS') }}
+              <span>{{ _('Security Inventory System') }}</span>
+            </a>
+          </h1>
         </figure>
-        <p class="login right">
+        <p class="login">
         {% if user.is_authenticated %}
           {{ _('Welcome,') }} <strong>{{ user.username }}</strong>.
           <a href="{% url admin:index %}">{{ _('Admin panel') }}</a> /

@@ -11,4 +11,3 @@ urlpatterns = patterns('apps.webapps.views',
     url(r'^applications/%s/assessments/%s/$' % (application_id, assessment_id),
         'assessment', name='assessment'),
 )
-

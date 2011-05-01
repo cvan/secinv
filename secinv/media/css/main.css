@@ -1,3 +1,11 @@
+#content:after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    visibility: hidden;
+}
+
 body {
     background: #f1f1f1;
     background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed));
@@ -52,11 +60,9 @@ p.none {
 }
 
 /* @group Header */
-h1 {
-    line-height: 1.3;
-}
 header .login {
-  margin-top: -3.5em;
+    float: right;
+    margin-top: -3.5em;
 }
 header .logo {
     font: 1.5em "American Typewriter", Georgia, serif;
@@ -88,21 +94,32 @@ header .logo strong {
     color: #333;
 }
 
+header .logo span {
+    border-left: #ccc 1px solid;
+    display: inline-block;
+    font-size: 0.5em;
+    font-weight: normal;
+    position: relative;
+    top: -0.25em;
+    margin-left: 0.25em;
+    padding-left: 0.75em;
+}
+header .logo a:hover span {
+    color: #444;
+}
+
 header nav {
     background: #008cc2;
     background: -webkit-gradient(linear, left top, left bottom, from(#73d2f3),
                                  to(#008cc2));
     background: -moz-linear-gradient(top, #73d2f3, #008cc2);
     background: linear-gradient(top, #73d2f3, #008cc2);
-
     -moz-border-radius-topleft: 10px;
     -moz-border-radius-topright: 10px;
     -webkit-border-top-left-radius: 10px;
     -webkit-border-top-right-radius: 10px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-
-/*    border-top: #0f84ad 1px solid; */
     border-bottom: #00648d 1px solid;
     color: #fff;
     padding: 10px;
@@ -202,10 +219,8 @@ aside#sidebar li.current h3 {
 }
 
 aside#sidebar ol {
-    /*margin-left: 3.5em;*/
     padding: 0 8px;
 }
-
 
 .submit, .submit:visited {
     background: #525252;
@@ -225,25 +240,21 @@ aside#sidebar ol {
 }
 
 footer {
-    font-size: 0.8em;
-    position: relative;
-    padding: 10px 0;
-
     background: #333;
     background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#333));
     background: -moz-linear-gradient(top, #aaa, #333);
     background: linear-gradient(top, #aaa, #333);
-
     border-top: #333 1px solid;
-
     -moz-border-radius-bottomleft: 10px;
     -moz-border-radius-bottomright: 10px;
     -webkit-border-bottom-left-radius: 10px;
     -webkit-border-bottom-right-radius: 10px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
-
     color: #fff;
+    font-size: 0.8em;
+    position: relative;
+    padding: 10px 0;
 }
 footer a {
     color: #ddd;
@@ -254,7 +265,7 @@ footer a:hover {
 }
 
 footer .license {
-    float: right;
+    text-align: right;
 }
 
 /* @group Headings */
@@ -265,10 +276,8 @@ footer .license {
 h1 {
     font-size: 2.571em; /* 36px */
     line-height: 1em; /* 36px */
-    margin-top: 0.1667em; /* 6px */
-    margin-bottom: 0.5833em; /* 21px */
+    margin: 0;
 }
-h1 { margin: 0; }
 
 h2 {
     font-size: 2.154em; /* 28px */
@@ -280,18 +289,14 @@ h2 {
 }
 h3 {
     color: #011234;
-    font-size: 1.385em; /* 18px */
+    font-size: 1.8em;
     font-weight: normal;
     line-height: 1.111em; /* 20px */
     margin-top: 1.556em; /* 28px */
     margin-bottom: 0.778em; /* 14px */
 }
-h3 {
-    font-size: 1.8em;
-}
 h4 {
-    color: #223355;
-/*    font-size: 1em *//* 13px *//*;*/
+    color: #235;
     font-size: 1.5em;
 }
 h5, h6 {
@@ -305,10 +310,10 @@ h5 {
 h3 em {
     color: #666;
     display: inline-block;
-    text-shadow: none;
     font-size: 0.6em;
     font-style: normal;
     font-weight: normal;
+    text-shadow: none;
 }
 h4 em {
     color: #999;

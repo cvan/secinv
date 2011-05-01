@@ -8,17 +8,16 @@
     <link rel="shortcut icon" type="image/x-icon"
           href="{{ MEDIA_URL }}img/favicon.ico">
     <link rel="stylesheet" type="text/css"
-          href="{{ MEDIA_URL }}css/general.css" media="screen">
+          href="{{ MEDIA_URL }}css/base.css" media="screen">
     <link rel="stylesheet" type="text/css"
           href="{{ MEDIA_URL }}css/login.css" media="screen">
   </head>
   <body class="{% block body_class %}{% endblock %}">
     <div id="wrap" class="row">
-      <h1>{{ _('SecInv') }}</h1>
+      <h1>{{ _('LittleSIS') }}</h1>
       <section id="content" class="content col_13 col">
 {% block content %}{% endblock %}
       </section><!-- #content -->
-      <div class="clear"></div>
     </div><!-- #wrap -->
   </body>
 </html>

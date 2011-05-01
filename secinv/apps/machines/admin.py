@@ -1,10 +1,11 @@
 from .models import (Machine, Services, System, RPMs, Interface, SSHConfig,
-                     IPTables, ApacheConfig, PHPConfig, MySQLConfig, 
+                     IPTables, ApacheConfig, PHPConfig, MySQLConfig,
                      AuthToken)
 from django.contrib import admin
 from django.conf.urls.defaults import patterns, url
 
 from .views import add_multiple_machines
+
 
 class SystemInline(admin.TabularInline):
     model = System
@@ -44,7 +45,7 @@ class MachineAdmin(admin.ModelAdmin):
                                                   'date_scanned'],
                                        'classes': 'collapse'}),]
 
-    inlines = [SystemInline, InterfaceInline, ServicesInline, 
+    inlines = [SystemInline, InterfaceInline, ServicesInline,
                SSHConfigInline, RPMSInline, IPTablesInline,
                ApacheConfigInline]
 
