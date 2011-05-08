@@ -72,10 +72,10 @@
         <tr>
           <td class="cmp">
             {% if ac_ver.is_newest %}{{ _('(current)') }}{% else %}
-            <a href="{% url diff machine_slug=machine.hostname, section_slug='iptables', version_number=ac_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
+            <a href="{% url diff machine_slug=machine.hostname, section_slug='apacheconfig', version_number=ac_ver.version, compare_with='current' %}">{{ _('(current)') }}</a>
             {% endif %}
 
-            <a href="{% url diff machine_slug=machine.hostname, section_slug='iptables', version_number=ac_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
+            <a href="{% url diff machine_slug=machine.hostname, section_slug='apacheconfig', version_number=ac_ver.version, compare_with='previous' %}">{{ _('(previous)') }}</a>
           </td>
           <td>
             {{ _('Version') }} #{{ ac_ver.version }}

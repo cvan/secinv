@@ -138,9 +138,11 @@ def split_as_list(parser, token):
     num_bits = len(bits)
 
     if num_bits != 4 and num_bits != 5:
-        raise template.TemplateSyntaxError('%r tag requires at least four arguments (at most five).' % bits[0])
+        raise template.TemplateSyntaxError(
+            '%r tag requires at least four arguments (at most five).' % bits[0])
     elif (bits[2] != 'as' and num_bits == 4) or (bits[3] != 'as' and num_bits == 5):
-        raise template.TemplateSyntaxError("%r tag must contain an 'as' argument." % bits[0])
+        raise template.TemplateSyntaxError(
+            "%r tag must contain an 'as' argument." % bits[0])
 
     source_string = bits[1]
     destination_list = bits[3]
@@ -236,14 +238,16 @@ class GetNestedItemsNode(template.Node):
 @register.tag
 def get_nested_items(parser, token):
     """
-    This wraps the enclosed text with the appropriate element: ins, mark, del.
+    This recursively parses the Apache Configuration files based on the
+    includes.
 
-    Requires two arguments: (1) a dictionary of the field differences,
-    and (2) a string of the field name.
+    Requires two arguments: (1) field name, and (2) a machine id.
 
     Example::
 
-        {% get_nested_items 'filename' machine.id %}{{ ac_includes|unordered_list_dl }}{% endget_nested_items %}
+        {% get_nested_items 'filename' machine.id %}
+          {{ ac_includes|unordered_list_dl }}
+        {% endget_nested_items %}
     """
 
     bits = token.split_contents()
@@ -259,15 +263,6 @@ def get_nested_items(parser, token):
     parser.delete_first_token()
     return GetNestedItemsNode(nodelist, field_name, machine_id)
 
-
-'''
-def highlight(value, arg=None, autoescape=False):
-    if autoescape:
-        from django.utils.html import conditional_escape
-        escaper = conditional_escape
-    else:
-        escaper = lambda x: x
-'''
 
 @register.filter
 def highlight(value, arg=None, autoescape=None):
@@ -297,10 +292,8 @@ def highlight(value, arg=None, autoescape=None):
             lexer = get_lexer_by_name(u'text', stripnl=False,
                                       encoding=u'UTF-8')
 
-    # TODO: Translation. uggetttext?
+    # TODO: Translation. uggettext?
     code = highlight(value, lexer, HtmlFormatter())
 
     return mark_safe(code)
 highlight.is_safe = True
-
-

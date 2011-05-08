@@ -204,26 +204,27 @@ class Machine(models.Model):
 
     def json_data(self):
         """JSON data for Machines index."""
-        return [self.id,
-                self.sys_ip,
-                '<a href="%s">%s</a>' %
-                    (reverse('machines-detail', args=[self.hostname]),
-                     self.hostname),
-                    self.ext_ip or '&mdash;',
-                '<mark class="enabled">&#10004;</span>' if self.httpd() \
-                    else '<mark class="disabled">&#10006;</mark>',
-                '<mark class="enabled">&#10004;</span>' if self.mysqld() \
-                    else '<mark class="disabled">&#10006;</mark>',
-                '<mark class="enabled">&#10004;</span>' if self.openvpn() \
-                    else '<mark class="disabled">&#10006;</mark>',
-                '<mark class="enabled">&#10004;</span>' if self.nfs() \
-                    else '<mark class="disabled">&#10006;</mark>',
-                '<time>%s</time>' %
-                    self.date_added.strftime('%m/%d/%Y %g:%m %p') \
-                    if self.date_added else '',
-                '<time>%s</time>' %
-                    self.date_scanned.strftime('%m/%d/%Y %g:%m %p') \
-                    if self.date_scanned else '']
+        return [
+            self.id,
+            self.sys_ip,
+            '<a href="%s">%s</a>' %
+                (reverse('machines-detail', args=[self.hostname]),
+                 self.hostname), self.ext_ip or '&mdash;',
+            ('<mark class="enabled">&#10004;</span>' if self.httpd()
+             else '<mark class="disabled">&#10006;</mark>'),
+            ('<mark class="enabled">&#10004;</span>' if self.mysqld()
+             else '<mark class="disabled">&#10006;</mark>'),
+            ('<mark class="enabled">&#10004;</span>' if self.openvpn()
+             else '<mark class="disabled">&#10006;</mark>'),
+            ('<mark class="enabled">&#10004;</span>' if self.nfs()
+             else '<mark class="disabled">&#10006;</mark>'),
+            '<time>%s</time>' %
+                (self.date_added.strftime('%m/%d/%Y %g:%m %p')
+                 if self.date_added else ''),
+            '<time>%s</time>' %
+                (self.date_scanned.strftime('%m/%d/%Y %g:%m %p')
+                 if self.date_scanned else '')
+        ]
 
 if not reversion.is_registered(Machine):
     reversion.register(Machine, fields=['sys_ip', 'hostname', 'ext_ip'])
@@ -231,8 +232,7 @@ if not reversion.is_registered(Machine):
 
 class AuthToken(models.Model):
     token = models.CharField(_('authorization token'), blank=True,
-                             null=True, max_length=255,
-                             default=generate_token)
+                             null=True, max_length=255, default=generate_token)
     active = models.BooleanField(_('active'), default=1)
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
@@ -339,14 +339,6 @@ if not reversion.is_registered(System):
 
 class Services(models.Model):
     machine = models.ForeignKey('Machine')
-    # TODO: Use TextFields.
-    '''
-    k_processes = models.CharField(_('processes'), max_length=255, blank=True,
-                                   null=True)
-    v_ports = models.CommaSeparatedIntegerField(_('ports'), max_length=255,
-                                                blank=True, null=True)
-    '''
-
     k_processes = models.TextField(_('processes'), blank=True, null=True)
     v_ports = models.TextField(_('ports'), blank=True, null=True)
 
@@ -412,9 +404,6 @@ class SSHConfig(models.Model):
 
     def __unicode__(self):
         return u'%s - %s' % (self.machine.hostname, self.filename)
-
-    #def __unicode__(self):
-    #    return u'%s - %s' % (self.k_parameters, self.v_values)
 
     class Meta:
         verbose_name = _('SSH Configuration')

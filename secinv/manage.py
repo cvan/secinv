@@ -25,5 +25,6 @@ except ImportError:
 
 site.addsitedir(path('apps'))
 
+
 if __name__ == "__main__":
     execute_manager(settings)
