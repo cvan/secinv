@@ -523,7 +523,7 @@ def conf_filter_parameters(request, section_slug):
         params = get_all_directives()
     elif section_slug in ('phpconfig', 'mysqlconfig', 'sshconfig'):
         params = get_all_items(section_slug)
-    parms = dict(params)
+    dirs = dict(params)
     result = dirs[parameter]
     return result
 
@@ -562,23 +562,58 @@ def conf_filter_results(request, section_slug):
     # Field name for dictionary of parameters/values.
     params_field = 'items'
 
+    REGEX = None
+    ICONTAINS = None
+    if conf_parameter and conf_value:
+        REGEX = r'"%s".+\[\w*"%s"\w*\]' % (conf_parameter, conf_value)
+    elif not conf_value:
+        ICONTAINS = '"%s"' % conf_parameter
+
     if section_slug == 'apacheconfig':
-        a_all = ApacheConfig.objects.filter(active=True).all()
+        if REGEX:
+            a_all = ApacheConfig.objects.filter(active=True,
+                directives__regex=REGEX).all()
+        else:
+            a_all = ApacheConfig.objects.filter(active=True,
+                directives__icontains=ICONTAINS).all()
         params_field = 'directives'
     elif section_slug == 'phpconfig':
-        a_all = PHPConfig.objects.filter(active=True).all()
+        if REGEX:
+            a_all = PHPConfig.objects.filter(active=True,
+                items__regex=REGEX).all()
+        else:
+            a_all = PHPConfig.objects.filter(active=True,
+                items__icontains=ICONTAINS).all()
     elif section_slug == 'mysqlconfig':
-        a_all = MySQLConfig.objects.filter(active=True).all()
+        if REGEX:
+            a_all = MySQLConfig.objects.filter(active=True,
+                items__regex=REGEX).all()
+        else:
+            a_all = MySQLConfig.objects.filter(active=True,
+                items__icontains=ICONTAINS).all()
     elif section_slug == 'sshconfig':
-        a_all = SSHConfig.objects.filter(active=True).all()
+        if REGEX:
+            a_all = SSHConfig.objects.filter(active=True,
+                items__regex=REGEX).all()
+        else:
+            a_all = SSHConfig.objects.filter(active=True,
+                items__icontains=ICONTAINS).all()
 
     for a in a_all:
-        if a.__getattribute__(params_field):
-            for param, values in a.__getattribute__(params_field).iteritems():
-                if param == conf_parameter or not conf_parameter:
-                    for v in values:
-                        if conf_value == v or not conf_value:
-                            results.append((param, v, a))
+        p = a.__getattribute__(params_field)
+        if not p:
+            continue
+        if conf_parameter:
+            if conf_value:
+                results.append((conf_parameter, conf_value, a))
+            else:
+                for v in p[conf_parameter]:
+                    results.append((conf_parameter, v, a))
+        else:
+            for param, values in p.iteritems():
+                for v in values:
+                    if conf_value == v:
+                        results.append((param, v, a))
 
     results = sorted(results)
 
