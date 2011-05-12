@@ -29,18 +29,7 @@ BASE_PATH = reduce(lambda l, r: l + os.path.sep + r,
 # Append settings directory.
 sys.path.append(os.path.join(BASE_PATH, 'secinv'))
 
-from django.core.management import execute_manager
-try:
-    import settings
-except ImportError:
-    sys.exit('Error: Could not import Django settings')
-
-# To suppress MySQLdb warnings.
-import warnings
-warnings.filterwarnings('ignore')
-
-from django.core.management import setup_environ
-setup_environ(settings)
+import manage
 
 import reversion
 
@@ -244,7 +233,7 @@ class ServerFunctions:
                 s_object.date_added = datetime.datetime.now()
                 with reversion.revision:
                     s_object.save()
- 
+
         except Services.DoesNotExist:
             sys_object = Services.objects.create(machine=self.machine_obj,
                                                  k_processes=csv_procs,
@@ -393,14 +382,14 @@ class ServerFunctions:
                 if p_object.body != phpini_dict['body'] or \
                    p_object.items != phpini_dict['items'] or \
                    p_object.filename != phpini_dict['filename']:
-    
+
                     p_object.body = phpini_dict['body']
                     p_object.items = phpini_dict['items']
                     p_object.filename = phpini_dict['filename']
                     p_object.date_added = datetime.datetime.now()
                     with reversion.revision:
                         p_object.save()
-    
+
                     #print 'Updating PHP Config ...'
             except PHPConfig.DoesNotExist:
                 p_object = PHPConfig.objects.create(machine=self.machine_obj,

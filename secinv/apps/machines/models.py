@@ -1,22 +1,25 @@
+import datetime
+import re
+import reversion
+from math import ceil
+from random import SystemRandom
+from string import letters, digits
+
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
-#from ..search.search import SearchManager
-from apps.fields import *
-from django.conf import settings
-from .utils import diff_list, diff_dict, get_version_diff
+
 from reversion.models import Version
 
-import datetime
-import re
-import reversion
+from apps.fields import *
+from apps.json_field import JSONField
+
+from .utils import diff_list, diff_dict, get_version_diff
+
 
 def generate_token():
-    from math import ceil
-    from random import SystemRandom
-    from string import letters, digits
-
     s = ''.join(SystemRandom().sample(letters + digits,
                                       settings.AUTH_TOKEN_LENGTH))
     chunk_count = int(ceil(len(s) / 5.0))
@@ -379,7 +382,7 @@ class SSHConfig(models.Model):
     body = CompressedTextField(_('contents'), blank=True, null=True)
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
-    items = SerializedTextField(_('items'), blank=True, null=True)
+    items = JSONField(_('items'), blank=True, null=True)
     active = models.BooleanField(_('status'), default=1)
     date_added = models.DateTimeField(_('date added'),
                                       default=datetime.datetime.now)
@@ -423,13 +426,13 @@ class ApacheConfig(models.Model):
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
 
-    directives = SerializedTextField()
-    domains = SerializedTextField()
+    directives = JSONField()
+    domains = JSONField()
 
     # Do not use a ManyToManyField or ForeignKey field, since we may not have
     # objects for the included Apache config files (since the files themselves
     # may be unreadable).
-    included = SerializedTextField()
+    included = JSONField()
 
     active = models.BooleanField(_('status'), default=1)
 
@@ -536,7 +539,7 @@ class PHPConfig(models.Model):
     body = CompressedTextField(_('contents'), blank=True, null=True)
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
-    items = SerializedTextField(_('items'), blank=True, null=True)
+    items = JSONField(_('items'), blank=True, null=True)
     active = models.BooleanField(_('status'), default=1)
 
     date_added = models.DateTimeField(_('date added'),
@@ -564,7 +567,7 @@ class MySQLConfig(models.Model):
     body = CompressedTextField(_('contents'), blank=True, null=True)
     filename = models.CharField(_('filename'), max_length=255, blank=True,
                                 null=True)
-    items = SerializedTextField(_('items'), blank=True, null=True)
+    items = JSONField(_('items'), blank=True, null=True)
     active = models.BooleanField(_('status'), default=1)
 
     date_added = models.DateTimeField(_('date added'),
@@ -585,4 +588,3 @@ class MySQLConfig(models.Model):
 
 if not reversion.is_registered(MySQLConfig):
     reversion.register(MySQLConfig)
-

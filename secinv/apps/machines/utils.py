@@ -1,7 +1,7 @@
 import difflib
 import re
 
-from apps.fields import dbsafe_decode
+from apps.json_field import JSONField
 
 from reversion.models import Version
 
@@ -184,7 +184,7 @@ def get_params(values, keys=False):
     """
     dirs = [] if keys else {}
     for val in values:
-        directives = dbsafe_decode(val[0]) or {}
+        directives = JSONField().to_python(val[0]) or {}
         if keys:
             dirs += directives.keys()
         else:

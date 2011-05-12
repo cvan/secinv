@@ -1,12 +1,15 @@
 from ConfigParser import ConfigParser
-from OpenSSL import SSL
 from os.path import expanduser
-from sys import exit
 import BaseHTTPServer
 import SimpleHTTPServer
 import SimpleXMLRPCServer
 import SocketServer
 import socket
+import sys
+
+from OpenSSL import SSL
+
+from functions import ServerFunctions
 
 
 # Path to server configuration file.
@@ -18,7 +21,7 @@ server_config = ConfigParser()
 try:
     server_config.readfp(file(SERVER_CONFIG_FN))
 except IOError:
-    exit("Error: Cannot open server configuration file '%s'"
+    sys.exit("Error: Cannot open server configuration file '%s'"
          % SERVER_CONFIG_FN)
 
 LISTEN_HOST = server_config.get('server', 'listen_host')
@@ -63,7 +66,7 @@ class RequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
         self.connection = self.request
         self.rfile = socket._fileobject(self.request, 'rb', self.rbufsize)
         self.wfile = socket._fileobject(self.request, 'wb', self.wbufsize)
-        
+
     def do_POST(self):
         """
         Handles the HTTPS POST request.
@@ -102,8 +105,6 @@ class RequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
 def process(HandlerClass=RequestHandler, ServerClass=SecureXMLRPCServer):
     """Process XML-RPC commands over HTTPS server."""
 
-    from functions import ServerFunctions
-
     # Initialize server.
     server_address = (LISTEN_HOST, int(LISTEN_PORT))
     server = ServerClass(server_address, HandlerClass)
@@ -113,11 +114,10 @@ def process(HandlerClass=RequestHandler, ServerClass=SecureXMLRPCServer):
     server.register_multicall_functions()
 
     on_host, on_port = server.socket.getsockname()
-    print "Serving HTTPS on %s port %s" % (on_host, on_port)
+    print 'Serving HTTPS on %s port %s' % (on_host, on_port)
 
     server.serve_forever()
 
 
 if __name__ == '__main__':
     process()
-

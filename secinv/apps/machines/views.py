@@ -18,7 +18,7 @@ from pygments.lexers import ApacheConfLexer
 from reversion.models import Version
 
 from apps.decorators import json_view
-from apps.fields import dbsafe_decode
+from apps.json_field import JSONField
 from .models import (Machine, Services, System, RPMs, Interface, SSHConfig,
                      IPTables, ApacheConfig, PHPConfig, MySQLConfig)
 from .forms import MachineSearchForm
@@ -49,7 +49,7 @@ def get_all_domains():
         'machine__hostname', 'domains', 'machine__id')
     for c in ac:
         m_hn, domains, m_id = c
-        domains = dbsafe_decode(domains).keys()
+        domains = JSONField().to_python(domains).keys()
         for d in domains:
             label = '%s (%s)' % (d, m_hn)
             all_domains.append((m_hn, label, m_id))
@@ -556,7 +556,8 @@ def conf_filter_results(request, section_slug):
     conf_parameter = request.GET.get('conf_parameter', '')
     conf_value = request.GET.get('conf_value', '')
 
-    a_all = results = []
+    a_all = []
+    results = []
 
     # Field name for dictionary of parameters/values.
     params_field = 'items'
