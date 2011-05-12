@@ -9,6 +9,7 @@ from django.http import (HttpResponse, HttpResponseRedirect,
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.html import escape
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_GET, require_POST
 
 from pygments import highlight
@@ -617,11 +618,23 @@ def conf_filter_results(request, section_slug):
 
     results = sorted(results)
 
-    template_context = {'conf_parameter': conf_parameter,
-                        'conf_value': conf_value,
-                        'results': results,
-                        'section_slug': section_slug}
-    return render_to_response('machines/conf_results.html', template_context,
+    if section_slug == 'apacheconfig':
+        page_title = _(u'Filtered Apache configuration files')
+    elif section_slug == 'phpconfig':
+        page_title = _(u'Filtered PHP configuration files')
+    elif section_slug == 'mysqlconfig':
+        page_title = _(u'Filtered MySQL configuration files')
+    elif section_slug == 'sshconfig':
+        page_title = _(u'Filtered SSH configuration files')
+
+    ctx = {
+        'page_title': page_title,
+        'conf_parameter': conf_parameter,
+        'conf_value': conf_value,
+        'results': results,
+        'section_slug': section_slug
+    }
+    return render_to_response('machines/conf_results.html', ctx,
                               context_instance=RequestContext(request))
 
 

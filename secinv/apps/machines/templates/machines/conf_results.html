@@ -1,64 +1,60 @@
 {% extends "machines/base.html" %}
-{% load i18n %}
 {% load machine_extras %}
 
-{% block head_title %}{% if section_slug == 'apacheconfig' %}{{ _('Filtered Apache configuration files') }}{% endif %}{% if section_slug == 'phpconfig' %}{{ _('Filtered PHP configuration files') }}{% endif %}{% if section_slug == 'mysqlconfig' %}{{ _('Filtered MySQL configuration files') }}{% endif %}{% if section_slug == 'sshconfig' %}{{ _('Filtered SSH configuration files') }}{% endif %} | {{ _('Machines') }} | {{ block.super }}{% endblock %}
+{% block head_title %}{{ page_title }} | {{ _('Machines') }} | {{ block.super }}{% endblock %}
 
 {% block content %}
+  <hgroup id="masthead">
+    <h2 class="sub">{{ _('Machines') }}</h2>
+    <h3 class="sub">{{ page_title }}</h3>
+    <h4>
+      <span>{{ _('Parameter:') }}</span> {% if conf_parameter %}{{ conf_parameter }}{% else %}{{ _('(All)') }}{% endif %}
+      <em><span>{{ _('Value:') }}</span> {% if conf_value %}{{ conf_value }}{% else %}{{ _('(All)') }}{% endif %}</em>
+    </h4>
+  </hgroup>
 
-      <hgroup id="masthead">
-        <h2 class="sub">{{ _('Machines') }}</h2>
-        <h3 class="sub">{% if section_slug == 'apacheconfig' %}{{ _('Filtered Apache configuration files') }}{% endif %}{% if section_slug == 'phpconfig' %}{{ _('Filtered PHP configuration files') }}{% endif %}{% if section_slug == 'mysqlconfig' %}{{ _('Filtered MySQL configuration files') }}{% endif %}{% if section_slug == 'sshconfig' %}{{ _('Filtered SSH configuration files') }}{% endif %}</h3>
-        <h4>
-          <span>{{ _('Parameter:') }}</span> {% if conf_parameter %}{{ conf_parameter }}{% else %}{{ _('(All)') }}{% endif %}
-          <em><span>{{ _('Value:') }}</span> {% if conf_value %}{{ conf_value }}{% else %}{{ _('(All)') }}{% endif %}</em>
-        </h4>
-      </hgroup>
-
-      <table class="wide">
-        <caption>{{ _('Filtered results') }}</caption>
-        <thead>
-          <tr>
-            <th colspan="2">{{ _('Machine') }}</th>
-{% if section_slug == 'apacheconfig' %}
-            <th>{{ _('Domains') }}</th>
-{% endif %}
-            <th>{{ _('Filename') }}</th>
-            <th>{{ _('Parameter') }}</th>
-            <th>{{ _('Value') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-      {% for param, value, cf in results %}
-          <tr>
-            <td>{{ cf.machine.sys_ip }}</td>
-            <td>
-              <a href="{% url machines-detail machine_slug=cf.machine.hostname %}">
-                {{ cf.machine.hostname }}
-              </a>
-            </td>
-{% if section_slug == 'apacheconfig' %}
-            <td>
-              {% if cf.get_domains %}
-              <ul>
-                {% for domain, ports, i_cf in cf.get_domains %}
-                <li><a href="{% url apacheconfig machine_slug=cf.machine.hostname, ac_id=i_cf.id %}">{{ domain }}</a><!--({{ ports|join:', ' }})--></li>
-                {% endfor %}
-              </ul>
-              {% endif %}
-            </td>
-{% endif %}
-{% if section_slug == 'apacheconfig' %}
-            <td><a href="{% url apacheconfig machine_slug=cf.machine.hostname, ac_id=cf.id %}">{{ cf.filename }}</a></td>
-{% else %}
-            <td>{{ cf.filename }}</td>
-{% endif %}
-            <td>{{ param }}</td>
-            <td>{{ value }}</td>
-          </tr>
-      {% endfor %}
-        </tbody>
-      </table>
-
+  <table class="wide">
+    <caption>{{ _('Filtered results') }}</caption>
+    <thead>
+      <tr>
+        <th colspan="2">{{ _('Machine') }}</th>
+        {% if section_slug == 'apacheconfig' %}
+          <th>{{ _('Domains') }}</th>
+        {% endif %}
+        <th>{{ _('Filename') }}</th>
+        <th>{{ _('Parameter') }}</th>
+        <th>{{ _('Value') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+  {% for param, value, cf in results %}
+      <tr>
+        <td>{{ cf.machine.sys_ip }}</td>
+        <td>
+          <a href="{% url machines-detail machine_slug=cf.machine.hostname %}">
+            {{ cf.machine.hostname }}
+          </a>
+        </td>
+        {% if section_slug == 'apacheconfig' %}
+          <td>
+            {% if cf.get_domains %}
+            <ul>
+              {% for domain, ports, i_cf in cf.get_domains %}
+              <li><a href="{% url apacheconfig machine_slug=cf.machine.hostname, ac_id=i_cf.id %}">{{ domain }}</a><!--({{ ports|join:', ' }})--></li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </td>
+        {% endif %}
+        {% if section_slug == 'apacheconfig' %}
+          <td><a href="{% url apacheconfig machine_slug=cf.machine.hostname, ac_id=cf.id %}">{{ cf.filename }}</a></td>
+        {% else %}
+          <td>{{ cf.filename }}</td>
+        {% endif %}
+        <td>{{ param }}</td>
+        <td>{{ value }}</td>
+      </tr>
+  {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}
-

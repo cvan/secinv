@@ -11,15 +11,17 @@ $(function() {
     });
 
     // Get section name of `selected` `option`'s parent `select` field.
-    if ($('select[id$=-parameter] option[selected]').length)
+    if ($('select[id$=-parameter] option[selected]').length) {
         selectedSection = $('select[id$=-parameter] option[selected]').parent().attr('id').split('-')[0];
+    }
 
     $("select[id$='-parameter']").each(function(index) {
         var section = $(this).attr('id').split('-')[0];
 
         if ($('select#' + section + '-parameter').val() == '' &&
-            $('select#' + section + '-parameter').find('option').length == 1)
+            $('select#' + section + '-parameter').find('option').length == 1) {
             doPopulate(section);
+        }
 
         $('select#' + section + '-parameter').change(function() {
             doChange(section);
@@ -65,12 +67,13 @@ function doChange(section) {
     $("select[id$='-parameter']:not(#" + section + "-parameter").val('');
 
     // Clear currently selected fields.
-    if (typeof selectedSection !== 'undefined' && section != selectedSection)
+    if (typeof selectedSection !== 'undefined' && section != selectedSection) {
         $('select#' + selectedSection + '-parameter, select#' + selectedSection + '-value').val('');
+    }
 
-    if (paramVal == '')
+    if (paramVal == '') {
         $('select#' + section + '-value').html('<option value="">*</option>\n');
-    else {
+    } else {
         $.post(filterURLs[section][1], { parameter: paramVal }, function(data) {
 
             var newOptions = '<option value="">*</option>\n';
@@ -87,4 +90,3 @@ function doChange(section) {
         });
     }
 }
-
