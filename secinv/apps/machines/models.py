@@ -269,7 +269,6 @@ class Interface(models.Model):
         Create a dictionary of the differences between the current and
         previous interface of the same interface name.
         """
-        i_diff = {}
 
         try:
             i_latest = Interface.objects.filter(machine__id=self.machine_id,
@@ -314,8 +313,6 @@ class System(models.Model):
         Create a dictionary of the differences between the current and
         previous entry of the system info.
         """
-        i_diff = {}
-
         try:
             s_latest = System.objects.filter(
                 machine__id=self.machine_id).latest()
@@ -494,7 +491,7 @@ class RPMs(models.Model):
 
         try:
             r_latest = RPMs.objects.get(machine__id=self.machine_id)
-            r_v = get_version_diff(s_latest, '\n')
+            r_v = get_version_diff(r_latest, '\n')
             if r_v:
                 r_diff = r_v[0]
         except RPMs.DoesNotExist:

@@ -1,11 +1,8 @@
-import re
-
 from django.core.urlresolvers import reverse
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import (login_required,
-                                            permission_required)
-from django.http import (HttpResponse, HttpResponseRedirect,
-                         HttpResponseNotFound, Http404)
+from django.contrib.auth.decorators import login_required, permission_required
+from django.db import connection
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.html import escape
@@ -26,18 +23,26 @@ from .forms import MachineSearchForm
 from .utils import (diff_list, diff_dict, get_version_diff,
                     get_version_diff_field, get_params)
 
-
 LIMIT_PER_PAGE = 5
 
 DIFF_SECTION_SLUGS = ['iptables', 'apacheconfig', 'phpconfig', 'mysqlconfig',
                      'sshconfig']
 CONFIG_SECTIONS = ['apacheconfig', 'phpconfig', 'mysqlconfig', 'sshconfig']
-DATATABLES_SECTIONS = ['machines']
-DATATABLES_COLUMNS = {'machines': ['id', 'sys_ip', 'hostname', 'ext_ip']}
-DATATABLES_FIELDS = {'machines': ['id', 'sys_ip', 'hostname', 'ext_ip',
-                                  'httpd', 'mysqld', 'openvpn', 'nfs',
-                                  'date_added', 'date_scanned']}
-DATATABLES_TABLES = {'machines': 'machines_machine'}
+ALL_CONFIGS = {
+    'apacheconfig': ApacheConfig,
+    'phpconfig': PHPConfig,
+    'mysqlconfig': MySQLConfig,
+    'sshconfig': SSHConfig,
+}
+
+DATATABLES = {
+    'machines': {
+        'table': 'machines_machine',
+        'columns': ['id', 'sys_ip', 'hostname', 'ext_ip'],
+        'fields': ['id', 'sys_ip', 'hostname', 'ext_ip', 'httpd', 'mysqld',
+                   'openvpn', 'nfs', 'date_added', 'date_scanned']
+    }
+}
 
 
 def compare_second(a, b):
@@ -65,21 +70,17 @@ def get_all_machines(order_by='id'):
 # TODO: Apache Parser -- Force directives to be uppercased.
 def get_all_directives(keys=False):
     """Returns directives from ApacheConfig files."""
-    a_all = ApacheConfig.objects.filter(active=True).values_list('directives')
-    return get_params(a_all, keys)
+    c_all = ApacheConfig.objects.filter(active=True).values_list('directives')
+    return get_params(c_all, keys)
 
 
 def get_all_items(section_slug, keys=False):
     """Returns items from PHP, MySQL, or SSH config files."""
     if section_slug not in CONFIG_SECTIONS:
         raise ValueError
-    if section_slug == 'phpconfig':
-        a_all = PHPConfig.objects.filter(active=True).values_list('items')
-    elif section_slug == 'mysqlconfig':
-        a_all = MySQLConfig.objects.filter(active=True).values_list('items')
-    elif section_slug == 'sshconfig':
-        a_all = SSHConfig.objects.filter(active=True).values_list('items')
-    return get_params(a_all, keys)
+    c_all = (ALL_CONFIGS[section_slug].objects.filter(active=True)
+                                      .values_list('items'))
+    return get_params(c_all, keys)
 
 
 @login_required
@@ -414,19 +415,12 @@ def diff(request, machine_slug, section_slug, version_number,
     body_current = ''
     body_previous = ''
 
-    if section_slug == 'iptables':
-        past_history = IPTables.objects.filter(machine__id=m.id).order_by(
-            '-date_added').all()
-    elif section_slug == 'apacheconfig':
+    if section_slug == 'apacheconfig':
         past_history = ApacheConfig.objects.filter(machine__id=m.id,
             id=item_id, active=True).order_by('-date_added').all()
-    elif section_slug == 'phpconfig':
-        past_history = PHPConfig.objects.filter(machine__id=m.id,
-            active=True).order_by('-date_added').all()
-    elif section_slug == 'mysqlconfig':
-        past_history = MySQLConfig.objects.filter(machine__id=m.id,
-            active=True).order_by('-date_added').all()
-
+    else:
+        past_history = ALL_CONFIGS[section_slug].objects.filter(
+            machine__id=m.id, active=True).order_by('-date_added').all()
 
     if past_history.exists():
         if compare_with == 'current':
@@ -557,64 +551,51 @@ def conf_filter_results(request, section_slug):
     conf_parameter = request.GET.get('conf_parameter', '')
     conf_value = request.GET.get('conf_value', '')
 
-    a_all = []
+    c_all = []
     results = []
 
-    # Field name for dictionary of parameters/values.
+    # Model field name that contains the dictionary of parameters/values.
     params_field = 'items'
 
-    REGEX = None
-    ICONTAINS = None
+    param_regex = None
+    param_like = None
     if conf_parameter and conf_value:
-        REGEX = r'"%s".+\[\w*"%s"\w*\]' % (conf_parameter, conf_value)
+        param_regex = r'"%s".+\[\w*"%s"\w*\]' % (conf_parameter, conf_value)
     elif not conf_value:
-        ICONTAINS = '"%s"' % conf_parameter
+        param_like = '"%s"' % conf_parameter
+
+    qs = ALL_CONFIGS[section_slug].objects
 
     if section_slug == 'apacheconfig':
-        if REGEX:
-            a_all = ApacheConfig.objects.filter(active=True,
-                directives__regex=REGEX).all()
+        if param_regex:
+            c_all = qs.filter(active=True, directives__regex=param_regex)
         else:
-            a_all = ApacheConfig.objects.filter(active=True,
-                directives__icontains=ICONTAINS).all()
+            c_all = qs.filter(active=True, directives__icontains=param_like)
         params_field = 'directives'
-    elif section_slug == 'phpconfig':
-        if REGEX:
-            a_all = PHPConfig.objects.filter(active=True,
-                items__regex=REGEX).all()
+    else:
+        if param_regex:
+            c_all = qs.filter(active=True, items__regex=param_regex)
         else:
-            a_all = PHPConfig.objects.filter(active=True,
-                items__icontains=ICONTAINS).all()
-    elif section_slug == 'mysqlconfig':
-        if REGEX:
-            a_all = MySQLConfig.objects.filter(active=True,
-                items__regex=REGEX).all()
-        else:
-            a_all = MySQLConfig.objects.filter(active=True,
-                items__icontains=ICONTAINS).all()
-    elif section_slug == 'sshconfig':
-        if REGEX:
-            a_all = SSHConfig.objects.filter(active=True,
-                items__regex=REGEX).all()
-        else:
-            a_all = SSHConfig.objects.filter(active=True,
-                items__icontains=ICONTAINS).all()
+            c_all = qs.filter(active=True, items__icontains=param_like)
 
-    for a in a_all:
-        p = a.__getattribute__(params_field)
-        if not p:
+    # TODO: Pagination!
+    c_all = c_all.all()[:30]
+
+    for c in c_all:
+        p = c.__getattribute__(params_field)
+        if not p or p not in conf_parameter:
             continue
         if conf_parameter:
             if conf_value:
-                results.append((conf_parameter, conf_value, a))
+                results.append((conf_parameter, conf_value, c))
             else:
                 for v in p[conf_parameter]:
-                    results.append((conf_parameter, v, a))
+                    results.append((conf_parameter, v, c))
         else:
             for param, values in p.iteritems():
                 for v in values:
                     if conf_value == v:
-                        results.append((param, v, a))
+                        results.append((param, v, c))
 
     results = sorted(results)
 
@@ -653,12 +634,13 @@ def add_multiple_machines(request):
 @login_required
 @json_view
 def datatables(request, section_slug):
-    if section_slug not in DATATABLES_SECTIONS:
+    if section_slug not in DATATABLES:
         raise Http404
 
-    s_columns = DATATABLES_COLUMNS[section_slug]
-    s_fields = DATATABLES_FIELDS[section_slug]
-    s_table = DATATABLES_TABLES[section_slug]
+    dt = DATATABLES[section_slug]
+    s_columns = dt['columns']
+    s_fields = dt['fields']
+    s_table = dt['table']
 
     try:
         s_index = s_columns[s_columns.index('id')]
@@ -668,10 +650,10 @@ def datatables(request, section_slug):
     result = ''
 
     # Paging.
-    i_display_length = int(escape(request.GET.get('iDisplayLength', '0')))
+    i_display_length = int(request.GET.get('iDisplayLength', '0'))
     s_limit = ''
     if i_display_length and i_display_length != -1:
-        i_display_start = int(escape(request.GET.get('iDisplayStart', '0')))
+        i_display_start = int(request.GET.get('iDisplayStart', '0'))
         s_limit = "LIMIT %s, %s" % (i_display_start, i_display_length)
 
     # Ordering.
@@ -680,7 +662,7 @@ def datatables(request, section_slug):
     s_order_by = []
     if i_sort_col_0:
         s_orders = []
-        for i in xrange(int(escape(request.GET.get('iSortingCols', '')))):
+        for i in xrange(int(request.GET.get('iSortingCols', ''))):
             i_sort_col_i = escape(request.GET.get('iSortCol_%s' % i, ''))
             if request.GET.get('bSortable_%s' % i_sort_col_i) == 'true':
                 s_orders.append(' '.join([s_fields[int(i_sort_col_i)],
@@ -711,7 +693,6 @@ def datatables(request, section_slug):
                 s_where = 'WHERE '
             s_where += "%s LIKE '%%%s%%'" % (value, escape(i_index))
 
-    from django.db import connection
     cursor = connection.cursor()
 
     r = Machine.objects.raw("SELECT SQL_CALC_FOUND_ROWS %s FROM %s %s %s" % (
@@ -736,9 +717,11 @@ def datatables(request, section_slug):
         if s_order == 'desc':
             aa_data.reverse()
 
-    result = {'sEcho': int(escape(request.GET.get('sEcho', '0'))),
-              'iTotalRecords': i_total,
-              'iTotalDisplayRecords': i_filtered_total,
-              'aaData': aa_data}
+    result = {
+        'sEcho': int(request.GET.get('sEcho', '0')),
+        'iTotalRecords': i_total,
+        'iTotalDisplayRecords': i_filtered_total,
+        'aaData': aa_data
+    }
 
     return result
