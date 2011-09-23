@@ -313,6 +313,8 @@ class System(models.Model):
         Create a dictionary of the differences between the current and
         previous entry of the system info.
         """
+	s_diff = {}
+
         try:
             s_latest = System.objects.filter(
                 machine__id=self.machine_id).latest()
@@ -324,7 +326,6 @@ class System(models.Model):
                       'diff': {'kernel_rel': ''},
                       'timestamp': '',
                       'version': ''}
-
 
         return s_diff
 
