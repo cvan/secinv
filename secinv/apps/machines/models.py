@@ -313,7 +313,7 @@ class System(models.Model):
         Create a dictionary of the differences between the current and
         previous entry of the system info.
         """
-	s_diff = {}
+        s_diff = {}
 
         try:
             s_latest = System.objects.filter(
